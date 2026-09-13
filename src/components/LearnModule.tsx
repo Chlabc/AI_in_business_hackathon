@@ -44,10 +44,13 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
     setCardIndex((i) => (i - 1 + cards.length) % cards.length);
   }
 
-  function submitAnswer() {
-    if (!question || !selected) return;
-    const nextAnswers = { ...answers, [question.id]: selected };
-    setAnswers(nextAnswers);
+  function checkAnswer() {
+    if (!question || !selected || answers[question.id]) return;
+    setAnswers((prev) => ({ ...prev, [question.id]: selected }));
+  }
+
+  function goNextQuestion() {
+    if (!question || !answers[question.id]) return;
     if (qIndex >= questions.length - 1) {
       setPhase("done");
       return;
@@ -172,6 +175,11 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
 
   if (phase === "quiz" && question) {
     const locked = Boolean(answers[question.id]);
+    const picked = answers[question.id] ?? selected;
+    const isCorrect = locked && answers[question.id] === question.correctId;
+    const correctLabel =
+      question.options.find((o) => o.id === question.correctId)?.label ?? "";
+
     return (
       <div className="flex flex-col gap-6">
         <div>
@@ -184,34 +192,90 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
 
         <ul className="grid gap-2">
           {question.options.map((opt) => {
-            const isSel = selected === opt.id;
+            const isSel = picked === opt.id;
+            const isRight = opt.id === question.correctId;
+            let tone =
+              "border-border bg-card text-muted hover:border-accent hover:text-foreground";
+            if (locked) {
+              if (isRight) {
+                tone = "border-ok/50 bg-ok-soft text-foreground";
+              } else if (isSel) {
+                tone = "border-danger/50 bg-danger-soft text-foreground";
+              } else {
+                tone = "border-border bg-card text-muted opacity-60";
+              }
+            } else if (isSel) {
+              tone = "border-accent bg-accent-soft text-foreground";
+            }
             return (
               <li key={opt.id}>
                 <button
                   type="button"
                   disabled={locked}
                   onClick={() => setSelected(opt.id)}
-                  className={`w-full rounded-lg border px-4 py-3 text-left text-sm transition ${
-                    isSel
-                      ? "border-accent bg-accent-soft text-foreground"
-                      : "border-border bg-card text-muted hover:border-accent hover:text-foreground"
-                  }`}
+                  className={`w-full rounded-lg border px-4 py-3 text-left text-sm transition ${tone}`}
                 >
                   {opt.label}
+                  {locked && isRight ? (
+                    <span className="ml-2 text-xs font-semibold text-ok">
+                      Correct
+                    </span>
+                  ) : null}
+                  {locked && isSel && !isRight ? (
+                    <span className="ml-2 text-xs font-semibold text-danger">
+                      Your answer
+                    </span>
+                  ) : null}
                 </button>
               </li>
             );
           })}
         </ul>
 
-        <button
-          type="button"
-          disabled={!selected}
-          onClick={submitAnswer}
-          className="w-fit rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-fg disabled:opacity-40"
-        >
-          {qIndex >= questions.length - 1 ? "Finish" : "Next question"}
-        </button>
+        {locked ? (
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm ${
+              isCorrect
+                ? "border-ok/40 bg-ok-soft text-foreground"
+                : "border-danger/40 bg-danger-soft text-foreground"
+            }`}
+            role="status"
+          >
+            <p className="font-semibold">
+              {isCorrect ? "Correct" : "Not quite"}
+            </p>
+            {!isCorrect ? (
+              <p className="mt-1 text-muted">
+                Correct answer:{" "}
+                <span className="font-medium text-foreground">
+                  {correctLabel}
+                </span>
+              </p>
+            ) : null}
+            <p className="mt-2 leading-relaxed text-muted">{question.explain}</p>
+          </div>
+        ) : null}
+
+        {!locked ? (
+          <button
+            type="button"
+            disabled={!selected}
+            onClick={checkAnswer}
+            className="w-fit rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-fg disabled:opacity-40"
+          >
+            Check answer
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={goNextQuestion}
+            className="w-fit rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-fg"
+          >
+            {qIndex >= questions.length - 1
+              ? "See results"
+              : "Next question"}
+          </button>
+        )}
       </div>
     );
   }
@@ -232,19 +296,44 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
         </p>
       </div>
 
-      {missed.length > 0 ? (
-        <section className="surface-card rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-foreground">Missed</h3>
-          <ul className="mt-3 space-y-3">
-            {missed.map((q) => (
-              <li key={q.id} className="text-sm text-muted">
+      <section className="surface-card rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-foreground">Summary</h3>
+        <ul className="mt-3 space-y-3">
+          {questions.map((q) => {
+            const gotIt = answers[q.id] === q.correctId;
+            const pickedLabel =
+              q.options.find((o) => o.id === answers[q.id])?.label ?? "—";
+            const correctLabel =
+              q.options.find((o) => o.id === q.correctId)?.label ?? "—";
+            return (
+              <li key={q.id} className="border-t border-border pt-3 text-sm first:border-t-0 first:pt-0">
                 <p className="font-medium text-foreground">{q.prompt}</p>
-                <p className="mt-1">{q.explain}</p>
+                <p className="mt-1">
+                  <span
+                    className={
+                      gotIt
+                        ? "font-semibold text-ok"
+                        : "font-semibold text-danger"
+                    }
+                  >
+                    {gotIt ? "Correct" : "Missed"}
+                  </span>
+                  {!gotIt ? (
+                    <span className="text-muted">
+                      {" "}
+                      · you chose {pickedLabel} · answer was {correctLabel}
+                    </span>
+                  ) : null}
+                </p>
+                <p className="mt-1 text-muted">{q.explain}</p>
               </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+            );
+          })}
+        </ul>
+        {missed.length === 0 ? (
+          <p className="mt-3 text-sm text-ok">All five correct — nice work.</p>
+        ) : null}
+      </section>
 
       <div className="flex flex-wrap gap-3">
         <Link
