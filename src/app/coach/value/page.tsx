@@ -486,14 +486,10 @@ function PriceHold({
 
   return (
     <section className="surface-card rounded-xl p-5 sm:p-6">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+      <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
         Did they stop discounting?
-        <InfoTip text="How often a drill ended at or near list price ,  the first half of attempts against the second half." />
+        <InfoTip text="How often a drill ended at or near list price — the first half of attempts against the second half." />
       </h2>
-      <p className="mt-1 text-sm leading-relaxed text-muted">
-        How often a drill ended at or near list price — their first half of
-        attempts against their second half.
-      </p>
 
       {unchanged && earlyPct === 100 ? (
         <div className="mt-4 rounded-lg border border-border bg-background p-4">
