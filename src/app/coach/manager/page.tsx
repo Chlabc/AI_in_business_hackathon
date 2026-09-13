@@ -15,40 +15,63 @@ export const dynamic = "force-dynamic";
 export default async function ManagerPage() {
   const session = await getSession();
   const rep = getRep(DEMO_REP_ID);
-  const share = await getShareSettings(DEMO_REP_ID);
-  const attempts = await listAttempts(DEMO_REP_ID);
-  const practice = practiceKpisFromAttempts(attempts);
-  const liveAe = TEAM.find((t) => t.id === DEMO_REP_ID)!;
-  const liveAeWithSessions = {
-    ...liveAe,
-    sessionsCompleted: Math.max(liveAe.sessionsCompleted, practice.attempts),
-  };
-  const teamForPdf = TEAM.map((e) =>
-    e.id === DEMO_REP_ID ? liveAeWithSessions : e,
+
+  const teamRows = await Promise.all(
+    TEAM.map(async (member) => {
+      const [share, attempts] = await Promise.all([
+        getShareSettings(member.id),
+        listAttempts(member.id),
+      ]);
+      const practice = practiceKpisFromAttempts(attempts);
+      return {
+        member: {
+          ...member,
+          // Live drills win over static demo session counts / skill labels.
+          sessionsCompleted: Math.max(
+            member.sessionsCompleted,
+            practice.attempts,
+          ),
+          weakestSkill:
+            practice.weakestCriterionLabel ?? member.weakestSkill,
+          // Show drill hold rate in the conversion column when we have attempts.
+          conversionRate:
+            practice.feeHoldRate !== null
+              ? practice.feeHoldRate
+              : member.conversionRate,
+        },
+        share,
+        practice,
+        fromDrills: practice.attempts > 0,
+      };
+    }),
   );
+
+  const alexRow = teamRows.find((r) => r.member.id === DEMO_REP_ID)!;
+  const teamForPdf = teamRows.map((r) => r.member);
 
   return (
     <AppShell>
       <PageHeader
         eyebrow="Team"
         title="Team overview"
-        description="Development tool, not surveillance. Alex's practice summary only appears when they choose to share it."
+        description="Development tool, not surveillance. Each agent's practice summary only appears when they choose to share it."
         action={
           <ManagerReportPdfButton
             managerName={session?.name ?? "Manager"}
             firmLabel={`${FIRM.name} · ${FIRM.vertical}`}
             teamAverageConversion={TEAM_AVERAGE_CONVERSION}
             team={teamForPdf}
-            focusRepName={rep?.name ?? liveAe.name}
+            focusRepName={rep?.name ?? alexRow.member.name}
             share={{
-              shareProgressWithManager: share.shareProgressWithManager,
-              updatedAt: share.updatedAt,
+              shareProgressWithManager:
+                alexRow.share.shareProgressWithManager,
+              updatedAt: alexRow.share.updatedAt,
             }}
             practice={{
-              attempts: practice.attempts,
-              lastScore: practice.lastScore,
-              feeHoldRate: practice.feeHoldRate,
-              trendLabel: practice.trendLabel,
+              attempts: alexRow.practice.attempts,
+              lastScore: alexRow.practice.lastScore,
+              feeHoldRate: alexRow.practice.feeHoldRate,
+              trendLabel: alexRow.practice.trendLabel,
             }}
           />
         }
@@ -60,7 +83,9 @@ export default async function ManagerPage() {
             <thead className="border-b border-border bg-background text-xs uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-3 font-medium">Employee</th>
-                <th className="px-5 py-3 font-medium">Listing conversion</th>
+                <th className="px-5 py-3 font-medium">
+                  Hold rate (drills)
+                </th>
                 <th className="px-5 py-3 font-medium">Weakest skill</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Sessions</th>
@@ -68,105 +93,139 @@ export default async function ManagerPage() {
               </tr>
             </thead>
             <tbody>
-              {TEAM.map((e) => {
-                const row = e.id === DEMO_REP_ID ? liveAeWithSessions : e;
-                return (
-                  <tr key={e.id} className="border-t border-border">
-                    <td className="px-5 py-3 font-medium text-foreground">
-                      {row.name}
-                      <div className="text-xs text-muted">{row.role}</div>
-                    </td>
-                    <td className="px-5 py-3">
-                      {row.conversionRate}%
-                      <span className="ml-1 text-xs text-muted">
-                        (team {TEAM_AVERAGE_CONVERSION}%)
+              {teamRows.map(({ member: row, fromDrills }) => (
+                <tr key={row.id} className="border-t border-border">
+                  <td className="px-5 py-3 font-medium text-foreground">
+                    {row.name}
+                    <div className="text-xs text-muted">{row.role}</div>
+                  </td>
+                  <td className="px-5 py-3">
+                    {row.conversionRate}%
+                    <span className="ml-1 text-xs text-muted">
+                      {fromDrills
+                        ? "of drills held fee"
+                        : "demo placeholder"}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-muted">{row.weakestSkill}</td>
+                  <td className="px-5 py-3">
+                    {row.flagged ? (
+                      <span className="rounded border border-danger/30 bg-danger-soft px-2 py-0.5 text-xs text-danger">
+                        Flagged for training
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-muted">{row.weakestSkill}</td>
-                    <td className="px-5 py-3">
-                      {row.flagged ? (
-                        <span className="rounded border border-danger/30 bg-danger-soft px-2 py-0.5 text-xs text-danger">
-                          Flagged for training
-                        </span>
-                      ) : (
-                        <span className="rounded border border-ok/30 bg-ok-soft px-2 py-0.5 text-xs text-ok">
-                          On track
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3">{row.sessionsCompleted}</td>
-                    <td className="px-5 py-3">
-                      <LeaveNoteButton repId={row.id} repName={row.name} />
-                    </td>
-                  </tr>
-                );
-              })}
+                    ) : (
+                      <span className="rounded border border-ok/30 bg-ok-soft px-2 py-0.5 text-xs text-ok">
+                        On track
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3">{row.sessionsCompleted}</td>
+                  <td className="px-5 py-3">
+                    <LeaveNoteButton repId={row.id} repName={row.name} />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </section>
 
       <PracticeLogsSection
-        repId={DEMO_REP_ID}
-        repName={rep?.name ?? liveAe.name}
+        agents={TEAM.map((t) => ({ id: t.id, name: t.name }))}
+        initialRepId={DEMO_REP_ID}
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="surface-card rounded-xl p-6">
           <ConversionChart
-            data={liveAe.kpiHistory}
-            label={`${liveAe.name} — listing conversion`}
+            data={alexRow.practice.trend.map((p) => ({
+              label: p.label,
+              value: p.score,
+            }))}
+            label={`${alexRow.member.name} — drill score trend`}
+            seriesName="Drill score"
+            yDomain={[0, 100]}
           />
           <p className="mt-2 text-xs text-muted">
-            Illustrative measurement alongside training — not proof that
-            training alone caused the change.
+            Live from scored practice attempts (oldest → newest). Not CRM
+            listing conversion.
           </p>
         </section>
 
         <section className="surface-card rounded-xl p-6">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-            {rep?.name ?? "Alex"} — shared practice summary
+            Shared practice summaries
           </h2>
-          {!share.shareProgressWithManager ? (
-            <div className="mt-4 rounded-lg border border-accent/30 bg-accent-soft p-5">
-              <p className="font-medium text-foreground">Access blocked</p>
-              <p className="mt-2 text-sm text-muted">
-                Rep has not shared progress. Practice stays private until they
-                toggle sharing on their coach page.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-4 space-y-4">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <p className="text-xs text-muted">Attempts</p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {practice.attempts}
-                  </p>
+          <p className="mt-1 text-sm text-muted">
+            One card per agent. KPI numbers only appear when that agent has
+            shared progress.
+          </p>
+          <div className="mt-4 space-y-4">
+            {teamRows.map(({ member, share, practice }) => (
+              <div
+                key={member.id}
+                className="rounded-lg border border-border bg-background p-4"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {member.name}
+                  </h3>
+                  <span className="text-xs text-muted">{member.role}</span>
                 </div>
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <p className="text-xs text-muted">Last score</p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {practice.lastScore ?? "—"}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-border bg-background p-3">
-                  <p className="text-xs text-muted">Price hold</p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {practice.feeHoldRate === null
-                      ? "—"
-                      : `${practice.feeHoldRate}%`}
-                  </p>
-                </div>
+                {!share.shareProgressWithManager ? (
+                  <div className="mt-3 rounded-md border border-accent/30 bg-accent-soft px-3 py-2">
+                    <p className="text-sm font-medium text-foreground">
+                      Access blocked
+                    </p>
+                    <p className="mt-1 text-xs text-muted">
+                      {member.name.split(/\s+/)[0]} has not shared progress.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-3 space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="rounded-md border border-border bg-card p-2.5">
+                        <p className="text-[11px] text-muted">Attempts</p>
+                        <p className="mt-0.5 text-xl font-semibold">
+                          {practice.attempts}
+                        </p>
+                      </div>
+                      <div className="rounded-md border border-border bg-card p-2.5">
+                        <p className="text-[11px] text-muted">Last score</p>
+                        <p className="mt-0.5 text-xl font-semibold">
+                          {practice.lastScore ?? "—"}
+                        </p>
+                      </div>
+                      <div className="rounded-md border border-border bg-card p-2.5">
+                        <p className="text-[11px] text-muted">Price hold</p>
+                        <p className="mt-0.5 text-xl font-semibold">
+                          {practice.feeHoldRate === null
+                            ? "—"
+                            : `${practice.feeHoldRate}%`}
+                        </p>
+                      </div>
+                    </div>
+                    {practice.weakestCriterionLabel ? (
+                      <p className="text-xs text-muted">
+                        Weakest in drills:{" "}
+                        <span className="font-medium text-foreground">
+                          {practice.weakestCriterionLabel}
+                        </span>
+                        {practice.avgScore !== null
+                          ? ` · avg ${practice.avgScore}/100`
+                          : null}
+                      </p>
+                    ) : null}
+                    <p className="text-xs text-muted">{practice.trendLabel}</p>
+                    <p className="text-[11px] text-muted">
+                      Shared{" "}
+                      {new Date(share.updatedAt).toLocaleString()}
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-muted">{practice.trendLabel}</p>
-              <p className="text-xs text-muted">
-                KPI summary only — open Practice logs above for transcripts and
-                calibration. Shared{" "}
-                {new Date(share.updatedAt).toLocaleString()}.
-              </p>
-            </div>
-          )}
+            ))}
+          </div>
         </section>
       </div>
     </AppShell>
