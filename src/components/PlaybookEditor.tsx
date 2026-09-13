@@ -449,8 +449,9 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="eyebrow">Import</p>
-            <h2 className="mt-1 text-lg font-semibold text-foreground">
+            <h2 className="mt-1 flex items-center gap-2 text-lg font-semibold text-foreground">
               Company document → knowledge draft
+              <InfoTip text="Download the sample PDF (or upload your own text-layer PDF), then Parse with AI or without AI. That builds a locked draft — review proposals, then Publish so Learn, cue cards, scoring, and the next voice drill pick it up. Employees never edit this. Clear knowledge base first if you want to reparse from a blank slate." />
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-2">
