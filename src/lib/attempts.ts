@@ -331,6 +331,15 @@ export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+export type PracticeTrendPoint = {
+  /** Short axis label (e.g. drill # or date). */
+  label: string;
+  /** Overall score 0–100 for this drill. */
+  score: number;
+  /** 100 if fee held, 0 if softened — for hold-rate style charts. */
+  holdPct: number;
+};
+
 export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
   if (attempts.length === 0) {
     return {
@@ -338,8 +347,13 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
       lastScore: null as number | null,
       avgScore: null as number | null,
       feeHoldRate: null as number | null,
+      /** % of drills where the agent softened / didn't hold fee. */
+      concessionRate: null as number | null,
+      /** % of drills scoring >= 70 (usable "success" proxy — not CRM win rate). */
+      strongDrillRate: null as number | null,
       weakestCriterionLabel: null as string | null,
       trendLabel: "No practice attempts yet — start a drill to track KPIs",
+      trend: [] as PracticeTrendPoint[],
     };
   }
   const lastScore = attempts[0]!.score.overall;
@@ -348,6 +362,10 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
   );
   const holds = attempts.filter((a) => a.score.heldFee).length;
   const feeHoldRate = Math.round((holds / attempts.length) * 1000) / 10;
+  const concessionRate =
+    Math.round(((attempts.length - holds) / attempts.length) * 1000) / 10;
+  const strong = attempts.filter((a) => a.score.overall >= 70).length;
+  const strongDrillRate = Math.round((strong / attempts.length) * 1000) / 10;
   const chronological = [...attempts].reverse();
   let trendLabel = "Keep drilling the fee objection.";
   if (chronological.length >= 2) {
@@ -384,12 +402,27 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
     }
   }
 
+  const trend: PracticeTrendPoint[] = chronological.map((a, i) => {
+    const d = new Date(a.createdAt);
+    const label = Number.isNaN(d.getTime())
+      ? `#${i + 1}`
+      : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    return {
+      label: chronological.length > 8 ? `#${i + 1}` : label,
+      score: a.score.overall,
+      holdPct: a.score.heldFee ? 100 : 0,
+    };
+  });
+
   return {
     attempts: attempts.length,
     lastScore,
     avgScore,
     feeHoldRate,
+    concessionRate,
+    strongDrillRate,
     weakestCriterionLabel,
     trendLabel,
+    trend,
   };
 }
