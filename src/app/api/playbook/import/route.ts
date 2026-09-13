@@ -129,7 +129,10 @@ export async function POST(request: Request) {
     const findings = [...heuristic.findings];
     if (extractNote) findings.unshift(extractNote);
 
-    let talkTrackPatches: Partial<PlaybookTalkTrack>[] = [];
+    // Rules parse can fill fee talk-track; LLM patches merge on top by id/type.
+    let talkTrackPatches: Partial<PlaybookTalkTrack>[] = [
+      ...(heuristic.talkTrackPatches ?? []),
+    ];
     let method: "heuristic" | "llm" | "llm+heuristic" = "heuristic";
     let source: "heuristic" | "llm" = "heuristic";
 
@@ -142,12 +145,22 @@ export async function POST(request: Request) {
       if (llm) {
         const merged = mergeLlmWithHeuristic(current, heuristic.patch, llm);
         patch = merged.patch;
-        talkTrackPatches = merged.talkTrackPatches;
+        // Prefer LLM talk-track patch when present for the same track id.
+        const byId = new Map<string, Partial<PlaybookTalkTrack>>();
+        for (const t of talkTrackPatches) {
+          if (t.id) byId.set(t.id, t);
+        }
+        for (const t of merged.talkTrackPatches) {
+          if (t.id) byId.set(t.id, { ...byId.get(t.id), ...t });
+        }
+        talkTrackPatches = [...byId.values()];
         findings.push(...merged.findings);
         method = merged.method;
         source = "llm";
       } else {
-        findings.push("AI parse unavailable — used rules only");
+        findings.push(
+          "AI parse unavailable — used rules only (including fee talk-track if found in the doc)",
+        );
       }
     }
 

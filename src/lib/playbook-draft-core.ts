@@ -130,13 +130,19 @@ export function buildProposals(
       objectionType: before.objectionType,
     };
     if (valuesEqual(before, after)) continue;
+    // After Clear knowledge base, live talk-tracks are empty — auto-accept so
+    // Publish actually fills cue cards without a hidden extra checkbox step.
+    const liveEmpty =
+      !before.approvedPlay.trim() &&
+      before.anchorPoints.length === 0 &&
+      before.neverDo.length === 0;
     proposals.push({
       id: newId(),
       field: `talkTrack:${id}`,
       label: `Talk-track · ${before.title}`,
       before,
       after,
-      accepted: false,
+      accepted: liveEmpty ? true : false,
       source,
     });
   }

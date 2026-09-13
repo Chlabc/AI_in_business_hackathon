@@ -514,8 +514,9 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
             Accept changes before publish
           </h2>
           <p className="mt-2 text-sm text-muted">
-            Unchecked items stay on the live playbook. Firm facts default on;
-            talk-track edits default off.
+            Unchecked items stay on the live playbook. Firm facts default on.
+            Talk-track edits default on when that track is empty (e.g. after
+            Clear), otherwise off so you review coaching copy before Publish.
           </p>
           <ul className="mt-4 space-y-3">
             {proposals.map((p) => (
