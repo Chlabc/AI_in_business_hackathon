@@ -400,15 +400,15 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <span
           className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${
             statusTone === "green"
-              ? "border-ok/30 bg-ok/10 text-ok"
+              ? "border-ok/40 bg-ok-soft text-ok"
               : statusTone === "red"
-                ? "border-danger/30 bg-danger/10 text-danger"
-                : "border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-200"
+                ? "border-danger/40 bg-danger-soft text-danger"
+                : "border-amber-700/50 bg-amber-500 text-amber-950"
           }`}
         >
           <span
             aria-hidden
-            className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusDotClass} ${processing ? "animate-pulse" : ""}`}
+            className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusDotClass} ${processing ? "animate-pulse" : ""} ${statusTone === "orange" ? "bg-amber-950" : ""}`}
           />
           {statusLabel}
         </span>
