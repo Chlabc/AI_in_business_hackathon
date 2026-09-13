@@ -1,0 +1,28 @@
+[
+  {
+    "id": "std_1789313122662",
+    "firmId": "northline",
+    "scenarioId": "not-interested",
+    "criterionId": "agreed_next_step",
+    "targetScore": 1,
+    "reason": "When a seller is not ready, permission to follow up later is an acceptable outcome.",
+    "setByEmail": "jordan@northline.demo",
+    "setByName": "Jordan Hale",
+    "sourceAttemptId": "demo_alex_calibrate_refusal",
+    "createdAt": "2026-09-13T15:25:22.662Z",
+    "active": true
+  },
+  {
+    "id": "std_1789317900196",
+    "firmId": "northline",
+    "scenarioId": "price-objection",
+    "criterionId": "explored_objection",
+    "targetScore": 1,
+    "reason": "Stress test: permission to follow up later is an acceptable outcome.",
+    "setByEmail": "jordan@northline.demo",
+    "setByName": "Jordan Hale",
+    "sourceAttemptId": "demo_alex_06",
+    "createdAt": "2026-09-13T16:45:00.197Z",
+    "active": true
+  }
+]
