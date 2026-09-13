@@ -12,8 +12,8 @@ type PracticeBriefingProps = {
 };
 
 /**
- * Approved play + prices + do/never — lives on Practice so reps see it
- * before picking a scenario. Same content that used to sit on Profile.
+ * Tips + prices + do/never — lives on Practice so reps see them before
+ * picking a scenario.
  */
 export function PracticeBriefing({
   firmName,
@@ -25,16 +25,17 @@ export function PracticeBriefing({
   return (
     <section className={colors.guidance}>
       <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-        What to practise
+        Tips
       </h2>
       <p className="mt-1 text-sm text-muted">
-        What {firmName} says to do here
+        Quick coaching tips from {firmName}
         {whyThis ? (
           <>
             {" "}
-            — <span className="text-foreground">{whyThis}</span>
+            for <span className="text-foreground">{whyThis}</span>
           </>
         ) : null}
+        .
       </p>
       <h3 className="display-serif mt-5 text-2xl text-accent sm:text-3xl">
         {talkTrack.title}

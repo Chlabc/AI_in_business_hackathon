@@ -103,7 +103,7 @@ export default async function PracticePage({ searchParams }: Props) {
             talkTrack={track}
             whyThis={
               diagnosis
-                ? `your profile flags ${label(diagnosis.primaryObjection)} in the ${label(diagnosis.primaryStage)} stage`
+                ? `${label(diagnosis.primaryObjection)} in the ${label(diagnosis.primaryStage)} stage`
                 : null
             }
           />
