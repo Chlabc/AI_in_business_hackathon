@@ -7,6 +7,7 @@ import {
   useState,
   type TextareaHTMLAttributes,
 } from "react";
+import { InfoTip } from "@/components/InfoTip";
 import type { FirmPlaybook, PlaybookTalkTrack } from "@/lib/playbook";
 import {
   draftStatus,
