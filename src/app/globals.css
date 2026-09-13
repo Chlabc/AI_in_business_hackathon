@@ -59,6 +59,49 @@ html.dark {
   --band-alt: #171d24;
 }
 
+/* Frame the supplied full-canvas artwork around its logo, preserving the source. */
+.brand-logo-light,
+.brand-logo-dark {
+  display: block;
+  position: relative;
+  width: 180px;
+  height: 37px;
+  overflow: hidden;
+}
+
+.brand-logo-light img,
+.brand-logo-dark img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+}
+
+/* Match the visible artwork width, accounting for each source's outer padding. */
+.brand-logo-light img {
+  width: 205px;
+  left: -13px;
+  top: -14.7px;
+}
+
+.brand-logo-dark {
+  display: none;
+  mix-blend-mode: lighten;
+}
+
+.brand-logo-dark img {
+  width: 258px;
+  left: -39px;
+  top: -52.5px;
+}
+
+html.dark .brand-logo-light {
+  display: none;
+}
+
+html.dark .brand-logo-dark {
+  display: block;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -420,7 +463,11 @@ body {
       rgb(255 255 255 / 9%) 42%,
       color-mix(in srgb, var(--fc-ivory) 18%, transparent) 72%
     ),
+<<<<<<< Updated upstream
     color-mix(in srgb, var(--fc-ivory) 92%, transparent);
+=======
+    var(--fc-ivory);
+>>>>>>> Stashed changes
   backdrop-filter: blur(22px) saturate(124%);
   -webkit-backdrop-filter: blur(22px) saturate(124%);
   box-shadow:
@@ -462,7 +509,46 @@ body {
   }
 }
 
+<<<<<<< Updated upstream
 /* Text and controls above the sheen. */
+=======
+/* Opaque, low-glare card surfaces for night study, including the answer side. */
+html.dark .flashcard {
+  --fc-ivory: #222c38;
+  --fc-ink: #e5edf5;
+  --fc-muted: #a5b4c4;
+  --fc-border: #3b4b5d;
+  --fc-bronze: #c5ad86;
+  --foreground: #e5edf5;
+  --muted: #a5b4c4;
+  --card: #222c38;
+  --border: #3b4b5d;
+  --accent: #91bce8;
+  --accent-fg: #122234;
+  --accent-soft: #2d4055;
+  --ok: #83caa2;
+  --ok-soft: #223b32;
+  box-shadow: 0 12px 28px -16px rgb(0 0 0 / 60%);
+}
+
+html.dark .flashcard-face {
+  background: var(--fc-ivory);
+  border-color: var(--fc-border);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
+}
+
+html.dark .flashcard-face.flashcard-back {
+  background: color-mix(in srgb, var(--ok-soft) 65%, var(--fc-ivory));
+  border-color: color-mix(in srgb, var(--ok) 26%, var(--fc-border));
+}
+
+html.dark .flashcard-face::after {
+  opacity: 0.05;
+}
+
+>>>>>>> Stashed changes
 .flashcard-face > * {
   position: relative;
   z-index: 1;

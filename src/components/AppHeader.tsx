@@ -38,6 +38,37 @@ const NAV_ICONS: Record<string, IconComponent> = {
   "/login": LockIcon,
 };
 
+<<<<<<< Updated upstream
+=======
+/** Theme-specific lockups; CSS follows the pre-paint theme without a flash. */
+function BrandLogo() {
+  return (
+    <>
+      <span className="brand-logo-light">
+        <Image
+          src="/cornerman-logo-light.png"
+          alt="Cornerman"
+          width={2172}
+          height={724}
+          sizes="205px"
+          priority
+        />
+      </span>
+      <span className="brand-logo-dark">
+        <Image
+          src="/cornerman-logo-dark.png"
+          alt="Cornerman"
+          width={1672}
+          height={941}
+          sizes="258px"
+          priority
+        />
+      </span>
+    </>
+  );
+}
+
+>>>>>>> Stashed changes
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return (
