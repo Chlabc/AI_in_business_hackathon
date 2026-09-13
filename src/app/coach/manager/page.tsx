@@ -54,7 +54,6 @@ export default async function ManagerPage() {
       <PageHeader
         eyebrow="Team"
         title="Team overview"
-        description="Development tool, not surveillance. Each agent's practice summary only appears when they choose to share it."
         action={
           <ManagerReportPdfButton
             managerName={session?.name ?? "Manager"}
@@ -138,17 +137,33 @@ export default async function ManagerPage() {
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="surface-card rounded-xl p-6">
           <ConversionChart
-            data={alexRow.practice.trend.map((p) => ({
-              label: p.label,
-              value: p.score,
+            data={(() => {
+              const maxLen = Math.max(
+                0,
+                ...teamRows.map((r) => r.practice.trend.length),
+              );
+              return Array.from({ length: maxLen }, (_, i) => {
+                const point: {
+                  label: string;
+                  [key: string]: string | number | undefined;
+                } = { label: `#${i + 1}` };
+                for (const row of teamRows) {
+                  const t = row.practice.trend[i];
+                  if (t) point[row.member.id] = t.score;
+                }
+                return point;
+              });
+            })()}
+            label="Team drill score trend"
+            series={teamRows.map((r) => ({
+              key: r.member.id,
+              name: r.member.name.split(/\s+/)[0] ?? r.member.name,
             }))}
-            label={`${alexRow.member.name} — drill score trend`}
-            seriesName="Drill score"
             yDomain={[0, 100]}
           />
           <p className="mt-2 text-xs text-muted">
-            Live from scored practice attempts (oldest → newest). Not CRM
-            listing conversion.
+            Each line is one agent&apos;s scored drills (oldest → newest). Gaps
+            mean that agent has fewer attempts so far.
           </p>
         </section>
 
@@ -156,10 +171,6 @@ export default async function ManagerPage() {
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
             Shared practice summaries
           </h2>
-          <p className="mt-1 text-sm text-muted">
-            One card per agent. KPI numbers only appear when that agent has
-            shared progress.
-          </p>
           <div className="mt-4 space-y-4">
             {teamRows.map(({ member, share, practice }) => (
               <div

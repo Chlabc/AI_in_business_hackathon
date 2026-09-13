@@ -2,6 +2,7 @@
 
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -12,24 +13,42 @@ import {
 
 type Point = {
   label: string;
-  /** Primary series (e.g. drill score 0–100). */
-  value: number;
+  /** Single-series charts use `value`; multi-series pass named keys. */
+  value?: number;
+  [key: string]: string | number | undefined;
 };
+
+const SERIES_COLORS = [
+  "var(--accent)",
+  "var(--ok)",
+  "var(--warn)",
+  "var(--danger)",
+  "#7c3aed",
+];
 
 export function ConversionChart({
   data,
   label,
   seriesName = "Score",
+  series,
   yDomain = [0, 100] as [number, number],
   unit = "",
 }: {
   data: Point[];
   label: string;
+  /** Label for the single `value` series (ignored when `series` is set). */
   seriesName?: string;
+  /** Multi-line mode: one entry per agent / metric. */
+  series?: { key: string; name: string }[];
   yDomain?: [number, number];
   unit?: string;
 }) {
-  if (data.length === 0) {
+  const multi = series && series.length > 0;
+  const hasData = multi
+    ? data.some((d) => series!.some((s) => typeof d[s.key] === "number"))
+    : data.length > 0;
+
+  if (!hasData) {
     return (
       <div className="h-56 w-full">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
@@ -43,7 +62,7 @@ export function ConversionChart({
   }
 
   return (
-    <div className="h-56 w-full">
+    <div className="h-64 w-full">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
         {label}
       </p>
@@ -64,15 +83,35 @@ export function ConversionChart({
               borderRadius: 8,
               color: "var(--foreground)",
             }}
-            formatter={(value) => [`${value}${unit}`, seriesName]}
+            formatter={(value, name) => [
+              `${value}${unit}`,
+              typeof name === "string" ? name : seriesName,
+            ]}
           />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="var(--accent)"
-            strokeWidth={2}
-            dot={{ r: 3, fill: "var(--accent)" }}
-          />
+          {multi ? <Legend wrapperStyle={{ fontSize: 12 }} /> : null}
+          {multi ? (
+            series!.map((s, i) => (
+              <Line
+                key={s.key}
+                type="monotone"
+                dataKey={s.key}
+                name={s.name}
+                stroke={SERIES_COLORS[i % SERIES_COLORS.length]}
+                strokeWidth={2}
+                dot={{ r: 3, fill: SERIES_COLORS[i % SERIES_COLORS.length] }}
+                connectNulls
+              />
+            ))
+          ) : (
+            <Line
+              type="monotone"
+              dataKey="value"
+              name={seriesName}
+              stroke="var(--accent)"
+              strokeWidth={2}
+              dot={{ r: 3, fill: "var(--accent)" }}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
