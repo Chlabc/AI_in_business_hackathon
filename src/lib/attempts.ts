@@ -305,10 +305,6 @@ async function ensureAlexDemoAttempts(
     (a) => a.repId === DEMO_REP_ID && a.id.startsWith("demo_alex_"),
   );
   const hasCalibrate = all.some((a) => a.id === "demo_alex_calibrate_refusal");
-  const hasPriya = all.some((a) => a.id.startsWith("demo_priya_"));
-  const hasMarcus = all.some((a) => a.id.startsWith("demo_marcus_"));
-
-  if (hasAlex && hasCalibrate && hasPriya && hasMarcus) return all;
 
   let next = [...all];
   const toMirror: PracticeAttempt[] = [];
@@ -328,38 +324,18 @@ async function ensureAlexDemoAttempts(
     }
   }
 
-  {
-    const seeded = buildPriyaDemoAttempts();
-    if (!hasPriya) {
-      next = next.filter((a) => a.repId !== "rep_demo_priya");
-      next.push(...seeded);
-      toMirror.push(...seeded);
-    } else {
-      const missing = seeded.filter((s) => !next.some((a) => a.id === s.id));
-      if (missing.length) {
-        next.push(...missing);
-        toMirror.push(...missing);
-      }
-    }
+  // Append any missing demo ids (expanding 01–03 → 01–06 must still plant 04–06).
+  for (const seeded of [buildPriyaDemoAttempts(), buildMarcusDemoAttempts()]) {
+    const missing = seeded.filter((s) => !next.some((a) => a.id === s.id));
+    if (!missing.length) continue;
+    next.push(...missing);
+    toMirror.push(...missing);
   }
 
-  {
-    const seeded = buildMarcusDemoAttempts();
-    if (!hasMarcus) {
-      next = next.filter((a) => a.repId !== "rep_demo_marcus");
-      next.push(...seeded);
-      toMirror.push(...seeded);
-    } else {
-      const missing = seeded.filter((s) => !next.some((a) => a.id === s.id));
-      if (missing.length) {
-        next.push(...missing);
-        toMirror.push(...missing);
-      }
-    }
-  }
+  if (!toMirror.length) return next;
 
   await writeAll(next);
-  if (toMirror.length) await mirrorDemoToSupabase(toMirror);
+  await mirrorDemoToSupabase(toMirror);
   return next;
 }
 
