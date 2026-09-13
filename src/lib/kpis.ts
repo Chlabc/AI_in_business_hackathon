@@ -90,7 +90,7 @@ export function computeKpis(calls: CallRecord[]): RepKpis {
       attempts: 0,
       lastScore: null,
       feeHoldRate: null,
-      trendLabel: "No practice attempts yet — start a drill to track KPIs",
+      trendLabel: "No practice attempts yet, start a drill to track KPIs",
     },
   };
 }

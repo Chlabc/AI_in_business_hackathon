@@ -27,7 +27,7 @@ export type MergedLlmImport = {
   method: "llm" | "llm+heuristic";
 };
 
-/** Commission % — keep up to 3 decimal places, range (0, 100]. */
+/** Commission % - keep up to 3 decimal places, range (0, 100]. */
 function clampMoney(n: unknown): number | null {
   if (typeof n !== "number" || !Number.isFinite(n)) return null;
   const v = Math.round(n * 1000) / 1000;
@@ -69,7 +69,7 @@ export function mergeLlmWithHeuristic(
       typeof heuristicPatch[field] === "number" ? heuristicPatch[field] : null;
     if (llmVal !== null && heurVal !== null && Math.abs(llmVal - heurVal) > 0.5) {
       findings.push(
-        `AI disagreed on ${field} (${llmVal}% vs rules ${heurVal}%) — kept rules parse; review`,
+        `AI disagreed on ${field} (${llmVal}% vs rules ${heurVal}%), kept rules parse; review`,
       );
       continue;
     }
@@ -149,7 +149,7 @@ export function mergeLlmWithHeuristic(
       talkTrackPatches.push(partial);
       usedLlm = true;
       findings.push(
-        `AI proposed talk-track edits for ${match.title} (review — off by default)`,
+        `AI proposed talk-track edits for ${match.title} (review, off by default)`,
       );
     }
   }
@@ -199,7 +199,7 @@ export function resolvePlaybookLlmProvider(): PlaybookLlmProvider {
 
 /**
  * Call chat-completions compatible endpoint (xAI or Ollama OpenAI-compat).
- * Returns null on any failure — caller falls back to heuristic.
+ * Returns null on any failure - caller falls back to heuristic.
  */
 export async function extractPlaybookWithLlm(
   text: string,
@@ -251,9 +251,9 @@ Rules:
 - Floor must be ≤ standard when both present.
 - valueAnchors: max 8, each ≤ 160 chars (appraisal, marketing, negotiation, seller updates).
 - talkTrackPatches: MUST include one entry for EVERY objection type in [${trackTypes.join(", ")}].
-  - When the doc explicitly covers that objection, ground the play in the doc (confidence 0.8–1).
-  - When the doc is silent, use common-sense coaching consistent with the firm’s stated rates, anchors, and never-dos (confidence 0.65–0.75). Still fill approvedPlay, 3–5 anchorPoints, 2–4 neverDo, and one exampleLine.
-  - Plays must help the agent explore, restate value, and hold firm policy — never invent a lower commission than the floor, and never coach adversarial or deceptive tactics.
+ , When the doc explicitly covers that objection, ground the play in the doc (confidence 0.8 to 1).
+ , When the doc is silent, use common-sense coaching consistent with the firm’s stated rates, anchors, and never-dos (confidence 0.65 to 0.75). Still fill approvedPlay, 3 to 5 anchorPoints, 2 to 4 neverDo, and one exampleLine.
+ , Plays must help the agent explore, restate value, and hold firm policy, never invent a lower commission than the floor, and never coach adversarial or deceptive tactics.
 - Never put seller-adversary instructions into talk-tracks.`,
           },
           {

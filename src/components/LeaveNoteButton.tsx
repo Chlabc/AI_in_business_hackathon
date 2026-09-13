@@ -11,7 +11,7 @@ type LeaveNoteButtonProps = {
 type PanelPos = { top: number; left: number };
 
 /**
- * Manager Team action — post a coaching note to an employee's inbox.
+ * Manager Team action ,  post a coaching note to an employee's inbox.
  * Panel is portaled + fixed so the team table stays static (no scroll/clip
  * from overflow-x-auto on the table wrapper).
  */
@@ -112,7 +112,7 @@ export function LeaveNoteButton({ repId, repName }: LeaveNoteButtonProps) {
               Note for {repName}
             </p>
             <p className="mt-0.5 text-[11px] text-muted">
-              Shows in their inbox bell — not a transcript share.
+              Shows in their inbox bell ,  not a transcript share.
             </p>
             <textarea
               value={body}
@@ -120,7 +120,7 @@ export function LeaveNoteButton({ repId, repName }: LeaveNoteButtonProps) {
               rows={4}
               maxLength={2000}
               autoFocus
-              placeholder="e.g. Strong hold on the Beacon call — keep asking what 'too expensive' is measured against before you move."
+              placeholder="e.g. Strong hold on the Beacon call ,  keep asking what 'too expensive' is measured against before you move."
               className="mt-2 w-full resize-none rounded-md border border-border bg-background px-2.5 py-2 text-sm text-foreground outline-none focus:border-accent"
             />
             {error ? (

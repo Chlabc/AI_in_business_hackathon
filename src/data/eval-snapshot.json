@@ -86,7 +86,7 @@
     },
     {
       "id": "competitor_ok",
-      "label": "Competitor scenario — appraisal offer",
+      "label": "Competitor scenario ,  appraisal offer",
       "pass": true,
       "detail": "ai=90 human=78 (Δ12); heldFee ai=true human=true"
     },
@@ -126,14 +126,14 @@
   "method": [
     "Diagnosis: deterministic aggregation over call outcomes (diagnoseCalls).",
     "Scoring: heuristic rubric only in this harness (no live XAI_API_KEY dependency).",
-    "Human gold: teammate ratings on synthetic transcripts / labelled histories — not live CRM data.",
+    "Human gold: teammate ratings on synthetic transcripts / labelled histories ,  not live CRM data.",
     "Agreement band for overall score: absolute difference ≤ 20."
   ],
   "knownLimits": [
-    "Reps can game rubrics by reciting approved lines robotically (robotic_perfect) — shallow delivery detection is out of scope.",
+    "Reps can game rubrics by reciting approved lines robotically (robotic_perfect) ,  shallow delivery detection is out of scope.",
     "Heuristic keyword matching will miss nuanced delivery and can false-positive on some phrasings.",
     "Diagnosis needs ≥2 calls in a stage×objection bucket; thin histories fall back to fee-biased defaults.",
-    "Voice persona faithfulness (live ElevenLabs) is not covered here — manual demo check.",
+    "Voice persona faithfulness (live ElevenLabs) is not covered here ,  manual demo check.",
     "Product diagnosis uses labelled demo calls, not a live CRM pipe."
   ],
   "reproduce": "npm run eval"

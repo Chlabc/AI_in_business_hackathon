@@ -162,7 +162,7 @@ export async function POST(request: Request) {
         source = "llm";
       } else {
         findings.push(
-          "AI parse unavailable — used rules only (including fee talk-track if found in the doc)",
+          "AI parse unavailable, used rules only (including fee talk-track if found in the doc)",
         );
       }
     }

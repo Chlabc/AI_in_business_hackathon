@@ -23,7 +23,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-function pct(n: number | null | undefined, fallback = "-") {
+function pct(n: number | null | undefined, fallback = "n/a") {
   if (n === null || n === undefined) return fallback;
   return `${n}%`;
 }
@@ -278,10 +278,10 @@ function ManagerEvidence({
         }
       />
 
-      {/* Claim 1 - the scorer is accurate. This is the strong evidence. */}
+      {/* Claim 1, the scorer is accurate. This is the strong evidence. */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Claim 1 - the coach judges calls the way a human would
+          Claim 1, the coach judges calls the way a human would
         </h2>
         <div className="mt-3 grid gap-3 lg:grid-cols-3">
           {checks.map((c) => (
@@ -307,14 +307,18 @@ function ManagerEvidence({
         </p>
       </section>
 
-      {/* Claim 2 - team-wide practice improvement (all agents’ drills). */}
+      {/* Claim 2, team-wide practice improvement (all agents’ drills). */}
       <section>
         <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
-          Claim 2 - reps improve with practice
+          Claim 2, reps improve with practice
           <InfoTip
             text={`Aggregated across ${agentCount} agents' scored drills (oldest → newest), not a single rep.`}
           />
         </h2>
+        <p className="mt-1 text-sm text-muted">
+          Aggregated across {agentCount} agents&apos; scored drills (oldest →
+          newest), not a single rep.
+        </p>
         <div className="mt-4 space-y-6">
           <BeforeAfterScore
             attemptCount={evidence.attemptCount}
@@ -334,7 +338,7 @@ function ManagerEvidence({
 
 /**
  * The headline claim. Shows the direction of travel in colour and shape, so it
- * reads before the numbers do - and says plainly when there isn't enough data,
+ * reads before the numbers do — and says plainly when there isn't enough data,
  * rather than dressing up a drop as a result.
  */
 function BeforeAfterScore({
@@ -375,11 +379,17 @@ function BeforeAfterScore({
       ? { border: "border-l-border", text: "text-muted", bar: "bg-muted" }
       : { border: "border-l-danger", text: "text-danger", bar: "bg-danger" };
 
+  const scoreTip = improved
+    ? `Each drill is marked out of 100 against six criteria. Scores rose ${delta} points from the first drill to the latest — that improvement is the product working.`
+    : flat
+      ? "Each drill is marked out of 100 against six criteria. Scores held flat between the first drill and the latest. More reps needed before the trend means anything."
+      : `Each drill is marked out of 100 against six criteria. Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it — with this few attempts it may reflect test sessions more than real practice.`;
+
   return (
     <section className={`surface-card rounded-xl border-l-4 ${tone.border} p-6`}>
       <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
         Score across {attemptCount} drills
-        <InfoTip text="Each drill is marked out of 100 against six criteria. First vs latest shows whether practice is moving the needle." />
+        <InfoTip text={scoreTip} />
       </h2>
 
       <div className="mt-5 flex flex-wrap items-center gap-6 sm:gap-10">
@@ -408,14 +418,6 @@ function BeforeAfterScore({
         <ScoreBar label="First" score={firstScore} barClass="bg-muted" />
         <ScoreBar label="Latest" score={latestScore} barClass={tone.bar} />
       </div>
-
-      <p className="mt-5 text-sm leading-relaxed text-muted">
-        {improved
-          ? `Scores rose ${delta} points from the first drill to the latest. That improvement is the product working.`
-          : flat
-            ? "Scores held flat between the first drill and the latest. More reps needed before the trend means anything."
-            : `Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it - with this few attempts it reflects test sessions more than real practice.`}
-      </p>
     </section>
   );
 }
@@ -425,7 +427,7 @@ function ScoreBlock({ label, score }: { label: string; score: number | null }) {
     <div>
       <p className="text-xs uppercase tracking-wider text-muted">{label}</p>
       <p className="mt-1 text-5xl font-semibold tabular-nums text-foreground">
-        {score ?? "-"}
+        {score ?? "n/a"}
       </p>
     </div>
   );
@@ -450,7 +452,7 @@ function ScoreBar({
         />
       </div>
       <span className="w-12 shrink-0 text-right font-mono tabular-nums text-muted">
-        {score ?? "-"}
+        {score ?? "n/a"}
       </span>
     </div>
   );
@@ -470,8 +472,9 @@ function PriceHold({
   if (earlyPct === null) {
     return (
       <section className="surface-card rounded-xl p-5 sm:p-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+        <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
           Did they stop discounting?
+          <InfoTip text="How often a drill ended at or near list price ,  the first half of attempts against the second half." />
         </h2>
         <p className="mt-2 text-sm text-muted">Not enough scored drills yet.</p>
       </section>
@@ -496,7 +499,7 @@ function PriceHold({
           <p className="mt-2 text-sm leading-relaxed text-muted">
             In all scored drills the price was held, first to last. There is no
             before-and-after to show here because there was never a discount to
-            stop - this metric only becomes interesting once someone caves in a
+            stop, this metric only becomes interesting once someone caves in a
             drill.
           </p>
         </div>
@@ -506,7 +509,7 @@ function PriceHold({
           <HoldBar label="Later drills" value={late} tone="strong" />
           {unchanged ? (
             <p className="text-sm text-muted">
-              Unchanged at {earlyPct}% - more drills needed before this means
+              Unchanged at {earlyPct}%, more drills needed before this means
               anything.
             </p>
           ) : null}

@@ -31,7 +31,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "agent",
-        text: "So you can go lower — how low?",
+        text: "So you can go lower ,  how low?",
       },
       {
         role: "user",
@@ -52,7 +52,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Help me understand — what is the 1.75% quote measured against? Does it include the marketing plan, inspections, and negotiation support?",
+        text: "Help me understand ,  what is the 1.75% quote measured against? Does it include the marketing plan, inspections, and negotiation support?",
       },
       {
         role: "agent",
@@ -77,7 +77,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Compared to what — the marketing plan and service included, or just the commission rate?",
+        text: "Compared to what ,  the marketing plan and service included, or just the commission rate?",
       },
       {
         role: "agent",
@@ -160,7 +160,7 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "competitor_ok",
-    label: "Competitor scenario — appraisal offer",
+    label: "Competitor scenario ,  appraisal offer",
     scenarioId: "competitor",
     turns: [
       {
@@ -169,7 +169,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Totally fair — where are they still leaving gaps? Happy to arrange a no-obligation appraisal so you can compare selling approaches.",
+        text: "Totally fair ,  where are they still leaving gaps? Happy to arrange a no-obligation appraisal so you can compare selling approaches.",
       },
     ],
     humanOverall: 78,
@@ -186,7 +186,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Interesting — what does that 1.75% include? Our list is 2.5% with the marketing plan and negotiation support. I am not matching 1.75%.",
+        text: "Interesting ,  what does that 1.75% include? Our list is 2.5% with the marketing plan and negotiation support. I am not matching 1.75%.",
       },
       {
         role: "agent",
@@ -194,7 +194,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "I'll trade scope — campaign scope — before discount. Holding 2.5%.",
+        text: "I'll trade scope ,  campaign scope ,  before discount. Holding 2.5%.",
       },
     ],
     humanOverall: 84,

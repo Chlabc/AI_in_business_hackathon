@@ -51,7 +51,7 @@ export async function GET(request: Request) {
         available: false,
         sessions: await fileSessions(),
         message:
-          "Supabase is not configured — showing local drills. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then run supabase/practice_sessions.sql so transcripts sync for calibration.",
+          "Supabase is not configured, showing local drills. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then run supabase/practice_sessions.sql so transcripts sync for calibration.",
       });
     }
 

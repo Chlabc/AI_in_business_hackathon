@@ -18,7 +18,7 @@ function getSnapshot(): boolean {
   try {
     return window.localStorage.getItem(STORAGE_KEY) === "1";
   } catch {
-    return true; // storage blocked — stay out of the way
+    return true; // storage blocked, stay out of the way
   }
 }
 
@@ -54,7 +54,7 @@ export function OnboardingBanner({ className = "" }: { className?: string }) {
           New here? Here&apos;s what this page does
         </p>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-foreground">
-          This is your <strong>profile</strong> — identity, recent losses, and
+          This is your <strong>profile</strong>, identity, recent losses, and
           performance. Hit <strong>&ldquo;Practice this now&rdquo;</strong> to
           drill your weak spot live; the Practice tab also shows the full
           diagnosis verdict and approved play.

@@ -34,7 +34,7 @@ function LoginForm() {
       router.replace(dest);
       router.refresh();
     } catch {
-      setError("Network error — is the server running?");
+      setError("Network error, is the server running?");
     } finally {
       setLoading(false);
     }
@@ -129,12 +129,15 @@ function LoginForm() {
 
         <p className="mt-6 text-center text-xs text-muted">
           Demo: alex@northline.demo (employee) or jordan@northline.demo
-          (manager) — any password
+          (manager), any password
         </p>
 
         <p className="mt-4 text-center text-xs text-muted">
-          <Link href="/" className="text-accent hover:underline">
-            ← Back to landing
+          <Link
+            href="/"
+            className="inline-flex h-9 items-center rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground transition hover:border-accent"
+          >
+            Back
           </Link>
         </p>
       </div>

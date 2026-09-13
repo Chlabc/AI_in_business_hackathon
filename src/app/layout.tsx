@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/** Display face for headlines — the advisory-firm serif look. */
+/** Display face for headlines - the advisory-firm serif look. */
 const sourceSerif = Source_Serif_4({
   variable: "--font-serif",
   subsets: ["latin"],
@@ -30,7 +30,7 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Cornerman — AI Sales Coach",
+  title: "Cornerman: AI Sales Coach",
   description:
     "Diagnose where you lose deals, then drill that weak spot in a live spoken roleplay. Rep-owned coaching for residential real estate agents.",
 };

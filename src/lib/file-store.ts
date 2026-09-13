@@ -3,7 +3,7 @@ import path from "path";
 /**
  * Local: `data/<name>` under the project.
  * Vercel/serverless: `/tmp/cornerman/<name>` (only writable path).
- * Data in /tmp is ephemeral per instance — fine for demo; use Supabase later.
+ * Data in /tmp is ephemeral per instance - fine for demo; use Supabase later.
  */
 export function dataStorePath(filename: string): string {
   const base =

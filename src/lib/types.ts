@@ -91,7 +91,7 @@ export type RepKpis = {
   avgFeeEndedPct: number | null;
   byStage: StageStat[];
   byObjection: ObjectionStat[];
-  /** Practice KPIs — filled from Phase 3+ attempts; zeroed until then */
+  /** Practice KPIs - filled from Phase 3+ attempts; zeroed until then */
   practice: {
     attempts: number;
     lastScore: number | null;

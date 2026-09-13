@@ -70,11 +70,16 @@ export function PracticeSession({
       <SignalStreamGuard />
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <section className="surface-card rounded-xl p-5 sm:p-6 lg:p-8">
-          <p className="eyebrow">2 · Live drill · {scenario.title}</p>
+          <p className="eyebrow">{scenario.title}</p>
           <h2 className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
             {scenario.customerPersona}
           </h2>
-          <p className="mt-2 text-sm text-muted">{diagnosisHeadline}</p>
+          {diagnosisHeadline ? (
+            <p className="mt-3 rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-sm text-foreground">
+              <span className="font-semibold text-accent">Focus: </span>
+              {diagnosisHeadline}
+            </p>
+          ) : null}
 
           <div className="mt-5 rounded-lg border border-border bg-background px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted">

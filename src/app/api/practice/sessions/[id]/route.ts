@@ -11,7 +11,7 @@ import {
 type Ctx = { params: Promise<{ id: string }> };
 
 /**
- * Manager session detail — includes transcript for calibration.
+ * Manager session detail - includes transcript for calibration.
  */
 export async function GET(_request: Request, ctx: Ctx) {
   try {

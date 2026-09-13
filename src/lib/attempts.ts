@@ -15,7 +15,7 @@ import {
 } from "@/lib/rubric";
 import type { TranscriptTurn } from "@/lib/score";
 
-/** Rep-owned debrief after a scored drill — never sent to manager PDF. */
+/** Rep-owned debrief after a scored drill - never sent to manager PDF. */
 export type AttemptReflection = {
   whatWentWrong: string;
   nextTime: string;
@@ -46,7 +46,7 @@ export type PracticeAttempt = {
   /**
    * How much help was on screen during the drill.
    * Without this, a score can't be read as "earned unaided" rather than
-   * "earned while reading the approved play off a cue card" — which is the
+   * "earned while reading the approved play off a cue card", which is the
    * difference between practising and copying.
    */
   cueMode?: CueMode;
@@ -178,7 +178,7 @@ export async function updateAttemptCalibration(
   if (!reason) throw new Error("Reason is required.");
   if (reason.length > 500) throw new Error("Reason is too long (max 500).");
 
-  // Supabase-first — Practice logs list cloud ids that often aren't in /tmp.
+  // Supabase-first, Practice logs list cloud ids that often aren't in /tmp.
   const attempt = await resolveAttempt(attemptId);
   if (!attempt) return null;
 
@@ -233,7 +233,7 @@ export async function updateAttemptCalibration(
     console.error("[attempts] file write after calibrate failed", err);
   }
 
-  // Durable write — required for the next Vercel instance.
+  // Durable write, required for the next Vercel instance.
   const { tryUpsertPracticeSession, updatePracticeSessionCalibration } =
     await import("@/lib/practice-sessions");
   const upserted = await tryUpsertPracticeSession(updated);
@@ -254,7 +254,7 @@ export async function updateAttemptCalibration(
   return updated;
 }
 
-/** Manager calibrate list — criteria yes, transcript/reflection no. */
+/** Manager calibrate list - criteria yes, transcript/reflection no. */
 export type CalibrateAttemptSummary = {
   id: string;
   repId: string;
@@ -385,9 +385,9 @@ export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
 export type PracticeTrendPoint = {
   /** Short axis label (e.g. drill # or date). */
   label: string;
-  /** Overall score 0–100 for this drill. */
+  /** Overall score 0 to 100 for this drill. */
   score: number;
-  /** 100 if fee held, 0 if softened — for hold-rate style charts. */
+  /** 100 if fee held, 0 if softened, for hold-rate style charts. */
   holdPct: number;
 };
 
@@ -400,7 +400,7 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
       feeHoldRate: null as number | null,
       /** % of drills where the agent softened / didn't hold fee. */
       concessionRate: null as number | null,
-      /** % of drills scoring >= 70 (usable "success" proxy — not CRM win rate). */
+      /** % of drills scoring >= 70 (usable "success" proxy - not CRM win rate). */
       strongDrillRate: null as number | null,
       weakestCriterionLabel: null as string | null,
       weakestCriterionId: null as string | null,
@@ -409,7 +409,7 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
         label: string;
         avgPct: number;
       }[],
-      trendLabel: "No practice attempts yet — start a drill to track KPIs",
+      trendLabel: "No practice attempts yet, start a drill to track KPIs",
       trend: [] as PracticeTrendPoint[],
     };
   }
@@ -429,7 +429,7 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
     const first = chronological[0]!.score.overall;
     const latest = chronological[chronological.length - 1]!.score.overall;
     if (latest > first + 5) {
-      trendLabel = `Improving — score ${first} → ${latest} across ${attempts.length} attempts.`;
+      trendLabel = `Improving, score ${first} → ${latest} across ${attempts.length} attempts.`;
     } else if (latest < first - 5) {
       trendLabel = `Dip vs first attempt (${first} → ${latest}). Re-read the approved play.`;
     } else {

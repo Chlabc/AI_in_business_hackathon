@@ -39,7 +39,7 @@ export function GuidedDemo() {
     <section className="surface-card rounded-2xl p-6 lg:p-8">
       <p className="eyebrow">See it work</p>
       <h2 className="display-serif mt-1 text-2xl text-foreground sm:text-3xl">
-        Four steps. Click through — no signup.
+        Four steps. Click through, no signup.
       </h2>
 
       {/* step rail */}
@@ -90,7 +90,7 @@ export function GuidedDemo() {
               The pattern costing you deals
             </p>
             <p className="display-serif mt-2 text-xl leading-snug text-foreground sm:text-2xl">
-              Your fee conversations end lost or discounted — you concede before
+              Your fee conversations end lost or discounted, you concede before
               exploring the objection.
             </p>
             <p className="mt-3 text-sm text-muted">
@@ -101,9 +101,9 @@ export function GuidedDemo() {
               The losses behind it
             </p>
             <ul className="mt-2 space-y-1.5 text-sm text-foreground">
-              <li>Alex Parker · South Melbourne — no comparison clarification (2.5% → 1.95%)</li>
-              <li>Cameron Ellis · Prahran — early drop signalled desperation (2.5% → 2.25%)</li>
-              <li>Riley Patel · South Yarra — broke the firm floor (2.5% → 1.75%)</li>
+              <li>Alex Parker · South Melbourne, no comparison clarification (2.5% → 1.95%)</li>
+              <li>Cameron Ellis · Prahran, early drop signalled desperation (2.5% → 2.25%)</li>
+              <li>Riley Patel · South Yarra, broke the firm floor (2.5% → 1.75%)</li>
             </ul>
           </div>
         ) : null}
@@ -115,7 +115,7 @@ export function GuidedDemo() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
                   Client
                 </p>
-                &ldquo;Look, I&apos;ll be straight with you — your 2.5% commission is too
+                &ldquo;Look, I&apos;ll be straight with you, your 2.5% commission is too
                 high. Another agency already quoted us 1.75%. Why should I pay
                 more?&rdquo;
               </div>
@@ -125,7 +125,7 @@ export function GuidedDemo() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide opacity-75">
                   You (spoken)
                 </p>
-                &ldquo;That&apos;s fair — what does their 1.75% actually
+                &ldquo;That&apos;s fair, what does their 1.75% actually
                 include?&rdquo;
               </div>
             </div>
@@ -139,7 +139,7 @@ export function GuidedDemo() {
               </div>
             </div>
             <p className="pt-1 text-xs text-muted">
-              A real spoken call — the client argues back and won&apos;t let you
+              A real spoken call, the client argues back and won&apos;t let you
               off easy.
             </p>
           </div>
@@ -169,7 +169,7 @@ export function GuidedDemo() {
             </div>
             <p className="mt-4 rounded-md border-l-2 border-accent bg-card px-3 py-2 text-sm text-foreground">
               <strong className="font-medium">Fix next time:</strong> you moved
-              to price before establishing value. Try — &ldquo;what would a bad
+              to price before establishing value. Try, &ldquo;what would a bad
               hire in month two cost you?&rdquo;
             </p>
           </div>
@@ -190,12 +190,12 @@ export function GuidedDemo() {
                 >
                   <div className="flex w-full flex-1 items-end">
                     <div
-                      className={`w-full rounded-t ${i === TREND.length - 1 ? "bg-ok" : "bg-border"}`}
+                      className={`w-full rounded-t ${i === TREND.length, 1 ? "bg-ok" : "bg-border"}`}
                       style={{ height: `${v}%` }}
                     />
                   </div>
                   <span
-                    className={`text-xs ${i === TREND.length - 1 ? "font-semibold text-ok" : "text-muted"}`}
+                    className={`text-xs ${i === TREND.length, 1 ? "font-semibold text-ok" : "text-muted"}`}
                   >
                     {v}
                   </span>
@@ -218,9 +218,9 @@ export function GuidedDemo() {
           type="button"
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="text-sm font-medium text-muted transition hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-9 items-center rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground transition hover:border-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
-          ← Back
+          Back
         </button>
 
         {isLast ? (

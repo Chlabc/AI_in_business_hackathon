@@ -21,7 +21,7 @@ function isPdf(filename: string, mime: string): boolean {
 
 /**
  * Pull plain text from an uploaded buffer.
- * Text-layer PDFs only — scanned/image PDFs need OCR (out of scope).
+ * Text-layer PDFs only - scanned/image PDFs need OCR (out of scope).
  */
 export async function extractDocumentText(
   data: ArrayBuffer | Uint8Array,
@@ -44,7 +44,7 @@ export async function extractDocumentText(
       .decode(bytes)
       .replace(/\u0000/g, "")
       .trim();
-    if (!text) throw new Error("Empty document — nothing to extract");
+    if (!text) throw new Error("Empty document, nothing to extract");
     return {
       text: text.length > MAX_CHARS ? text.slice(0, MAX_CHARS) : text,
       source: "text",

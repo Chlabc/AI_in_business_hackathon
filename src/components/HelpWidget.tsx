@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Scripted help panel — deliberately NOT an AI chatbot.
+ * Scripted help panel - deliberately NOT an AI chatbot.
  *
  * Every answer here is written and checked, so it can't invent a number or a
  * feature that doesn't exist. It is labelled as a help menu rather than a
@@ -23,7 +23,7 @@ type Answer = {
 const GENERAL: Answer[] = [
   {
     q: "What is this app for?",
-    a: "You practise the hard part of a sales call — the moment a client pushes back on price — out loud, against an AI playing that client. Then you get scored on how you handled it.",
+    a: "You practise the hard part of a sales call, the moment a client pushes back on price, out loud, against an AI playing that client. Then you get scored on how you handled it.",
   },
   {
     q: "Who is Northline?",
@@ -31,11 +31,11 @@ const GENERAL: Answer[] = [
   },
   {
     q: "What does my score mean?",
-    a: "It's out of 100, across six things: did you explore the objection, ask questions, anchor on value, hold the price, use the approved play, and avoid caving early. Holding the price is only one of the six — which is why a drill can say \"Held\" and still score low.",
+    a: "It's out of 100, across six things: did you explore the objection, ask questions, anchor on value, hold the price, use the approved play, and avoid caving early. Holding the price is only one of the six, which is why a drill can say \"Held\" and still score low.",
   },
   {
     q: "Does my manager see my practice?",
-    a: "Only if you switch sharing on, and even then they see a progress summary — never what you actually said. Your transcripts stay yours.",
+    a: "Only if you switch sharing on, and even then they see a progress summary, never what you actually said. Your transcripts stay yours.",
   },
   {
     q: "What order should I do things in?",
@@ -49,7 +49,7 @@ const BY_PAGE: Record<string, Answer[]> = {
   "/coach": [
     {
       q: "Where did these numbers come from?",
-      a: "From your recent call outcomes. We looked at how each one ended and found the habit that costs the most — here, moving on price before asking what the objection really is.",
+      a: "From your recent call outcomes. We looked at how each one ended and found the habit that costs the most, here, moving on price before asking what the objection really is.",
     },
     {
       q: "What should I do on this page?",
@@ -61,11 +61,11 @@ const BY_PAGE: Record<string, Answer[]> = {
   "/coach/practice": [
     {
       q: "Which scenario should I pick?",
-      a: "The one matching your profile diagnosis is highlighted — start there. The others are the same live spoken drill with a different kind of client pushback.",
+      a: "The one matching your profile diagnosis is highlighted, start there. The others are the same live spoken drill with a different kind of client pushback.",
     },
     {
       q: "What do I actually do in a drill?",
-      a: "Press the big button, allow the microphone, and talk. The AI client will push back on your price — answer like you would on a real call. When you're done, press the button again and you'll be scored.",
+      a: "Press the big button, allow the microphone, and talk. The AI client will push back on your price, answer like you would on a real call. When you're done, press the button again and you'll be scored.",
     },
     {
       q: "The microphone isn't working",
@@ -73,7 +73,7 @@ const BY_PAGE: Record<string, Answer[]> = {
     },
     {
       q: "What are the cue cards on the left?",
-      a: "Hints from your firm's playbook, shown only on your screen — the AI client never sees them. Set them to Off if you want to test yourself properly.",
+      a: "Hints from your firm's playbook, shown only on your screen, the AI client never sees them. Set them to Off if you want to test yourself properly.",
     },
   ],
   "/coach/learn": [
@@ -116,7 +116,7 @@ export function HelpWidget() {
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   // Navigating closes the panel. Adjusted during render rather than in an
-  // effect — an effect here would paint the stale panel first, then close it.
+  // effect, an effect here would paint the stale panel first, then close it.
   const [seenPath, setSeenPath] = useState(pathname);
   if (seenPath !== pathname) {
     setSeenPath(pathname);
@@ -133,7 +133,7 @@ export function HelpWidget() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Not on the marketing pages — it's an in-app helper.
+  // Not on the marketing pages, it's an in-app helper.
   if (!pathname.startsWith("/coach")) return null;
 
   const questions = [...(BY_PAGE[pathname] ?? []), ...GENERAL];
@@ -153,7 +153,7 @@ export function HelpWidget() {
                 Need a hand?
               </p>
               <p className="mt-0.5 text-xs text-muted">
-                Common questions — pick one.
+                Common questions. Pick one.
               </p>
             </div>
             <button
@@ -172,9 +172,9 @@ export function HelpWidget() {
                 <button
                   type="button"
                   onClick={() => setActive(null)}
-                  className="text-xs font-medium text-muted transition hover:text-accent"
+                  className="inline-flex h-9 items-center rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground transition hover:border-accent"
                 >
-                  ← All questions
+                  Back
                 </button>
                 <p className="mt-4 text-sm font-semibold text-foreground">
                   {active.q}
@@ -210,7 +210,7 @@ export function HelpWidget() {
           </div>
 
           <p className="border-t border-border px-5 py-3 text-[11px] leading-relaxed text-muted">
-            These are written answers, not an AI assistant — so nothing here can
+            These are written answers, not an AI assistant, so nothing here can
             make something up.
           </p>
         </div>

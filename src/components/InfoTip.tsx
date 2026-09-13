@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Compact (i) control — shows help text on hover / focus.
+ * Compact (i) control ,  shows help text on hover / focus.
  */
 export function InfoTip({ text }: { text: string }) {
   return (

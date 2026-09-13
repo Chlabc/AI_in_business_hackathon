@@ -14,7 +14,7 @@ import {
 const WHAT_YOU_GET = [
   {
     title: "A live voice roleplay",
-    body: "An actual spoken conversation with an AI client — not a script you read, not a chatbot you type at.",
+    body: "An actual spoken conversation with an AI client, not a script you read, not a chatbot you type at.",
     Icon: DrillIcon,
   },
   {
@@ -24,12 +24,12 @@ const WHAT_YOU_GET = [
   },
   {
     title: "Practice that's yours, privately",
-    body: "Nothing goes to your manager unless you choose to share it — and even then, they see a summary, never the transcript.",
+    body: "Nothing goes to your manager unless you choose to share it, and even then they see a summary, never the transcript.",
     Icon: LockIcon,
   },
   {
     title: "A better line for next time",
-    body: "Not just 'do better' — an actual suggested response you could have used, grounded in your firm's approved talk-track.",
+    body: "Not just 'do better': an actual suggested response you could have used, grounded in your firm's approved talk-track.",
     Icon: LightbulbIcon,
   },
 ];
@@ -54,13 +54,13 @@ const scenario = SCENARIOS.find((s) => s.recommended) ?? SCENARIOS[0];
 /**
  * Cover photograph. Put the file in /public and name it cover.jpg.
  * If it isn't there, url() paints nothing and the drawn gradient behind it
- * shows through — so a missing file degrades instead of breaking the page.
+ * shows through ,  so a missing file degrades instead of breaking the page.
  */
 const COVER_STYLE = {
   "--cover-image": 'url("/cover.jpg")',
 } as React.CSSProperties;
 
-/** Soundwave motif — the product is voice, so the cover says so without a photo. */
+/** Soundwave motif ,  the product is voice, so the cover says so without a photo. */
 function CoverWaves() {
   const bars = Array.from({ length: 48 }, (_, i) => {
     // Deterministic, not random, so server and client render identically.
@@ -89,7 +89,7 @@ function CoverWaves() {
   );
 }
 
-/** A small, honest preview of the real drill — actual scenario copy, not a mockup. */
+/** A small, honest preview of the real drill ,  actual scenario copy, not a mockup. */
 function LivePreviewCard() {
   return (
     <div className="surface-card w-full max-w-sm rounded-xl p-5">
@@ -112,7 +112,7 @@ function LivePreviewCard() {
           <p className="mb-0.5 text-[10px] uppercase tracking-wide opacity-75">
             You
           </p>
-          &ldquo;Fair question — what does their quote actually include?&rdquo;
+          &ldquo;Fair question ,  what does their quote actually include?&rdquo;
         </div>
       </div>
       <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
@@ -121,7 +121,7 @@ function LivePreviewCard() {
           <p className="text-xs font-medium text-foreground">
             Explored the objection
           </p>
-          <p className="text-xs text-muted">Before defending the price — nice.</p>
+          <p className="text-xs text-muted">Before defending the price ,  nice.</p>
         </div>
       </div>
     </div>

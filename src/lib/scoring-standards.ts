@@ -121,7 +121,7 @@ function userText(turns: TurnLike[]): string {
 
 /**
  * Criterion is "in play" if heuristic already credited it, or a light
- * scenario signal fires — avoids free full marks on every drill.
+ * scenario signal fires - avoids free full marks on every drill.
  */
 export function criterionInPlay(
   criterionId: RubricCriterionId,

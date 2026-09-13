@@ -12,7 +12,7 @@ type AppShellProps = {
 };
 
 /**
- * Full-bleed coaching shell — uses the viewport width with comfortable
+ * Full-bleed coaching shell - uses the viewport width with comfortable
  * padding instead of a narrow centered column.
  */
 export async function AppShell({
@@ -28,7 +28,7 @@ export async function AppShell({
       <AppHeader user={user} variant={variant} />
       {headerExtra}
       {/* Marketing pages lay out their own full-bleed bands, so the shell gets
-          out of the way — no max-width, no padding, no gap. Boxed cards inside a
+          out of the way, no max-width, no padding, no gap. Boxed cards inside a
           padded column is what made the landing page read as a dashboard. */}
       {variant === "marketing" ? (
         <main className="page-enter flex w-full flex-1 flex-col">{children}</main>

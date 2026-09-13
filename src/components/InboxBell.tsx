@@ -11,7 +11,7 @@ type InboxComment = {
 };
 
 /**
- * Employee header bell — polls inbox for unread coaching notes from the manager.
+ * Employee header bell - polls inbox for unread coaching notes from the manager.
  */
 export function InboxBell() {
   const [open, setOpen] = useState(false);

@@ -204,14 +204,14 @@ export default async function ManagerPage() {
                       <div className="rounded-md border border-border bg-card p-2.5">
                         <p className="text-[11px] text-muted">Last score</p>
                         <p className="mt-0.5 text-xl font-semibold">
-                          {practice.lastScore ?? "—"}
+                          {practice.lastScore ?? "-"}
                         </p>
                       </div>
                       <div className="rounded-md border border-border bg-card p-2.5">
                         <p className="text-[11px] text-muted">Price hold</p>
                         <p className="mt-0.5 text-xl font-semibold">
                           {practice.feeHoldRate === null
-                            ? "—"
+                            ? ", "
                             : `${practice.feeHoldRate}%`}
                         </p>
                       </div>

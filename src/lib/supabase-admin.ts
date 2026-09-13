@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Server-only Supabase client (service role). Bypasses RLS — every caller must
+ * Server-only Supabase client (service role). Bypasses RLS - every caller must
  * already have gated with requireRole / getSession. Never import from client
  * components.
  */

@@ -74,7 +74,7 @@ export default function HealthPage() {
       emphasize: true,
     },
     {
-      label: "Scoring–human agreement",
+      label: "Scoring vs human agreement",
       value: `${h.scoringOverallAgree}/${h.scoringTotal}`,
       sub: `${h.scoringOverallPct} · band ±${snapshot.overallAgreementBand}`,
       emphasize: true,
@@ -101,9 +101,9 @@ export default function HealthPage() {
           <>
             <Link
               href="/coach/value"
-              className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted transition hover:text-foreground"
+              className="inline-flex h-10 items-center rounded-md border border-border bg-background px-4 text-sm font-medium text-foreground transition hover:border-accent"
             >
-              ← Evidence
+              Back
             </Link>
             <p className="inline-flex h-10 items-center text-xs text-muted">
               Generated{" "}
@@ -139,7 +139,7 @@ export default function HealthPage() {
         <CaseTable title="Persona / guardrails" rows={snapshot.persona} />
       </div>
 
-      <CaseTable title="Scoring–human agreement" rows={snapshot.scoring} />
+      <CaseTable title="Scoring vs human agreement" rows={snapshot.scoring} />
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="surface-card rounded-xl px-4 py-5 sm:px-5">

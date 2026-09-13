@@ -10,12 +10,12 @@ const PER_PAGE = 4;
  * How much help was on screen for a drill.
  *
  * Scoring well while reading the approved play off a cue card is not the same
- * as scoring well without it, so the two are shown differently — "Unaided" is
+ * as scoring well without it, so the two are shown differently ,  "Unaided" is
  * the one that means the behaviour transferred.
  */
 function CueBadge({ mode }: { mode?: "off" | "soft" | "full" }) {
   if (!mode) {
-    return <span className="text-xs text-muted">—</span>;
+    return <span className="text-xs text-muted">, </span>;
   }
   const map = {
     off: { label: "Unaided", cls: "border-ok/30 bg-ok-soft text-ok" },
@@ -65,7 +65,7 @@ export function AttemptHistory({ attempts }: { attempts: PracticeAttempt[] }) {
                 {/* toLocaleString resolves against the server's locale and
                     timezone during SSR and the browser's on the client, so the
                     two renders legitimately differ. This is the documented case
-                    for suppressing the warning rather than a masked bug — the
+                    for suppressing the warning rather than a masked bug ,  the
                     browser's local time is the value we actually want shown. */}
                 <td className="py-2 pr-3 text-muted" suppressHydrationWarning>
                   {new Date(a.createdAt).toLocaleString()}
