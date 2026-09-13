@@ -293,10 +293,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-block: 0.5rem;
-  /* Neighbours are clipped at the page edges rather than widening the page.
-     No fixed height: a tall card used to overflow this box and get cut off,
-     so the current card sets the height instead (see .deck-current). */
+  /* Fixed deck height so ← / → under the cards don’t jump when card copy
+     is short vs long (or when flipping front/back). */
+  min-height: 22rem;
+  padding-block: 0.75rem;
   overflow: clip;
 }
 
