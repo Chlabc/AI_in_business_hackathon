@@ -195,11 +195,8 @@
   max-width: 100%;
   box-sizing: border-box;
   align-self: start;
-  perspective: 1200px;
-  perspective-origin: center;
   border-radius: 1.25rem;
-  /* Clip projected edges, not the wrapper's own shadow. Unlike hidden,
-     overflow: clip does not flatten the preserved 3D scene. */
+  /* Contain the face reflections without clipping the wrapper's shadow. */
   overflow: clip;
   box-shadow:
     0 1px 2px rgb(255 255 255 / 55%),
@@ -262,6 +259,28 @@
   backdrop-filter: blur(22px) saturate(124%);
   -webkit-backdrop-filter: blur(22px) saturate(124%);
   transform-origin: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Rotate each face independently: frosted surfaces do not need to share
+     a preserved 3D compositor. Orthographic rotation cannot enlarge them. */
+  transform: rotateY(0deg);
+  visibility: visible;
+  transition: transform 420ms ease-in-out, visibility 0s 210ms;
+}
+
+.credentialFace.credentialBack {
+  transform: rotateY(-180deg);
+  visibility: hidden;
+}
+
+.credentialFlipped > .credentialFace {
+  transform: rotateY(180deg);
+  visibility: hidden;
+}
+
+.credentialFlipped > .credentialBack {
+  transform: rotateY(0deg);
+  visibility: visible;
 }
 
 .credentialFace.repProfile::before {
@@ -272,8 +291,7 @@
     0 0 8px rgb(255 255 255 / 24%);
 }
 
-/* Each face owns its reflection. No oversized/translated overlay and no
-   filters or opacity on the rotor that could flatten its preserved 3D. */
+/* Each face owns its reflection and rotates as one composited surface. */
 .credentialFace.repProfile::after {
   content: "";
   position: absolute;
@@ -316,6 +334,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .credentialFace.repProfile {
+    transition: none;
+  }
+
   .credentialFace.repProfile::after {
     transition: none;
     transform: none;
