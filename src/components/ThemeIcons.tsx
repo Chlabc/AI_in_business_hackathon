@@ -1,4 +1,4 @@
-/** Noun Project icons (day: Senandung Abhinowo · night: iconbysonny) — paths only. */
+/** Noun Project icons (day: Senandung Abhinowo · night: iconbysonny) - paths only. */
 
 export function DayIcon({ className }: { className?: string }) {
   return (

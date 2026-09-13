@@ -4,12 +4,12 @@ type PageHeaderProps = {
   eyebrow: string;
   title: string;
   description?: ReactNode;
-  /** Optional right-side CTA (not a back-link — tabs already live in the nav). */
+  /** Optional right-side CTA (not a back-link - tabs already live in the nav). */
   action?: ReactNode;
 };
 
 /**
- * Shared top chrome for coach tabs — employee (Profile / Learn / Practice /
+ * Shared top chrome for coach tabs - employee (Profile / Learn / Practice /
  * Progress) and manager (Team / Playbook / Evidence) open the same way.
  */
 export function PageHeader({

@@ -20,7 +20,7 @@ export type PlaybookProposal = {
   label: string;
   before: unknown;
   after: unknown;
-  /** Manager toggle — firm facts default true; talk-tracks default false */
+  /** Manager toggle - firm facts default true; talk-tracks default false */
   accepted: boolean;
   source: "heuristic" | "llm" | "manual";
 };
@@ -130,7 +130,7 @@ export function buildProposals(
       objectionType: before.objectionType,
     };
     if (valuesEqual(before, after)) continue;
-    // After Clear knowledge base, live talk-tracks are empty — auto-accept so
+    // After Clear knowledge base, live talk-tracks are empty, auto-accept so
     // Publish actually fills cue cards without a hidden extra checkbox step.
     const liveEmpty =
       !before.approvedPlay.trim() &&
@@ -152,7 +152,7 @@ export function buildProposals(
 
 /**
  * Apply accepted proposals onto live. Rejected proposals are ignored.
- * Does not write to disk — caller runs savePlaybook.
+ * Does not write to disk - caller runs savePlaybook.
  */
 export function applyAcceptedProposals(
   live: FirmPlaybook,

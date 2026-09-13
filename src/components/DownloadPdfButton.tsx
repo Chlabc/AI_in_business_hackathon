@@ -8,7 +8,7 @@ type DownloadPdfButtonProps = {
   score: PracticeScore;
   whatYouSaid?: string[];
   repName?: string;
-  /** Soft / Full / off — how much help was on screen. */
+  /** Soft / Full / off ,  how much help was on screen. */
   cueMode?: string | null;
   /** Omit from PDF when empty / undefined. */
   reflection?: { whatWentWrong?: string; nextTime?: string };
@@ -160,7 +160,7 @@ export function DownloadPdfButton({
       y += boxHeight + 6;
     }
 
-    /** Single continuous ring-segment path (annulus sector) — one fill, no seams. */
+    /** Single continuous ring-segment path (annulus sector) ,  one fill, no seams. */
     function ringSector(cx: number, cy: number, outerR: number, innerR: number, fromDeg: number, toDeg: number, color: RGB) {
       if (toDeg <= fromDeg) return;
       setFill(doc, color);
@@ -282,7 +282,7 @@ export function DownloadPdfButton({
       y += gaugeHeight;
     }
 
-    /** Clean criterion table — Criterion | Score | Pts | Notes */
+    /** Clean criterion table ,  Criterion | Score | Pts | Notes */
     function rubricTable() {
       sectionTitle("Rubric table");
       const cols = {
@@ -308,7 +308,7 @@ export function DownloadPdfButton({
       y += 5;
 
       for (const c of score.criteria) {
-        const noteLines = doc.splitTextToSize(c.notes || "—", notesW);
+        const noteLines = doc.splitTextToSize(c.notes || ", ", notesW);
         const rowH = Math.max(7, noteLines.length * 4 + 3);
         ensureSpace(rowH + 2);
         doc.setFont("helvetica", "bold");
@@ -346,7 +346,7 @@ export function DownloadPdfButton({
       no_early_cave: "No early cave",
     };
 
-    /** Radar chart across all rubric criteria — navy grid, tier-colored vertices. */
+    /** Radar chart across all rubric criteria ,  navy grid, tier-colored vertices. */
     function radarChart() {
       sectionTitle("Skill radar");
       const n = score.criteria.length;
@@ -411,7 +411,7 @@ export function DownloadPdfButton({
       y += chartHeight;
     }
 
-    /** Rubric bar chart with axis gridlines and tick labels — reads as a real chart. */
+    /** Rubric bar chart with axis gridlines and tick labels ,  reads as a real chart. */
     function rubricChart() {
       sectionTitle("Rubric breakdown");
       const labelW = 42;
@@ -502,7 +502,7 @@ export function DownloadPdfButton({
       bulletList(
         agency.map(
           (a) =>
-            `${a.label} — “${a.reason}” (set by ${a.setByName})`,
+            `${a.label} ,  “${a.reason}” (set by ${a.setByName})`,
         ),
       );
       y += 2;
@@ -530,7 +530,7 @@ export function DownloadPdfButton({
     bulletList(score.feedback);
     y += 2;
 
-    sectionTitle("Suggested response — rehearse this");
+    sectionTitle("Suggested response ,  rehearse this");
     calloutBox(`“${score.suggestedResponse}”`, { italic: true });
 
     const went = reflection?.whatWentWrong?.trim() ?? "";

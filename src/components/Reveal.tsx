@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 type RevealProps = {
   children: React.ReactNode;
-  /** Stagger position within a group — 0 fires immediately, 3 is the longest wait. */
+  /** Stagger position within a group - 0 fires immediately, 3 is the longest wait. */
   delay?: 0 | 1 | 2 | 3;
   className?: string;
   as?: "div" | "section" | "article" | "li";
@@ -14,7 +14,7 @@ type RevealProps = {
  * Fade-and-rise on scroll.
  *
  * The element renders VISIBLE. It is only hidden ("armed") once this effect has
- * run and confirmed IntersectionObserver exists — so if JS is slow, blocked, or
+ * run and confirmed IntersectionObserver exists - so if JS is slow, blocked, or
  * errors, the reader still sees the content instead of a blank band. Anyone who
  * prefers reduced motion is never armed at all.
  */
@@ -36,7 +36,7 @@ export function Reveal({
     )?.matches;
     if (reduced || typeof IntersectionObserver === "undefined") return;
 
-    // Anything already on screen at first paint stays put — no flash of hiding
+    // Anything already on screen at first paint stays put, no flash of hiding
     // content above the fold.
     const box = el.getBoundingClientRect();
     if (box.top < window.innerHeight * 0.9) return;

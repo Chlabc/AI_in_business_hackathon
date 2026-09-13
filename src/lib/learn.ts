@@ -51,7 +51,7 @@ export function buildFlashcards(playbook: FirmPlaybook): Flashcard[] {
   playbook.valueAnchors.slice(0, 3).forEach((anchor, i) => {
     cards.push({
       id: `anchor_${i}`,
-      front: `Name value anchor ${i + 1} — what do you point to instead of cutting price?`,
+      front: `Name value anchor ${i + 1}, what do you point to instead of cutting price?`,
       back: anchor,
       tag: "Value",
     });
@@ -127,7 +127,7 @@ function pricedOptions(correct: number, candidates: number[], slot = 2) {
 
   const ids = ["a", "b", "c", "d"] as const;
   // Deterministic placement (no Math.random, so demos stay stable), but each
-  // question puts the answer in a different slot — always-first is guessable,
+  // question puts the answer in a different slot, always-first is guessable,
   // and so is always-third.
   const others = values.filter((v) => v !== correct);
   const placed = [
@@ -160,7 +160,7 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
       id: "q_list",
       prompt: `What is ${playbook.firmName}’s standard commission in the playbook?`,
       ...pricedOptions(list, [floor, competitor, list - 0.5], 3),
-      explain: `List is ${money(list)}. Floor is ${money(floor)} — different number.`,
+      explain: `List is ${money(list)}. Floor is ${money(floor)}, different number.`,
     },
     {
       id: "q_floor",
@@ -173,7 +173,7 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
       prompt:
         "If the seller cites a competing commission, which figure is in our playbook?",
       ...pricedOptions(competitor, [list, floor, competitor + 0.375], 2),
-      explain: `Playbook competitor quote is ${money(competitor)} — explore before matching.`,
+      explain: `Playbook competitor quote is ${money(competitor)}, explore before matching.`,
     },
     {
       id: "q_anchor",

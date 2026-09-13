@@ -21,7 +21,7 @@ import { navForRole } from "@/lib/auth-nav";
 
 type AppHeaderProps = {
   user?: SessionUser | null;
-  /** "marketing" is the public landing page — no rep context, one clear CTA. */
+  /** "marketing" is the public landing page - no rep context, one clear CTA. */
   variant?: "app" | "marketing";
 };
 
@@ -117,7 +117,7 @@ export function AppHeader({
             <BrandLogo />
           </Link>
           <nav className="flex items-center gap-1 sm:gap-2">
-            {/* One anchor only — the landing page is a single scroll, and a second
+            {/* One anchor only, the landing page is a single scroll, and a second
                 link to a neighbouring section reads as a second page that repeats it. */}
             <a
               href="#how-it-works"

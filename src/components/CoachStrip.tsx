@@ -27,7 +27,7 @@ type CoachStripProps = {
 const MODES: { id: CueMode; label: string; hint: string }[] = [
   { id: "full", label: "Guided", hint: "Show me the play and an example line" },
   { id: "soft", label: "Hints", hint: "Just the anchor points" },
-  { id: "off", label: "Unaided", hint: "No help — test me" },
+  { id: "off", label: "Unaided", hint: "No help, test me" },
 ];
 
 function readStoredCueMode(): CueMode {
@@ -68,11 +68,6 @@ export function CoachStrip({
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted">
             How much help do you want?
-          </p>
-          <p className="mt-0.5 text-xs text-muted">
-            Work down to <strong className="text-foreground">Unaided</strong> —
-            that&apos;s the one that proves it stuck. Recorded with your score.
-            Tips stay on your screen only.
           </p>
         </div>
         <div
@@ -159,7 +154,7 @@ export function CoachStrip({
           {mode === "full" && track.exampleLine ? (
             <div className="rounded-md border border-border bg-card px-3 py-2">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">
-                Example line (glance — don’t read robotically)
+                Example line (glance, don’t read robotically)
               </p>
               <p className="mt-1 text-sm leading-relaxed text-foreground">
                 “{track.exampleLine}”

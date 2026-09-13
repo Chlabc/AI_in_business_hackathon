@@ -150,7 +150,7 @@ export async function POST(request: Request) {
     }
     if (!reason.trim()) {
       return NextResponse.json(
-        { error: "Why? is required — a score change needs an explanation." },
+        { error: "Why? is required, a score change needs an explanation." },
         { status: 400 },
       );
     }

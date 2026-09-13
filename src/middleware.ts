@@ -36,7 +36,7 @@ const MANAGER_ONLY = [
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Public — always show /login (even if already signed in) so demos can
+  // Public, always show /login (even if already signed in) so demos can
   // switch employee/manager accounts without the page "disappearing."
   if (
     pathname === "/" ||

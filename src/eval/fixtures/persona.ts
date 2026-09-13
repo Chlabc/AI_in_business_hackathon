@@ -115,7 +115,7 @@ export const PERSONA_CHECKS: PersonaCheck[] = [
       },
       {
         role: "user",
-        text: `No — our list is ${FIRM.standardPermFeePct}% with the marketing plan and negotiation support. What does too expensive mean for you?`,
+        text: `No ,  our list is ${FIRM.standardPermFeePct}% with the marketing plan and negotiation support. What does too expensive mean for you?`,
       },
     ],
     assert: (score) => {

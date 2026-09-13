@@ -1,7 +1,7 @@
 import type { CallRecord, Firm, Rep, TalkTrack } from "@/lib/types";
 
 /**
- * Demo firm — real estate (fictional).
+ * Demo firm - real estate (fictional).
  * Fee fields store commission percentages. These are fictional agency policies,
  * excluding GST, with marketing costs separate; not industry benchmarks.
  */
@@ -32,7 +32,7 @@ export const TALK_TRACKS: TalkTrack[] = [
   {
     id: "tt_price_anchor",
     objectionType: "fee",
-    title: "Commission pushback — explore, then anchor value",
+    title: "Commission pushback, explore, then anchor value",
     approvedPlay:
       "Ask what the lower commission includes, explain the appraisal, marketing and negotiation service, then hold the approved fee. Do not discount in the first response.",
     anchorPoints: [
@@ -93,7 +93,7 @@ export const TALK_TRACKS: TalkTrack[] = [
 ];
 
 /**
- * Seeded call outcomes for Alex — labelled demo data.
+ * Seeded call outcomes for Alex - labelled demo data.
  * Ground truth weak spot: pricing stage / price objection (high discount rate).
  * feeAskedPct / feeEndedPct = commission percentages.
  */
@@ -110,7 +110,7 @@ export const CALLS: CallRecord[] = [
     feeAskedPct: 2.5,
     feeEndedPct: 2.125,
     transcriptSnippet:
-      "Client: 2.5% is too high — another agency is 1.75%. Alex: Okay, we can do 2.125% if you sign this week.",
+      "Client: 2.5% is too high, another agency is 1.75%. Alex: Okay, we can do 2.125% if you sign this week.",
     notes: "Conceded in under 30s; no exploration of ‘too expensive’.",
   },
   {

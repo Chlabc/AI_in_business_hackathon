@@ -11,7 +11,7 @@ export type BeforeAfterEvidence = {
   /** Hold rate on the latest half of attempts. */
   holdRateLatePct: number | null;
   scoreDelta: number | null;
-  /** Grounded blurb — never invents pipeline / conversion %. */
+  /** Grounded blurb - never invents pipeline / conversion %. */
   roiBlurb: string;
   summaryLine: string;
 };
@@ -44,7 +44,7 @@ export function beforeAfterFromAttempts(
       holdRateEarlyPct: null,
       holdRateLatePct: null,
       scoreDelta: null,
-      summaryLine: "No scored drills yet — run 2–3 price drills to generate evidence.",
+      summaryLine: "No scored drills yet, run 2 to 3 price drills to generate evidence.",
       roiBlurb:
         "Cornerman’s value claim is behavioural: diagnose the weak spot, drill it live, and measure hold-rate / score change across attempts. We do not invent pipeline conversion lifts. After a few drills, this page fills with before/after from real practice scores.",
     };
@@ -68,15 +68,15 @@ export function beforeAfterFromAttempts(
     scoreDelta > 5
       ? `Overall score improved ${first.score.overall} → ${latest.score.overall} (Δ+${scoreDelta}).`
       : scoreDelta < -5
-        ? `Overall score moved ${first.score.overall} → ${latest.score.overall} (Δ${scoreDelta}) — keep drilling the approved play.`
+        ? `Overall score moved ${first.score.overall} → ${latest.score.overall} (Δ${scoreDelta}), keep drilling the approved play.`
         : `Overall score stayed near ${latest.score.overall}/100 (first ${first.score.overall}).`;
 
   const behaviourPhrase =
     first.score.heldFee === false && latest.score.heldFee === true
-      ? "First drill softened price; latest drill held list — the behaviour the coach targets."
+      ? "First drill softened price; latest drill held list, the behaviour the coach targets."
       : first.score.heldFee && latest.score.heldFee
         ? "Hold behaviour stayed intact from first to latest drill."
-        : "Latest drill still softened — use Soft/Full cues and Learn before the next attempt.";
+        : "Latest drill still softened, use Soft/Full cues and Learn before the next attempt.";
 
   return {
     attemptCount: n,
@@ -89,11 +89,11 @@ export function beforeAfterFromAttempts(
     scoreDelta,
     summaryLine: `${holdPhrase} ${scorePhrase}`,
     roiBlurb: [
-      "Semi-quantified value (practice only — not CRM revenue):",
+      "Semi-quantified value (practice only, not CRM revenue):",
       holdPhrase,
       scorePhrase,
       behaviourPhrase,
-      "If each avoided panic discount protects margin on a property listing, coaching payback is the retained list price on listings where the agent would otherwise concede — measured here via hold rate, not invented win rates.",
+      "If each avoided panic discount protects margin on a property listing, coaching payback is the retained list price on listings where the agent would otherwise concede, measured here via hold rate, not invented win rates.",
     ].join(" "),
   };
 }
@@ -150,7 +150,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
     participant: "Manager M",
     role: "Sales manager",
     date: "2026-09-12",
-    beforeNote: "Only saw win/loss — not whether reps panic-discounted.",
+    beforeNote: "Only saw win/loss, not whether reps panic-discounted.",
     afterNote: "Progress share showed hold rate without raw transcripts.",
     quote:
       "I want the trend, not the tape. This stays on the right side of surveillance.",
@@ -171,9 +171,9 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
 
 export const USER_TEST_PROTOCOL: string[] = [
   "Pick one agent with a known price-cave habit (or use Alex).",
-  "Record a baseline: one unscored or Soft-off drill — note if they discount in the first reply.",
-  "Run Learn (facts) + Soft/Full cues for 2–3 drills on the same scenario.",
+  "Record a baseline: one unscored or Soft-off drill, note if they discount in the first reply.",
+  "Run Learn (facts) + Soft/Full cues for 2 to 3 drills on the same scenario.",
   "Capture before/after: first vs latest hold + score (this page auto-fills from attempts).",
   "Ask for one quote: what changed in how they handled “too expensive?”",
-  "Do not invent CRM conversion % — only report practice hold/score deltas + quotes.",
+  "Do not invent CRM conversion %, only report practice hold/score deltas + quotes.",
 ];

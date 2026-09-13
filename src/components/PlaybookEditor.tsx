@@ -1,6 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type TextareaHTMLAttributes,
+} from "react";
+import { InfoTip } from "@/components/InfoTip";
 import type { FirmPlaybook, PlaybookTalkTrack } from "@/lib/playbook";
 import {
   draftStatus,
@@ -15,6 +22,30 @@ type PlaybookEditorProps = {
   live: FirmPlaybook;
   initialDraft: PlaybookDraft | null;
 };
+
+/** Grows/shrinks to fit content so the box wraps the text without empty space. */
+function AutoTextarea({
+  className,
+  value,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "0px";
+    el.style.height = `${Math.max(el.scrollHeight, 40)}px`;
+  }, [value]);
+  return (
+    <textarea
+      {...props}
+      ref={ref}
+      value={value}
+      rows={1}
+      className={`resize-y overflow-hidden ${className ?? ""}`}
+    />
+  );
+}
 
 function linesToList(text: string): string[] {
   return text
@@ -178,7 +209,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       setPendingPdf(null);
       setParseBanner(
         lockedOrMessage(nextProposals) ||
-          "Document parsed — scroll down and click Publish when ready.",
+          "Document parsed, scroll down and click Publish when ready.",
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Import failed");
@@ -190,9 +221,9 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   function lockedOrMessage(nextProposals: PlaybookProposal[]) {
     const n = nextProposals.length;
     if (!n) {
-      return "Document parsed — no field changes detected. Scroll down if you still want to edit, then Publish when ready.";
+      return "Document parsed, no field changes detected. Scroll down if you still want to edit, then Publish when ready.";
     }
-    return `Document parsed — ${n} proposal${n === 1 ? "" : "s"} ready. Scroll down, review what to accept, then click Publish.`;
+    return `Document parsed, ${n} proposal${n === 1 ? "" : "s"} ready. Scroll down, review what to accept, then click Publish.`;
   }
 
   function onFile(file: File | null) {
@@ -210,7 +241,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       setPendingPdf(file);
       setImportText("");
       setError(null);
-      setMessage(`PDF ready: ${file.name} — click Parse to extract + import.`);
+      setMessage(`PDF ready: ${file.name}, click Parse to extract + import.`);
       return;
     }
     setPendingPdf(null);
@@ -302,7 +333,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
 
   async function clearKnowledgeBase() {
     const ok = window.confirm(
-      "Clear the entire knowledge base?\n\nThis wipes live pricing, anchors, talk-track copy, and FAQ, and discards any draft — so you can upload the sample PDF and parse from a blank slate. This cannot be undone.",
+      "Clear the entire knowledge base?\n\nThis wipes live pricing, anchors, talk-track copy, and FAQ, and discards any draft, so you can upload the sample PDF and parse from a blank slate. This cannot be undone.",
     );
     if (!ok) return;
     setClearing(true);
@@ -364,7 +395,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   }
 
   const fieldClass =
-    "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
+    "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm font-normal text-foreground outline-none focus:border-accent";
 
   const processing = importing || publishing || savingDraft || clearing;
   const statusTone = error
@@ -385,7 +416,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           : savingDraft
             ? "Saving…"
             : locked
-              ? "Draft — not live in drills"
+              ? "Draft, not live in drills"
               : "Live";
   const statusDotClass =
     statusTone === "green"
@@ -394,37 +425,45 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         ? "bg-danger"
         : "bg-amber-500";
 
+  const statusBadge = (
+    <span
+      className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${
+        statusTone === "green"
+          ? "border-ok/40 bg-ok-soft text-ok"
+          : statusTone === "red"
+            ? "border-danger/40 bg-danger-soft text-danger"
+            : "border-amber-700/50 bg-amber-500 text-amber-950"
+      }`}
+    >
+      <span
+        aria-hidden
+        className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusDotClass} ${processing ? "animate-pulse" : ""} ${statusTone === "orange" ? "bg-amber-950" : ""}`}
+      />
+      {statusLabel}
+    </span>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${
-            statusTone === "green"
-              ? "border-ok/40 bg-ok-soft text-ok"
-              : statusTone === "red"
-                ? "border-danger/40 bg-danger-soft text-danger"
-                : "border-amber-700/50 bg-amber-500 text-amber-950"
-          }`}
-        >
-          <span
-            aria-hidden
-            className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusDotClass} ${processing ? "animate-pulse" : ""} ${statusTone === "orange" ? "bg-amber-950" : ""}`}
-          />
-          {statusLabel}
-        </span>
-        {method ? (
-          <span className="text-xs text-muted">Last parse: {method}</span>
-        ) : null}
-      </div>
-
       <section className="surface-card rounded-xl p-5 sm:p-6">
-        <p className="eyebrow">Import</p>
-        <h2 className="mt-1 text-lg font-semibold text-foreground">
-          Company document → knowledge draft
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow">Import</p>
+            <h2 className="mt-1 flex items-center gap-2 text-lg font-semibold text-foreground">
+              Company document → knowledge draft
+              <InfoTip text="Download the sample PDF (or upload your own text-layer PDF), then Parse with AI or without AI. That builds a locked draft — review proposals, then Publish so Learn, cue cards, scoring, and the next voice drill pick it up. Employees never edit this. Clear knowledge base first if you want to reparse from a blank slate." />
+            </h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {statusBadge}
+            {method ? (
+              <span className="text-xs text-muted">Last parse: {method}</span>
+            ) : null}
+          </div>
+        </div>
 
-        <textarea
-          className={`${fieldClass} mt-4 min-h-[140px] font-mono text-xs`}
+        <AutoTextarea
+          className={`${fieldClass} mt-4 min-h-[5rem] font-mono text-xs`}
           placeholder={`Example:\nStandard commission: 2.5%\nFloor (approval): 2%\nCompetitor often quotes 1.75%\n- local comparable sales\n- tailored marketing and negotiation support`}
           value={importText}
           onChange={(e) => {
@@ -477,7 +516,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
             onClick={() => void runImport("heuristic")}
             className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-accent disabled:opacity-50"
           >
-            Rules only
+            Parse without AI
           </button>
         </div>
         {importing ? (
@@ -608,8 +647,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
 
         <label className="mt-4 block text-xs font-semibold uppercase tracking-wider text-muted">
           Value anchors (one per line)
-          <textarea
-            rows={4}
+          <AutoTextarea
             className={fieldClass}
             value={listToLines(working.valueAnchors)}
             onChange={(e) =>
@@ -648,8 +686,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
                   <div className="space-y-3 border-t border-border px-4 py-4">
                     <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
                       Approved play
-                      <textarea
-                        rows={2}
+                      <AutoTextarea
                         className={fieldClass}
                         value={t.approvedPlay}
                         onChange={(e) =>
@@ -659,8 +696,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
                     </label>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
                       Anchor points (one per line)
-                      <textarea
-                        rows={3}
+                      <AutoTextarea
                         className={fieldClass}
                         value={listToLines(t.anchorPoints)}
                         onChange={(e) =>
@@ -672,8 +708,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
                     </label>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
                       Never do (one per line)
-                      <textarea
-                        rows={2}
+                      <AutoTextarea
                         className={fieldClass}
                         value={listToLines(t.neverDo)}
                         onChange={(e) =>
@@ -685,8 +720,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
                     </label>
                     <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
                       Example line (Full cues)
-                      <textarea
-                        rows={2}
+                      <AutoTextarea
                         className={fieldClass}
                         value={t.exampleLine}
                         onChange={(e) =>
@@ -707,8 +741,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <h2 className="mt-1 text-lg font-semibold text-foreground">
           Extra company notes
         </h2>
-        <textarea
-          rows={6}
+        <AutoTextarea
           className={`${fieldClass} mt-4`}
           value={working.faqNotes}
           onChange={(e) => update("faqNotes", e.target.value)}
@@ -754,7 +787,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           {livePlaybook.updatedAt &&
           livePlaybook.updatedAt !== new Date(0).toISOString()
             ? new Date(livePlaybook.updatedAt).toLocaleString()
-            : "— defaults (not published yet)"}
+            : ",  defaults (not published yet)"}
         </p>
       </div>
     </div>

@@ -67,10 +67,6 @@ export function ShareControls({
               ? "Sharing progress · click to make private"
               : "Private · click to share progress"}
         </button>
-        {/* No link to /coach/manager here — the middleware bounces employees, so it would dead-end. */}
-        <span className="text-sm text-muted">
-          Sign in as a manager to see what they see.
-        </span>
       </div>
 
       {error ? (

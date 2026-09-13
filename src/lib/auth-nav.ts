@@ -5,7 +5,7 @@ export function navForRole(
   role: Role | null,
 ): { href: string; label: string }[] {
   if (role === "employee") {
-    // Profile · Learn · Practice · Progress — one job each.
+    // Profile · Learn · Practice · Progress, one job each.
     // Scenarios live inside Practice (picker when no ?scenario=).
     return [
       { href: "/coach", label: "Profile" },

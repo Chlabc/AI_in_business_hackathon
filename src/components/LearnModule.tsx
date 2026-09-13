@@ -66,7 +66,7 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
           <div>
             <p className="eyebrow">Study</p>
             <h2 className="mt-1 text-2xl font-semibold text-foreground">
-              Firm facts — {firmName}
+              Firm facts: {firmName}
             </h2>
             <p className="mt-2 text-sm text-muted">
               Card {cardIndex + 1} of {cards.length}. Flip, then continue. Quiz
@@ -291,7 +291,7 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
         </h2>
         <p className="mt-2 text-sm text-muted">
           {score === questions.length
-            ? "Sharp — take that into a live drill."
+            ? "Sharp, take that into a live drill."
             : "Review the misses, then drill the price objection while it’s fresh."}
         </p>
       </div>
@@ -302,9 +302,9 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
           {questions.map((q) => {
             const gotIt = answers[q.id] === q.correctId;
             const pickedLabel =
-              q.options.find((o) => o.id === answers[q.id])?.label ?? "—";
+              q.options.find((o) => o.id === answers[q.id])?.label ?? "-";
             const correctLabel =
-              q.options.find((o) => o.id === q.correctId)?.label ?? "—";
+              q.options.find((o) => o.id === q.correctId)?.label ?? "-";
             return (
               <li key={q.id} className="border-t border-border pt-3 text-sm first:border-t-0 first:pt-0">
                 <p className="font-medium text-foreground">{q.prompt}</p>
@@ -331,7 +331,7 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
           })}
         </ul>
         {missed.length === 0 ? (
-          <p className="mt-3 text-sm text-ok">All five correct — nice work.</p>
+          <p className="mt-3 text-sm text-ok">All five correct, nice work.</p>
         ) : null}
       </section>
 
@@ -361,7 +361,7 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
   );
 }
 
-/** A neighbouring card in the deck — same material, no flip, no interaction. */
+/** A neighbouring card in the deck - same material, no flip, no interaction. */
 function DeckFace({ text, tag }: { text: string; tag: string }) {
   return (
     <div className="flashcard">

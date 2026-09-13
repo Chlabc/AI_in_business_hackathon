@@ -1,6 +1,6 @@
 import { DEMO_REP_ID } from "@/data/seed";
 
-/** Demo team KPIs — illustrative manager dashboard rows. */
+/** Demo team KPIs - illustrative manager dashboard rows. */
 export type TeamMember = {
   /** Same id space as seed reps when the member is a live demo AE. */
   id: string;

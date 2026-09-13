@@ -66,7 +66,7 @@ export function CalibrateCoachSection({
         <strong className="font-medium text-foreground">
           {repName.split(" ")[0]}&apos;s agency standard
         </strong>{" "}
-        for future drills. Criterion scores only — no transcripts.
+        for future drills. Criterion scores only, no transcripts.
       </p>
 
       {message ? (
@@ -169,8 +169,8 @@ function DisagreeForm({
       if (!res.ok) throw new Error(data.error ?? "Calibration failed");
       onDone(
         scope === "agency"
-          ? "Saved — this is now your agency standard for future drills."
-          : "Saved — applied to this conversation only.",
+          ? "Saved, this is now your agency standard for future drills."
+          : "Saved, applied to this conversation only.",
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Calibration failed");
@@ -193,7 +193,7 @@ function DisagreeForm({
         >
           {attempt.criteria.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.label} — coach gave {Math.round(c.score * 100)}%
+              {c.label}: coach gave {Math.round(c.score * 100)}%
             </option>
           ))}
         </select>

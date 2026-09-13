@@ -4,7 +4,7 @@ import { FIRM, TALK_TRACKS } from "@/data/seed";
 import { dataStorePath } from "@/lib/file-store";
 import type { ObjectionType, TalkTrack } from "@/lib/types";
 
-/** Editable firm knowledge — source of truth for coach UI + client overrides. */
+/** Editable firm knowledge - source of truth for coach UI + client overrides. */
 export type PlaybookTalkTrack = {
   id: string;
   objectionType: ObjectionType;
@@ -26,7 +26,7 @@ export type FirmPlaybook = {
   competitorQuotePct: number;
   valueAnchors: string[];
   talkTracks: PlaybookTalkTrack[];
-  /** Freeform dump — FAQ, policies, notes (not injected wholesale into ElevenLabs) */
+  /** Freeform dump - FAQ, policies, notes (not injected wholesale into ElevenLabs) */
   faqNotes: string;
   updatedAt: string;
 };
@@ -34,9 +34,9 @@ export type FirmPlaybook = {
 const STORE = dataStorePath("playbook.json");
 
 const DEFAULT_EXAMPLES: Partial<Record<ObjectionType, string>> = {
-  fee: "Before we discuss commission — what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.",
+  fee: "Before we discuss commission, what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.",
   other_agency:
-    "I respect that relationship — is there anything you still need from your selling plan? If useful, we can arrange a no-obligation appraisal so you can compare approaches.",
+    "I respect that relationship, is there anything you still need from your selling plan? If useful, we can arrange a no-obligation appraisal so you can compare approaches.",
   just_cvs:
     "A useful appraisal starts with your property and plans. What is your timeframe, and would a short appraisal appointment help?",
   timing:
@@ -65,7 +65,7 @@ export function defaultPlaybook(): FirmPlaybook {
 
 /**
  * Empty live knowledge for a clean reparse. Clears firm facts and all
- * talk-track copy — parse (AI + rules) regenerates plays from the new doc
+ * talk-track copy - parse (AI + rules) regenerates plays from the new doc
  * so leftover defaults can’t disagree with different uploaded content.
  */
 export function blankPlaybook(): FirmPlaybook {

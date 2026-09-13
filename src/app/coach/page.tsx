@@ -15,7 +15,7 @@ import { getShareSettings } from "@/lib/share";
 
 export const dynamic = "force-dynamic";
 
-function pct(n: number | null | undefined, fallback = "—") {
+function pct(n: number | null | undefined, fallback = "-") {
   if (n === null || n === undefined) return fallback;
   return `${n}%`;
 }
@@ -77,7 +77,7 @@ export default async function CoachPage() {
           value: seatPrice(
             kpis.avgFeeAskedPct !== null && kpis.avgFeeEndedPct !== null
               ? Math.round(
-                  (kpis.avgFeeAskedPct - kpis.avgFeeEndedPct) * 100,
+                  (kpis.avgFeeAskedPct, kpis.avgFeeEndedPct) * 100,
                 ) / 100
               : null,
           ).replace("%", " pp"),
@@ -94,7 +94,7 @@ export default async function CoachPage() {
 
   return (
     <AppShell>
-      {/* 2 — optional onboarding banner */}
+      {/* 2, optional onboarding banner */}
       <OnboardingBanner className={colors.onboarding} />
 
       <PageHeader
@@ -115,7 +115,7 @@ export default async function CoachPage() {
         }
       />
 
-      {/* Credential + snapshot — vertically centered as a pair */}
+      {/* Credential + snapshot, vertically centered as a pair */}
       <div className={colors.profilePerformance}>
         <EmployeeCredential
           key={`${rep.id}:${user.name}`}
@@ -142,14 +142,14 @@ export default async function CoachPage() {
             <div className="rounded-lg border border-border bg-background p-3">
               <p className="text-xs text-muted">Last drill score</p>
               <p className="mt-1 text-2xl font-semibold">
-                {practice.lastScore ?? "—"}
+                {practice.lastScore ?? "-"}
               </p>
             </div>
             <div className="rounded-lg border border-border bg-background p-3">
               <p className="text-xs text-muted">Price hold</p>
               <p className="mt-1 text-2xl font-semibold">
                 {practice.feeHoldRate === null
-                  ? "—"
+                  ? ", "
                   : `${practice.feeHoldRate}%`}
               </p>
             </div>

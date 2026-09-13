@@ -26,9 +26,9 @@ function suggestedForScenario(
   if (exampleLine?.trim()) return exampleLine.trim();
   switch (scenarioId) {
     case "competitor":
-      return "I respect that relationship — what else do you need from your selling plan? If useful, we can arrange a no-obligation appraisal to compare approaches.";
+      return "I respect that relationship, what else do you need from your selling plan? If useful, we can arrange a no-obligation appraisal to compare approaches.";
     case "not-interested":
-      return "Totally fair. If helpful I’ll leave one market note and book a 10-minute check-in next month — only if a local property update would be useful.";
+      return "Totally fair. If helpful I’ll leave one market note and book a 10-minute check-in next month, only if a local property update would be useful.";
     case "need-to-think":
       return "Makes sense. Shall I send a one-pager and we lock 15 minutes Thursday to decide go / no-go with your partner on the call?";
     case "price-objection":
@@ -37,7 +37,7 @@ function suggestedForScenario(
         playbook.valueAnchors.find((a) => /comparable|market|negotiation|appraisal/i.test(a)) ??
         playbook.valueAnchors[0] ??
         "local market evidence";
-      return `Before we discuss commission — what matters most in choosing your agent? Let’s compare the service, including ${anchor}. ${talkTrackPlay}`;
+      return `Before we discuss commission, what matters most in choosing your agent? Let’s compare the service, including ${anchor}. ${talkTrackPlay}`;
     }
   }
 }
@@ -56,7 +56,7 @@ function firstUserText(turns: TranscriptTurn[]): string {
 }
 
 /**
- * Detect commission percentages the agent offers/concedes —
+ * Detect commission percentages the agent offers/concedes  - 
  * not competitor quotes they only mention.
  */
 function extractOfferedFees(text: string): number[] {
@@ -150,7 +150,7 @@ function scoreCriterion(
         return {
           id,
           score: 1,
-          notes: "Asked permission to follow up later — a good outcome here.",
+          notes: "Asked permission to follow up later, a good outcome here.",
         };
       }
       if (cleanClose) {
@@ -215,21 +215,21 @@ function scoreCriterion(
           score: cave ? 0.3 : 0.85,
           notes: cave
             ? "Sounded open to dropping fee without a clear held number."
-            : "No explicit fee drop detected — treated as holding the ask.",
+            : "No explicit fee drop detected, treated as holding the ask.",
         };
       }
       if (minOffered < floor) {
         return {
           id,
           score: 0,
-          notes: `Offered ${minOffered}% — below firm floor (${floor}%).`,
+          notes: `Offered ${minOffered}%, below firm floor (${floor}%).`,
         };
       }
       if (minOffered < soft) {
         return {
           id,
           score: 0.35,
-          notes: `Moved to ${minOffered}% — above floor but soft vs ${std}% list.`,
+          notes: `Moved to ${minOffered}%, above floor but soft vs ${std}% list.`,
         };
       }
       if (minOffered < std) {
@@ -314,7 +314,7 @@ export function scoreTranscriptHeuristic(
   }
   const strong = criteria.filter((c) => c.score >= 0.8);
   if (strong[0]) {
-    feedback.unshift(`Strength — ${strong[0].label}: ${strong[0].notes}`);
+    feedback.unshift(`Strength: ${strong[0].label}: ${strong[0].notes}`);
   }
   feedback.push(`Approved play: ${talkTrack.approvedPlay}`);
   feedback.push(

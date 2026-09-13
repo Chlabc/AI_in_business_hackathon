@@ -41,13 +41,13 @@ export function ProgressPanel({
             Last score
           </p>
           <p className="mt-1 text-2xl font-semibold">
-            {attempts[0]?.score.overall ?? "—"}
+            {attempts[0]?.score.overall ?? "-"}
           </p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-wider text-muted">Price hold</p>
           <p className="mt-1 text-2xl font-semibold">
-            {feeHoldRate === null ? "—" : `${feeHoldRate}%`}
+            {feeHoldRate === null ? ", " : `${feeHoldRate}%`}
           </p>
         </div>
       </div>

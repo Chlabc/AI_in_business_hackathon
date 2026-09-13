@@ -4,10 +4,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { PracticeBriefing } from "@/components/PracticeBriefing";
 import { PracticeSession } from "@/components/PracticeSession";
 import { SCENARIOS, getScenario } from "@/data/scenarios";
-import { DEMO_REP_ID, FIRM } from "@/data/seed";
+import { DEMO_REP_ID } from "@/data/seed";
 import { requireRole } from "@/lib/auth";
-import colors from "@/app/coach/coach.module.css";
-import { diagnoseRep, getRepDashboard } from "@/lib/diagnosis";
+import { diagnoseRep } from "@/lib/diagnosis";
 import { getPlaybook, getPlaybookTalkTrack } from "@/lib/playbook";
 import { applyPlaybookToScenario } from "@/lib/scenario-session";
 
@@ -35,9 +34,8 @@ export default async function PracticePage({ searchParams }: Props) {
   const scenarioId = params.scenario?.trim() || null;
   const playbook = await getPlaybook();
   const diagnosis = diagnoseRep(repId);
-  const dash = getRepDashboard(repId);
 
-  // No scenario chosen → verdict + briefing + picker. With ?scenario= → live drill.
+  // No scenario chosen → tips + picker. With ?scenario= → live drill.
   if (!scenarioId) {
     const track =
       getPlaybookTalkTrack(
@@ -67,41 +65,12 @@ export default async function PracticePage({ searchParams }: Props) {
           title="What do you want to practise?"
         />
 
-        {diagnosis && dash ? (
-          <section
-            className={`${colors.verdict} surface-card rounded-xl p-6 lg:p-8`}
-          >
-            <p className="text-xs font-semibold uppercase tracking-wider text-accent">
-              The pattern costing you deals
-            </p>
-            <h2 className="display-serif mt-3 max-w-4xl text-3xl leading-snug text-foreground lg:text-4xl">
-              {diagnosis.headline}
-            </h2>
-            <p className="mt-4 text-sm text-muted">
-              Found across{" "}
-              <strong className="font-medium text-foreground">
-                {dash.kpis.callsAnalysed} calls
-              </strong>
-              , with {diagnosis.confidence} confidence. It shows up most in the{" "}
-              <strong className="font-medium text-foreground">
-                {label(diagnosis.primaryStage)}
-              </strong>{" "}
-              part of the conversation.
-            </p>
-          </section>
-        ) : null}
-
         {track ? (
           <PracticeBriefing
-            firmName={playbook.firmName || FIRM.name}
             listPct={playbook.standardPermFeePct}
             floorPct={playbook.feeFloorPct}
             talkTrack={track}
-            whyThis={
-              diagnosis
-                ? `${label(diagnosis.primaryObjection)} in the ${label(diagnosis.primaryStage)} stage`
-                : null
-            }
+            whyThis={diagnosis?.headline ?? null}
           />
         ) : null}
 
@@ -178,7 +147,7 @@ export default async function PracticePage({ searchParams }: Props) {
   const headline =
     scenario.id === "price-objection"
       ? (diagnosis?.headline ??
-        "Drill the price conversation — your diagnosed weak spot.")
+        "Drill the price conversation, your diagnosed weak spot.")
       : `${scenario.skill}: ${scenario.description}`;
 
   return (
@@ -191,9 +160,9 @@ export default async function PracticePage({ searchParams }: Props) {
           <>
             <Link
               href="/coach/practice"
-              className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted transition hover:text-foreground"
+              className="inline-flex h-10 items-center rounded-md border border-border bg-background px-4 text-sm font-medium text-foreground transition hover:border-accent"
             >
-              ← All scenarios
+              All scenarios
             </Link>
             <span className="inline-flex h-10 items-center rounded-md border border-border bg-card px-3 text-xs text-muted">
               {scenario.difficulty}

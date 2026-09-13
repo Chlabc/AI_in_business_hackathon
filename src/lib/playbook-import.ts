@@ -140,7 +140,7 @@ function pickFeeTalkTrackPatch(
 
 /**
  * When AI is unavailable, invent coaching plays for every empty talk-track
- * from extracted firm facts (rates + anchors + never-dos) — not stale defaults.
+ * from extracted firm facts (rates + anchors + never-dos) - not stale defaults.
  */
 export function synthesizeTalkTracksFromFacts(
   current: FirmPlaybook,
@@ -174,7 +174,7 @@ export function synthesizeTalkTracksFromFacts(
       neverDo: neverFromDoc,
       exampleLine:
         feeExisting?.exampleLine ??
-        `Before we talk rate — what are you comparing ${list}% to? Here’s how we protect your net proceeds…`,
+        `Before we talk rate, what are you comparing ${list}% to? Here’s how we protect your net proceeds…`,
     },
     other_agency: {
       approvedPlay: `Acknowledge the other relationship, ask what they’re still missing, then contrast ${firm}’s plan and ${valueLine}. Don’t trash the other agent.`,
@@ -188,7 +188,7 @@ export function synthesizeTalkTracksFromFacts(
         "Don’t invent exclusivity the seller hasn’t agreed to",
       ],
       exampleLine:
-        "Totally fair you’ve spoken to someone else — what’s the one outcome you’re not sure they’ll deliver?",
+        "Totally fair you’ve spoken to someone else, what’s the one outcome you’re not sure they’ll deliver?",
     },
     just_cvs: {
       approvedPlay: `Reframe an appraisal-only request into a short discovery: purpose of the estimate, timeline, and how ${firm} would market if they listed. Offer a brief consult, not a free dump.`,
@@ -202,7 +202,7 @@ export function synthesizeTalkTracksFromFacts(
         "Don’t commit to listing terms in the first message",
       ],
       exampleLine:
-        "Happy to share how we’d appraise it — can I ask what decision the number is feeding?",
+        "Happy to share how we’d appraise it, can I ask what decision the number is feeding?",
     },
     timing: {
       approvedPlay: `Respect “not selling now.” Ask permission to stay useful: market updates, street comps, and a light touch-back when timing changes.`,
@@ -216,10 +216,10 @@ export function synthesizeTalkTracksFromFacts(
         "Don’t guilt them about missing the market",
       ],
       exampleLine:
-        "No rush — want me to send a quiet update when similar homes nearby move?",
+        "No rush, want me to send a quiet update when similar homes nearby move?",
     },
     exclusivity: {
-      approvedPlay: `Treat authority/exclusivity concerns as process, not pressure. Explain what a sales authority covers, when it starts, and how ${firm} reports — then invite questions.`,
+      approvedPlay: `Treat authority/exclusivity concerns as process, not pressure. Explain what a sales authority covers, when it starts, and how ${firm} reports, then invite questions.`,
       anchorPoints: [
         "What the authority does and doesn’t lock in",
         "Reporting and cancellation expectations",
@@ -230,7 +230,7 @@ export function synthesizeTalkTracksFromFacts(
         "Don’t hide term length or fees",
       ],
       exampleLine:
-        "Before any paperwork — want a plain-English walkthrough of the authority and what you can change later?",
+        "Before any paperwork, want a plain-English walkthrough of the authority and what you can change later?",
     },
   };
 
@@ -274,7 +274,7 @@ export function synthesizeTalkTracksFromFacts(
 }
 
 /**
- * Deterministic heuristic import — no LLM required.
+ * Deterministic heuristic import - no LLM required.
  * Same-line keyword matching so short docs don’t assign one rate to every field.
  */
 export function extractPlaybookFromDocument(
@@ -288,7 +288,7 @@ export function extractPlaybookFromDocument(
   if (!text) {
     return {
       patch: {},
-      findings: ["Empty document — nothing imported."],
+      findings: ["Empty document, nothing imported."],
       talkTrackPatches: [],
     };
   }
@@ -355,7 +355,7 @@ export function extractPlaybookFromDocument(
     findings.length === 1 ||
     (findings.length === 2 && findings[0]?.startsWith("Appended"))
   ) {
-    findings.unshift("No priced fields detected — FAQ notes updated only");
+    findings.unshift("No priced fields detected, FAQ notes updated only");
   }
 
   const nextList = patch.standardPermFeePct ?? current.standardPermFeePct;

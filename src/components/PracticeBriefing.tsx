@@ -3,20 +3,18 @@ import { seatPrice, seatPriceFull } from "@/lib/money";
 import type { PlaybookTalkTrack } from "@/lib/playbook";
 
 type PracticeBriefingProps = {
-  firmName: string;
   listPct: number;
   floorPct: number;
   talkTrack: PlaybookTalkTrack;
-  /** Short diagnosis line tying this briefing to the profile. */
+  /** Biggest issue / diagnosis headline folded into Tips. */
   whyThis?: string | null;
 };
 
 /**
- * Tips + prices + do/never — lives on Practice so reps see them before
+ * Tips + prices + do/never - lives on Practice so reps see them before
  * picking a scenario.
  */
 export function PracticeBriefing({
-  firmName,
   listPct,
   floorPct,
   talkTrack,
@@ -27,16 +25,12 @@ export function PracticeBriefing({
       <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
         Tips
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        Quick coaching tips from {firmName}
-        {whyThis ? (
-          <>
-            {" "}
-            for <span className="text-foreground">{whyThis}</span>
-          </>
-        ) : null}
-        .
-      </p>
+      {whyThis ? (
+        <p className="mt-3 rounded-lg border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-foreground">
+          <span className="font-semibold text-accent">Your biggest issue: </span>
+          {whyThis}
+        </p>
+      ) : null}
       <h3 className="display-serif mt-5 text-2xl text-accent sm:text-3xl">
         {talkTrack.title}
       </h3>

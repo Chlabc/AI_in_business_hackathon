@@ -128,7 +128,7 @@ export async function listPracticeSessionsForRep(
 }
 
 /**
- * Full-ish rows for Progress / KPIs — one query, no N+1 getPracticeSession.
+ * Full-ish rows for Progress / KPIs - one query, no N+1 getPracticeSession.
  * Turns omitted (empty) unless you need transcripts (use getPracticeSession).
  */
 export async function listPracticeAttemptsForRep(
@@ -192,7 +192,7 @@ export async function updatePracticeSessionCalibration(
   return data ? mapRow(data as Row) : null;
 }
 
-/** Best-effort dual-write — never throw into the score response path. */
+/** Best-effort dual-write - never throw into the score response path. */
 export async function tryUpsertPracticeSession(
   attempt: PracticeAttempt,
 ): Promise<{ ok: true } | { ok: false; error: string }> {

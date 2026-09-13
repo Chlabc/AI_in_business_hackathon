@@ -60,7 +60,7 @@ export function FeedbackCard({
     try {
       if (!attemptId || !attemptPersisted) {
         setSaveMsg(
-          "Kept for this PDF download. Attempt wasn’t persisted on the server — re-download before you leave.",
+          "Kept for this PDF download. Attempt wasn’t persisted on the server, re-download before you leave.",
         );
         return;
       }
@@ -134,7 +134,7 @@ export function FeedbackCard({
             {agency.map((a) => (
               <li key={a.criterionId} className="text-sm text-foreground">
                 <span className="font-medium">{a.label}</span>
-                {" — "}
+                {", "}
                 <span className="text-muted">&ldquo;{a.reason}&rdquo;</span>
                 <span className="mt-0.5 block text-xs text-muted">
                   Set by {a.setByName}
@@ -219,7 +219,7 @@ export function FeedbackCard({
                   <td className="py-3 pr-3 text-right font-mono text-xs text-muted">
                     {Math.round(c.score * c.max)}/{c.max}
                   </td>
-                  <td className="py-3 text-muted">{c.notes || "—"}</td>
+                  <td className="py-3 text-muted">{c.notes || "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -233,7 +233,7 @@ export function FeedbackCard({
           What will you do differently?
         </h3>
         <p className="mt-1 text-sm text-muted">
-          Optional — your words, not the AI’s. Included in the PDF when filled
+          Optional, your words, not the AI’s. Included in the PDF when filled
           in. Private to you (not on the manager report).
         </p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">

@@ -6,7 +6,7 @@ const APPROVED =
   "Ask what the lower commission includes, explain the appraisal, marketing and negotiation service, then hold the approved fee. Do not discount in the first response.";
 
 const SUGGESTED =
-  "Before we discuss commission — what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.";
+  "Before we discuss commission, what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.";
 
 function criteria(partial: {
   explored: number;
@@ -72,7 +72,7 @@ function overallFrom(c: CriterionScore[]): number {
 }
 
 /**
- * Seeded practice history for Alex — clear before→after for the Progress page.
+ * Seeded practice history for Alex - clear before→after for the Progress page.
  * Early drills cave on price; later drills explore, anchor, and hold list.
  */
 export function buildAlexDemoAttempts(): PracticeAttempt[] {
@@ -100,7 +100,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         notes: {
           explored_objection:
             "Jumped to discount without exploring the 1.75% quote.",
-          held_fee: "Offered 1.875% — below list.",
+          held_fee: "Offered 1.875%, below list.",
           no_early_cave: "Conceded in the opening turn.",
         },
       },
@@ -132,7 +132,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Explored a little, then dropped to 2%.",
         "Missed local market evidence / negotiation support anchors.",
       ],
-      userLine: "Okay — 2% is our floor if you sign this quarter.",
+      userLine: "Okay, 2% is our floor if you sign this quarter.",
     },
     {
       id: "demo_alex_03",
@@ -177,8 +177,8 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Held near standard fee.",
-        "Strength — No early cave.",
+        "Strength: Held near standard fee.",
+        "Strength: No early cave.",
         "Used approved play structure.",
       ],
       userLine:
@@ -202,8 +202,8 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Anchored on value.",
-        "Strength — Held near standard fee.",
+        "Strength: Anchored on value.",
+        "Strength: Held near standard fee.",
         "Clean approved-play structure.",
       ],
       userLine:
@@ -227,12 +227,12 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Explored the objection.",
-        "Strength — Held near standard fee.",
-        "Strength — Used approved play ideas.",
+        "Strength: Explored the objection.",
+        "Strength: Held near standard fee.",
+        "Strength: Used approved play ideas.",
       ],
       userLine:
-        "What does the 1.75% include — the same marketing plan and negotiation support? Our commission is 2.5%. Let’s compare the service before deciding.",
+        "What does the 1.75% include, the same marketing plan and negotiation support? Our commission is 2.5%. Let’s compare the service before deciding.",
     },
   ];
 
@@ -246,7 +246,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       turns: [
         {
           role: "agent" as const,
-          text: "Look, I'll be straight with you — 2.5% is too high. Another agency already quoted us 1.75%. Why should I pay more?",
+          text: "Look, I'll be straight with you, 2.5% is too high. Another agency already quoted us 1.75%. Why should I pay more?",
         },
         { role: "user" as const, text: s.userLine },
         {
@@ -257,7 +257,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
           role: "user" as const,
           text: s.heldFee
             ? "Our commission stays at 2.5%. We can review the campaign scope together before making any decision."
-            : "I hear you — let me see what I can do on the number.",
+            : "I hear you, let me see what I can do on the number.",
         },
       ],
       score: {
@@ -296,7 +296,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       label: "Agreed an appropriate next step",
       score: 0.3,
       max: 25,
-      notes: "Coach treated follow-up permission as weak — calibrate candidate.",
+      notes: "Coach treated follow-up permission as weak, calibrate candidate.",
     },
     {
       id: "used_approved_play",
@@ -327,7 +327,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       },
       {
         role: "user",
-        text: "Understood — I won't push. Would it be okay if I checked in later with a local market update when timing is better?",
+        text: "Understood, I won't push. Would it be okay if I checked in later with a local market update when timing is better?",
       },
       {
         role: "agent",
@@ -340,7 +340,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       feeOfferedPct: null,
       criteria: refusalCriteria,
       feedback: [
-        "Strength — Respected the refusal.",
+        "Strength: Respected the refusal.",
         "Agreed an appropriate next step: coach treated follow-up permission as weak.",
       ],
       approvedPlayReminder:
@@ -360,7 +360,7 @@ const PRIYA_ID = "rep_demo_priya";
 const MARCUS_ID = "rep_demo_marcus";
 
 /**
- * Priya — on-track closer story: exclusivity / next-step drills improving.
+ * Priya - on-track closer story: exclusivity / next-step drills improving.
  */
 export function buildPriyaDemoAttempts(): PracticeAttempt[] {
   const specs = [
@@ -410,11 +410,11 @@ export function buildPriyaDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Clarified term and reporting.",
-        "Strength — Held list without rushing the signature.",
+        "Strength: Clarified term and reporting.",
+        "Strength: Held list without rushing the signature.",
       ],
       userLine:
-        "Before any paperwork — want a plain-English walkthrough of the authority and what you can change later?",
+        "Before any paperwork, want a plain-English walkthrough of the authority and what you can change later?",
       scenarioId: "need-to-think",
       talkTrackId: "tt_exclusivity",
       opening:
@@ -437,11 +437,11 @@ export function buildPriyaDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Agreed an appropriate next step.",
+        "Strength: Agreed an appropriate next step.",
         "Clean exclusivity conversation.",
       ],
       userLine:
-        "Let's leave the authority unsigned today. I'll email a one-pager on term options and check in Thursday — does that work?",
+        "Let's leave the authority unsigned today. I'll email a one-pager on term options and check in Thursday, does that work?",
       scenarioId: "need-to-think",
       talkTrackId: "tt_exclusivity",
       opening: "Can we pause on the exclusive and think overnight?",
@@ -461,7 +461,7 @@ export function buildPriyaDemoAttempts(): PracticeAttempt[] {
         { role: "user" as const, text: s.userLine },
         {
           role: "agent" as const,
-          text: "That helps — thanks for not pressuring me.",
+          text: "That helps, thanks for not pressuring me.",
         },
       ],
       score: {
@@ -481,7 +481,7 @@ export function buildPriyaDemoAttempts(): PracticeAttempt[] {
 }
 
 /**
- * Marcus — competitive positioning struggle: other-agency drills, softer scores.
+ * Marcus - competitive positioning struggle: other-agency drills, softer scores.
  */
 export function buildMarcusDemoAttempts(): PracticeAttempt[] {
   const specs = [
@@ -507,7 +507,7 @@ export function buildMarcusDemoAttempts(): PracticeAttempt[] {
         "Ask what they're still missing before talking fee.",
       ],
       userLine:
-        "They're cheaper because they cut corners — we can do 2% to keep you.",
+        "They're cheaper because they cut corners, we can do 2% to keep you.",
       scenarioId: "competitor",
       talkTrackId: "tt_other_agency",
       opening:
@@ -556,11 +556,11 @@ export function buildMarcusDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Strength — Held list.",
+        "Strength: Held list.",
         "Keep asking what outcome the other pitch won't deliver.",
       ],
       userLine:
-        "Totally fair you've spoken to someone else — what's the one outcome you're not sure they'll deliver? Our commission stays 2.5%.",
+        "Totally fair you've spoken to someone else, what's the one outcome you're not sure they'll deliver? Our commission stays 2.5%.",
       scenarioId: "competitor",
       talkTrackId: "tt_other_agency",
       opening: "I'm comparing two agencies and fee is the main gap.",

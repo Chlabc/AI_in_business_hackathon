@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Option A — Grounded Corner (light) */
+/* Option A ,  Grounded Corner (light) */
 :root,
 html.light {
   --background: #f8f9fa;
@@ -22,16 +22,16 @@ html.light {
   --audio: #1c7ed6;
   --audio-soft: #e7f5ff;
   --header: #ffffff;
-  /* Marketing-only brand accent — deliberately distinct from --warn (a status colour). */
+  /* Marketing-only brand accent ,  deliberately distinct from --warn (a status colour). */
   --brand-navy: #16304d;
   --brand-gold: #c9a961;
   --brand-gold-fg: #16304d;
-  /* Alternating band ground — a hair warmer than --background so full-width
+  /* Alternating band ground ,  a hair warmer than --background so full-width
      sections separate without needing borders. */
   --band-alt: #f1f3f5;
 }
 
-/* Option B — High-Performance Dark (navy + copper) */
+/* Option B ,  High-Performance Dark (navy + copper) */
 html.dark {
   --background: #12161a;
   --foreground: #f1f3f5;
@@ -138,7 +138,7 @@ body {
    Small shared pieces so "this bit matters" reads the same everywhere,
    instead of every page inventing its own badge. */
 
-/* Status pills — rounded, filled, readable at a glance. */
+/* Status pills ,  rounded, filled, readable at a glance. */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -190,7 +190,7 @@ body {
   color: inherit;
 }
 
-/* Framed callout — for the one thing on a page that must not be missed. */
+/* Framed callout ,  for the one thing on a page that must not be missed. */
 .callout {
   position: relative;
   border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
@@ -338,7 +338,7 @@ body {
   pointer-events: none;
 }
 
-/* Narrow screens have no room for neighbours — show the centre card only. */
+/* Narrow screens have no room for neighbours ,  show the centre card only. */
 @media (max-width: 900px) {
   .deck-prev,
   .deck-next {
@@ -373,7 +373,7 @@ body {
   }
 }
 
-/* ── Flashcards — same flip mechanic as EmployeeCredential ──────────────
+/* ── Flashcards ,  same flip mechanic as EmployeeCredential ──────────────
    Faces rotate on themselves (no preserve-3d parent). Visibility swaps at
    mid-spin so Chromium never shows a mirrored front. */
 .flashcard {
@@ -656,7 +656,7 @@ html.dark .flashcard-face::after {
   color: rgba(255, 255, 255, 0.72);
 }
 
-/* Pull quote — one per page, large and quiet. */
+/* Pull quote ,  one per page, large and quiet. */
 .pullquote {
   font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(1.5rem, 3vw, 2.4rem);
@@ -715,7 +715,7 @@ html.dark .flashcard-face::after {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  /* Edge to edge — a rounded card floating in a padded column is what made
+  /* Edge to edge ,  a rounded card floating in a padded column is what made
      this read as a dashboard rather than a site. */
   min-height: min(86vh, 44rem);
   display: flex;
@@ -739,7 +739,7 @@ html.dark .flashcard-face::after {
   background-position: center;
 }
 
-/* Photo layer — inert until --cover-image is set. */
+/* Photo layer ,  inert until --cover-image is set. */
 .cover::before {
   content: "";
   position: absolute;
@@ -950,7 +950,7 @@ html.dark .flashcard-face::after {
   transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
-/* For cards that are themselves a link/button target — signals real affordance. */
+/* For cards that are themselves a link/button target ,  signals real affordance. */
 .card-interactive {
   cursor: pointer;
 }
@@ -969,7 +969,7 @@ html.dark .flashcard-face::after {
   color: var(--accent);
 }
 
-/* Advisory-firm display type — headlines only, never body copy. */
+/* Advisory-firm display type ,  headlines only, never body copy. */
 .display-serif {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-weight: 600;

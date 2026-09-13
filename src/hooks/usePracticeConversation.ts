@@ -49,7 +49,7 @@ async function fetchConversationToken(): Promise<string> {
   if (!res.ok || !data.token) {
     throw new Error(
       data.error
-        ? `${data.error}${data.detail ? ` — ${data.detail}` : ""}`
+        ? `${data.error}${data.detail ? ` - ${data.detail}` : ""}`
         : "Could not get conversation token",
     );
   }
@@ -141,7 +141,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
     setIsSpeaking(false);
   }, []);
 
-  // Unmount / remount only — parent keys by scenario.id
+  // Unmount / remount only, parent keys by scenario.id
   useEffect(() => {
     endingRef.current = false;
     return () => {
@@ -195,7 +195,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
         setAttemptId(null);
         setAttemptPersisted(false);
         setNotice(
-          "Session ended before we caught your reply — speak, pause a beat, then End & score.",
+          "Session ended before we caught your reply, speak, pause a beat, then End & score.",
         );
         return;
       }
@@ -276,7 +276,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
           setStatus("connected");
           pushTurn(
             "system",
-            `Connected · ${sc.title} — speak as the real estate agent.`,
+            `Connected · ${sc.title}, speak as the real estate agent.`,
           );
         },
         onDisconnect: (details) => {
@@ -362,7 +362,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
 
   const end = useCallback(async () => {
     const cid = conversationIdRef.current ?? conversationId;
-    // Capture whatever is already on screen NOW — before teardown races.
+    // Capture whatever is already on screen NOW, before teardown races.
     const seedTurns = turnsRef.current.slice();
     endingRef.current = true;
     setScoring(true);

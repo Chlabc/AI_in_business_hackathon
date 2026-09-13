@@ -9,7 +9,7 @@ export function parseCueMode(raw: string | null | undefined): CueMode {
 
 /**
  * Pick which talk-track anchor to spotlight from the latest client (agent) turn.
- * Heuristic only — coaching stays in our UI, never in ElevenLabs.
+ * Heuristic only - coaching stays in our UI, never in ElevenLabs.
  */
 export function pickSpotlightIndex(
   agentText: string,

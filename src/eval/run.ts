@@ -119,7 +119,7 @@ function renderMd(args: {
 
 Generated: ${args.generatedAt}
 
-Offline harness for hackathon judges — diagnosis accuracy, scoring–human agreement, and persona/guardrail checks. Run with \`npm run eval\`.
+Offline harness for hackathon judges ,  diagnosis accuracy, scoring–human agreement, and persona/guardrail checks. Run with \`npm run eval\`.
 
 ## Headline metrics
 
@@ -147,15 +147,15 @@ ${table(args.persona)}
 
 - Diagnosis: deterministic aggregation over call outcomes (\`diagnoseCalls\`).
 - Scoring: heuristic rubric only in this harness (no live \`XAI_API_KEY\` dependency).
-- Human gold: teammate ratings on **synthetic** transcripts / labelled histories — not live CRM data.
+- Human gold: teammate ratings on **synthetic** transcripts / labelled histories ,  not live CRM data.
 - Agreement band for overall score: absolute difference ≤ ${OVERALL_AGREEMENT_BAND}.
 
 ## Known limits
 
-- Reps can game rubrics by reciting approved lines robotically (\`robotic_perfect\` case) — shallow delivery detection is out of scope for the hackathon.
+- Reps can game rubrics by reciting approved lines robotically (\`robotic_perfect\` case) ,  shallow delivery detection is out of scope for the hackathon.
 - Heuristic keyword matching will miss nuanced delivery and false-positive on some phrasings.
 - Diagnosis needs ≥2 calls in a stage×objection bucket; thin histories fall back to fee-biased defaults.
-- Voice persona faithfulness (live ElevenLabs) is **not** covered here — manual demo check.
+- Voice persona faithfulness (live ElevenLabs) is **not** covered here ,  manual demo check.
 - Seeded demo honesty: product diagnosis uses labelled demo calls, not a live CRM pipe.
 
 ## How to re-run
@@ -242,14 +242,14 @@ function main() {
     method: [
       "Diagnosis: deterministic aggregation over call outcomes (diagnoseCalls).",
       "Scoring: heuristic rubric only in this harness (no live XAI_API_KEY dependency).",
-      "Human gold: teammate ratings on synthetic transcripts / labelled histories — not live CRM data.",
+      "Human gold: teammate ratings on synthetic transcripts / labelled histories ,  not live CRM data.",
       `Agreement band for overall score: absolute difference ≤ ${OVERALL_AGREEMENT_BAND}.`,
     ],
     knownLimits: [
-      "Reps can game rubrics by reciting approved lines robotically (robotic_perfect) — shallow delivery detection is out of scope.",
+      "Reps can game rubrics by reciting approved lines robotically (robotic_perfect) ,  shallow delivery detection is out of scope.",
       "Heuristic keyword matching will miss nuanced delivery and can false-positive on some phrasings.",
       "Diagnosis needs ≥2 calls in a stage×objection bucket; thin histories fall back to fee-biased defaults.",
-      "Voice persona faithfulness (live ElevenLabs) is not covered here — manual demo check.",
+      "Voice persona faithfulness (live ElevenLabs) is not covered here ,  manual demo check.",
       "Product diagnosis uses labelled demo calls, not a live CRM pipe.",
     ],
     reproduce: "npm run eval",

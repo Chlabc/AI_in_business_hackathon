@@ -55,7 +55,7 @@ export function ConversionChart({
           {label}
         </p>
         <p className="text-sm text-muted">
-          No scored drills yet — finish a practice session to see the trend.
+          No scored drills yet, finish a practice session to see the trend.
         </p>
       </div>
     );

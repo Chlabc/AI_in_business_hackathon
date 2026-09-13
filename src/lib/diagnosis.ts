@@ -104,8 +104,8 @@ export function diagnoseCalls(
   // which counts only the discounted ones.
   const headline =
     top.objection === "fee"
-      ? `${rate}% of your price conversations end in a discount or a lost deal — you move on price before asking what the objection really is.`
-      : `${rate}% of your calls hitting the ${top.objection.replaceAll("_", " ")} objection end lost or discounted — that's your weakest moment.`;
+      ? `${rate}% of your price conversations end in a discount or a lost deal, you move on price before asking what the objection really is.`
+      : `${rate}% of your calls hitting the ${top.objection.replaceAll("_", " ")} objection end lost or discounted, that's your weakest moment.`;
 
   return {
     repId,

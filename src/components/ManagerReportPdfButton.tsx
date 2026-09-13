@@ -52,7 +52,7 @@ const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - PAGE_MARGIN * 2;
 
 /**
- * Manager progress PDF — Huey-inspired navy/gold report.
+ * Manager progress PDF ,  Huey-inspired navy/gold report.
  * Summaries only; never embeds transcripts.
  */
 export function ManagerReportPdfButton({
@@ -123,7 +123,7 @@ export function ManagerReportPdfButton({
       setRgb(doc, COLOR.muted);
       doc.setFontSize(9);
       const honesty = doc.splitTextToSize(
-        "Practice summaries appear only when the agent opts in to share — transcripts are never included.",
+        "Practice summaries appear only when the agent opts in to share ,  transcripts are never included.",
         CONTENT_WIDTH,
       );
       doc.text(honesty, PAGE_MARGIN, y);
@@ -163,7 +163,7 @@ export function ManagerReportPdfButton({
       doc.text(`Team listing conversion: ${teamAverageConversion}%`, PAGE_MARGIN, y);
       y += 10;
 
-      sectionTitle(`${focusRepName} — practice summary`);
+      sectionTitle(`${focusRepName} ,  practice summary`);
       if (!share.shareProgressWithManager) {
         setDraw(doc, COLOR.hairline);
         doc.setLineWidth(0.3);
@@ -188,11 +188,11 @@ export function ManagerReportPdfButton({
           ["Attempts", String(practice.attempts)],
           [
             "Last score",
-            practice.lastScore === null ? "—" : String(practice.lastScore),
+            practice.lastScore === null ? ", " : String(practice.lastScore),
           ],
           [
             "Price hold",
-            practice.feeHoldRate === null ? "—" : `${practice.feeHoldRate}%`,
+            practice.feeHoldRate === null ? ", " : `${practice.feeHoldRate}%`,
           ],
         ];
         const boxW = (CONTENT_WIDTH - 8) / 3;

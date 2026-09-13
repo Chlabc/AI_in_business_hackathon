@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { InfoTip } from "@/components/InfoTip";
 import type { CriterionScore, PracticeScore, RubricCriterionId } from "@/lib/rubric";
 
 type LogItem = {
@@ -108,7 +109,10 @@ export function PracticeLogsSection({
 
   return (
     <section className="surface-card rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-foreground">Practice logs</h2>
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+        Practice logs
+        <InfoTip text="Open a drill to review the transcript and rubric. You can calibrate any criterion (full / half / none) with a reason — the score updates and shows as (calibrated)." />
+      </h2>
       <label className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
         Agent
         <select
@@ -272,7 +276,7 @@ function SessionDetailPanel({
                   <td className="py-2.5 pr-3 text-right font-mono text-xs text-muted">
                     {Math.round(c.score * c.max)}/{c.max}
                   </td>
-                  <td className="py-2.5 text-muted">{c.notes || "—"}</td>
+                  <td className="py-2.5 text-muted">{c.notes || "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -335,8 +339,8 @@ function DisagreeForm({
       setReason("");
       onDone(
         scope === "agency"
-          ? "Saved — this is now your agency standard for future drills."
-          : "Saved — applied to this conversation only.",
+          ? "Saved, this is now your agency standard for future drills."
+          : "Saved, applied to this conversation only.",
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Calibration failed");
@@ -375,7 +379,7 @@ function DisagreeForm({
             >
               {criteria.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.label} — coach gave {Math.round(c.score * 100)}%
+                  {c.label}: coach gave {Math.round(c.score * 100)}%
                 </option>
               ))}
             </select>

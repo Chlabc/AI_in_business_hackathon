@@ -52,11 +52,11 @@ export async function POST(request: Request) {
         conversationId: body.conversationId ?? null,
         turns,
         score,
-        // Validated rather than trusted — this comes from the client.
+        // Validated rather than trusted, this comes from the client.
         cueMode: parseCueMode(body.cueMode),
       });
     } catch (err) {
-      // Vercel serverless FS is often read-only — never block the score card.
+      // Vercel serverless FS is often read-only, never block the score card.
       console.error(
         "[practice/score] saveAttempt failed; returning score only",
         err,
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       };
     }
 
-    // Durable manager log (transcript + score) — best-effort alongside file store.
+    // Durable manager log (transcript + score), best-effort alongside file store.
     const cloud = await tryUpsertPracticeSession(attempt);
 
     return NextResponse.json({
