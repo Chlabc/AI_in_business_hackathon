@@ -61,10 +61,6 @@ function LoginForm() {
         </p>
       </div>
 
-      <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted">
-        Demo accounts · not production IdP · no magic link
-      </div>
-
       <div className="flex flex-wrap gap-2">
         {DEMO_ACCOUNTS.map((a) => (
           <button
