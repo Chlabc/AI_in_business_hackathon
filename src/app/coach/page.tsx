@@ -93,24 +93,7 @@ export default async function CoachPage() {
         </Link>
       </div>
 
-      {/* Evidence for the diagnosis — the verdict headline lives on Practice. */}
-      <section className="surface-card rounded-xl p-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Why we think that — {diagnosis.evidence.length} recent losses
-        </h2>
-        <ol className="mt-4 space-y-3">
-          {diagnosis.evidence.map((line, i) => (
-            <li key={line} className="flex gap-3 text-sm text-foreground">
-              <span className="mt-0.5 font-mono text-xs text-muted">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="leading-relaxed">{line}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* 6 — paired identity and performance */}
+      {/* Credential + snapshot — vertically centered as a pair */}
       <div className={colors.profilePerformance}>
         <EmployeeCredential
           key={`${rep.id}:${user.name}`}
@@ -167,8 +150,23 @@ export default async function CoachPage() {
         </section>
       </div>
 
-      {/* Stage weakness + practice progress — pulled up after moving the
-          playbook briefing onto Practice. */}
+      {/* Evidence sits under the card + snapshot pair */}
+      <section className="surface-card rounded-xl p-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+          Why we think that — {diagnosis.evidence.length} recent losses
+        </h2>
+        <ol className="mt-4 space-y-3">
+          {diagnosis.evidence.map((line, i) => (
+            <li key={line} className="flex gap-3 text-sm text-foreground">
+              <span className="mt-0.5 font-mono text-xs text-muted">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="leading-relaxed">{line}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {/* paired stage weakness and practice progress.
              items-start so the stage card is only as tall as its five rows.
              Stretching it to match the progress panel just moved the empty
