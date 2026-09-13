@@ -352,12 +352,10 @@ export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
     } = await import("@/lib/practice-sessions");
 
     if (practiceSessionsAvailable()) {
-      let cloud = await listPracticeAttemptsForRep(repId, 50);
-      // Seed demos into cloud if this rep has nothing yet (first Team/Progress hit).
-      if (cloud.length === 0) {
-        await ensureAlexDemoAttempts(await readAll());
-        cloud = await listPracticeAttemptsForRep(repId, 50);
-      }
+      // Always run ensure so newly added demo_* ids (e.g. priya_04–06) mirror
+      // to Supabase even when older demos already exist in the cloud.
+      await ensureAlexDemoAttempts(await readAll());
+      const cloud = await listPracticeAttemptsForRep(repId, 50);
       return cloud.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     }
   } catch (err) {
