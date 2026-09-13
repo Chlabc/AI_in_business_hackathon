@@ -1,6 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { buildAlexDemoAttempts } from "@/data/demo-attempts";
+import {
+  buildAlexDemoAttempts,
+  buildMarcusDemoAttempts,
+  buildPriyaDemoAttempts,
+} from "@/data/demo-attempts";
 import { DEMO_REP_ID } from "@/data/seed";
 import type { CueMode } from "@/lib/cue-reactivity";
 import { dataStorePath } from "@/lib/file-store";
@@ -277,49 +281,69 @@ export function toCalibrateSummary(
   };
 }
 
+async function mirrorDemoToSupabase(rows: PracticeAttempt[]) {
+  try {
+    const { tryUpsertPracticeSession } = await import(
+      "@/lib/practice-sessions"
+    );
+    for (const row of rows) {
+      await tryUpsertPracticeSession(row);
+    }
+  } catch (err) {
+    console.error("[attempts] demo seed supabase mirror failed", err);
+  }
+}
+
 /**
- * Plant Alex’s demo improvement arc when missing (fresh /tmp on Vercel, or
- * only ad-hoc test drills). Idempotent once `demo_alex_*` ids exist.
+ * Plant demo arcs for Alex / Priya / Marcus when missing.
+ * Idempotent once each prefix exists.
  */
 async function ensureAlexDemoAttempts(
   all: PracticeAttempt[],
 ): Promise<PracticeAttempt[]> {
-  const hasDemoArc = all.some(
+  const hasAlex = all.some(
     (a) => a.repId === DEMO_REP_ID && a.id.startsWith("demo_alex_"),
   );
-  const calibrateId = "demo_alex_calibrate_refusal";
-  const hasCalibrate = all.some((a) => a.id === calibrateId);
+  const hasCalibrate = all.some((a) => a.id === "demo_alex_calibrate_refusal");
+  const hasPriya = all.some((a) => a.id.startsWith("demo_priya_"));
+  const hasMarcus = all.some((a) => a.id.startsWith("demo_marcus_"));
 
-  if (hasDemoArc && hasCalibrate) return all;
+  if (hasAlex && hasCalibrate && hasPriya && hasMarcus) return all;
 
-  const seeded = buildAlexDemoAttempts();
-  async function mirrorToSupabase(rows: PracticeAttempt[]) {
-    try {
-      const { tryUpsertPracticeSession } = await import(
-        "@/lib/practice-sessions"
-      );
-      for (const row of rows) {
-        await tryUpsertPracticeSession(row);
-      }
-    } catch (err) {
-      console.error("[attempts] demo seed supabase mirror failed", err);
+  let next = [...all];
+  const toMirror: PracticeAttempt[] = [];
+
+  if (!hasAlex) {
+    const seeded = buildAlexDemoAttempts();
+    next = next.filter((a) => a.repId !== DEMO_REP_ID);
+    next.push(...seeded);
+    toMirror.push(...seeded);
+  } else if (!hasCalibrate) {
+    const calibrate = buildAlexDemoAttempts().find(
+      (a) => a.id === "demo_alex_calibrate_refusal",
+    );
+    if (calibrate) {
+      next.push(calibrate);
+      toMirror.push(calibrate);
     }
   }
 
-  if (!hasDemoArc) {
-    const withoutAlex = all.filter((a) => a.repId !== DEMO_REP_ID);
-    const next = [...withoutAlex, ...seeded];
-    await writeAll(next);
-    await mirrorToSupabase(seeded);
-    return next;
+  if (!hasPriya) {
+    const seeded = buildPriyaDemoAttempts();
+    next = next.filter((a) => a.repId !== "rep_demo_priya");
+    next.push(...seeded);
+    toMirror.push(...seeded);
   }
 
-  // Existing demo arc but missing calibrate seed — append only that row.
-  const calibrate = seeded.find((a) => a.id === calibrateId);
-  if (!calibrate) return all;
-  const next = [...all, calibrate];
+  if (!hasMarcus) {
+    const seeded = buildMarcusDemoAttempts();
+    next = next.filter((a) => a.repId !== "rep_demo_marcus");
+    next.push(...seeded);
+    toMirror.push(...seeded);
+  }
+
   await writeAll(next);
-  await mirrorToSupabase([calibrate]);
+  if (toMirror.length) await mirrorDemoToSupabase(toMirror);
   return next;
 }
 

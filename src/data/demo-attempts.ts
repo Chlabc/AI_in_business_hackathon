@@ -355,3 +355,254 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
 
   return [...feeAttempts, calibrateTarget];
 }
+
+const PRIYA_ID = "rep_demo_priya";
+const MARCUS_ID = "rep_demo_marcus";
+
+/**
+ * Priya — on-track closer story: exclusivity / next-step drills improving.
+ */
+export function buildPriyaDemoAttempts(): PracticeAttempt[] {
+  const specs = [
+    {
+      id: "demo_priya_01",
+      createdAt: "2026-09-04T09:00:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.5,
+        clarify: 0.4,
+        value: 0.5,
+        held: 0.8,
+        play: 0.3,
+        cave: 0.7,
+        notes: {
+          used_approved_play: "Rushed toward paperwork.",
+          asked_clarifying_q: "Skipped how long they wanted exclusivity.",
+        },
+      },
+      feedback: [
+        "Held commission, but next-step agreement was vague.",
+        "Slow down before asking for the authority.",
+      ],
+      userLine:
+        "Our fee is 2.5%. Shall we just get the sales authority signed today?",
+      scenarioId: "need-to-think",
+      talkTrackId: "tt_exclusivity",
+      opening:
+        "I'm not ready to sign an exclusive authority until I understand the term.",
+    },
+    {
+      id: "demo_priya_02",
+      createdAt: "2026-09-09T11:30:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.7,
+        clarify: 0.8,
+        value: 0.7,
+        held: 0.9,
+        play: 0.7,
+        cave: 1,
+        notes: {
+          asked_clarifying_q: "Asked about preferred term length.",
+          used_approved_play: "Walked through reporting expectations.",
+        },
+      },
+      feedback: [
+        "Strength — Clarified term and reporting.",
+        "Strength — Held list without rushing the signature.",
+      ],
+      userLine:
+        "Before any paperwork — want a plain-English walkthrough of the authority and what you can change later?",
+      scenarioId: "need-to-think",
+      talkTrackId: "tt_exclusivity",
+      opening:
+        "I'm worried about locking into a long exclusive authority.",
+    },
+    {
+      id: "demo_priya_03",
+      createdAt: "2026-09-12T15:00:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.85,
+        clarify: 0.9,
+        value: 0.85,
+        held: 0.95,
+        play: 0.85,
+        cave: 1,
+        notes: {
+          used_approved_play: "Clear next step with permission to follow up.",
+        },
+      },
+      feedback: [
+        "Strength — Agreed an appropriate next step.",
+        "Clean exclusivity conversation.",
+      ],
+      userLine:
+        "Let's leave the authority unsigned today. I'll email a one-pager on term options and check in Thursday — does that work?",
+      scenarioId: "need-to-think",
+      talkTrackId: "tt_exclusivity",
+      opening: "Can we pause on the exclusive and think overnight?",
+    },
+  ];
+
+  return specs.map((s) => {
+    const c = criteria(s.partial);
+    return {
+      id: s.id,
+      createdAt: s.createdAt,
+      repId: PRIYA_ID,
+      conversationId: null,
+      cueMode: "soft" as const,
+      turns: [
+        { role: "agent" as const, text: s.opening },
+        { role: "user" as const, text: s.userLine },
+        {
+          role: "agent" as const,
+          text: "That helps — thanks for not pressuring me.",
+        },
+      ],
+      score: {
+        overall: overallFrom(c),
+        heldFee: s.heldFee,
+        feeOfferedPct: s.feeOfferedPct,
+        criteria: c,
+        feedback: s.feedback,
+        approvedPlayReminder: APPROVED,
+        suggestedResponse: SUGGESTED,
+        method: "heuristic" as const,
+        talkTrackId: s.talkTrackId,
+        scenarioId: s.scenarioId,
+      },
+    };
+  });
+}
+
+/**
+ * Marcus — competitive positioning struggle: other-agency drills, softer scores.
+ */
+export function buildMarcusDemoAttempts(): PracticeAttempt[] {
+  const specs = [
+    {
+      id: "demo_marcus_01",
+      createdAt: "2026-09-02T10:00:00.000Z",
+      heldFee: false,
+      feeOfferedPct: 2,
+      partial: {
+        explored: 0.3,
+        clarify: 0.3,
+        value: 0.2,
+        held: 0.2,
+        play: 0.2,
+        cave: 0.2,
+        notes: {
+          explored_objection: "Badmouthed the other agency.",
+          held_fee: "Matched toward their quote too fast.",
+        },
+      },
+      feedback: [
+        "Don't trash the other agent.",
+        "Ask what they're still missing before talking fee.",
+      ],
+      userLine:
+        "They're cheaper because they cut corners — we can do 2% to keep you.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening:
+        "We've already spoken to another agency who quoted a lower fee.",
+    },
+    {
+      id: "demo_marcus_02",
+      createdAt: "2026-09-07T13:00:00.000Z",
+      heldFee: false,
+      feeOfferedPct: 2.25,
+      partial: {
+        explored: 0.5,
+        clarify: 0.5,
+        value: 0.4,
+        held: 0.4,
+        play: 0.4,
+        cave: 0.5,
+        notes: {
+          explored_objection: "Asked one question, then discounted.",
+        },
+      },
+      feedback: [
+        "Better discovery, still softened on commission.",
+        "Contrast the plan before the number.",
+      ],
+      userLine:
+        "What aren't they covering in marketing? We could meet at 2.25%.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening: "The other agency feels more flexible on fees.",
+    },
+    {
+      id: "demo_marcus_03",
+      createdAt: "2026-09-11T16:30:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.7,
+        clarify: 0.7,
+        value: 0.65,
+        held: 0.85,
+        play: 0.6,
+        cave: 0.8,
+        notes: {
+          held_fee: "Held 2.5% and contrasted the campaign plan.",
+        },
+      },
+      feedback: [
+        "Strength — Held list.",
+        "Keep asking what outcome the other pitch won't deliver.",
+      ],
+      userLine:
+        "Totally fair you've spoken to someone else — what's the one outcome you're not sure they'll deliver? Our commission stays 2.5%.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening: "I'm comparing two agencies and fee is the main gap.",
+    },
+  ];
+
+  return specs.map((s) => {
+    const c = criteria(s.partial);
+    return {
+      id: s.id,
+      createdAt: s.createdAt,
+      repId: MARCUS_ID,
+      conversationId: null,
+      cueMode: "full" as const,
+      turns: [
+        { role: "agent" as const, text: s.opening },
+        { role: "user" as const, text: s.userLine },
+        {
+          role: "agent" as const,
+          text: "I'll think about it and compare notes with my partner.",
+        },
+      ],
+      score: {
+        overall: overallFrom(c),
+        heldFee: s.heldFee,
+        feeOfferedPct: s.feeOfferedPct,
+        criteria: c,
+        feedback: s.feedback,
+        approvedPlayReminder: APPROVED,
+        suggestedResponse: SUGGESTED,
+        method: "heuristic" as const,
+        talkTrackId: s.talkTrackId,
+        scenarioId: s.scenarioId,
+      },
+    };
+  });
+}
+
+export function buildTeamDemoAttempts(): PracticeAttempt[] {
+  return [
+    ...buildAlexDemoAttempts(),
+    ...buildPriyaDemoAttempts(),
+    ...buildMarcusDemoAttempts(),
+  ];
+}
