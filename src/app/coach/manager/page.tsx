@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/AppShell";
+import { CalibrationPanel } from "@/components/CalibrationPanel";
 import { ConversionChart } from "@/components/ConversionChart";
 import { LeaveNoteButton } from "@/components/LeaveNoteButton";
 import { ManagerReportPdfButton } from "@/components/ManagerReportPdfButton";
@@ -7,6 +8,7 @@ import { FIRM, DEMO_REP_ID, getRep } from "@/data/seed";
 import { TEAM, TEAM_AVERAGE_CONVERSION } from "@/data/team";
 import { getSession } from "@/lib/auth";
 import { listAttempts, practiceKpisFromAttempts } from "@/lib/attempts";
+import { listGuidance } from "@/lib/agency-guidance";
 import { getShareSettings } from "@/lib/share";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +19,7 @@ export default async function ManagerPage() {
   const share = await getShareSettings(DEMO_REP_ID);
   const attempts = await listAttempts(DEMO_REP_ID);
   const practice = practiceKpisFromAttempts(attempts);
+  const guidance = await listGuidance();
   const liveAe = TEAM.find((t) => t.id === DEMO_REP_ID)!;
   const liveAeWithSessions = {
     ...liveAe,
@@ -162,6 +165,12 @@ export default async function ManagerPage() {
           )}
         </section>
       </div>
+
+      <CalibrationPanel
+        attempts={attempts}
+        repName={rep?.name ?? "Your team"}
+        initialGuidance={guidance}
+      />
     </AppShell>
   );
 }

@@ -133,4 +133,15 @@ export type PracticeScore = {
   method: "heuristic" | "llm+heuristic";
   talkTrackId: string;
   scenarioId: string;
+  /**
+   * Agency standards the principal set that changed this score.
+   *
+   * Shown to the rep so a corrected verdict is attributable — "your principal
+   * decided this" rather than an unexplained difference from last time.
+   */
+  appliedGuidance?: {
+    criterionLabel: string;
+    reason: string;
+    byName: string;
+  }[];
 };

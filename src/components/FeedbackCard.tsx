@@ -163,6 +163,30 @@ export function FeedbackCard({
         </p>
       </div>
 
+      {/* A score changed by a principal's standard must say so and say who set
+          it — otherwise the rep just sees an unexplained difference from the
+          last time they did the same thing. */}
+      {score.appliedGuidance?.length ? (
+        <div className="border-b border-border bg-accent-soft/50 p-5 sm:p-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-accent">
+            Scored using your agency&apos;s standard
+          </h3>
+          <ul className="mt-3 space-y-2">
+            {score.appliedGuidance.map((g) => (
+              <li key={g.criterionLabel} className="text-sm">
+                <span className="font-medium text-foreground">
+                  {g.criterionLabel}
+                </span>
+                <span className="text-muted"> — &ldquo;{g.reason}&rdquo;</span>
+                <span className="block text-xs text-muted">
+                  Set by {g.byName}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <div className="border-b border-border p-5 sm:p-6">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
           Rubric breakdown

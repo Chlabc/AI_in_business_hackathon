@@ -1,4 +1,5 @@
 import { getScenario } from "@/data/scenarios";
+import { activeAgencyStandards } from "@/lib/agency-guidance";
 import {
   rubricForScenario,
   type CriterionScore,
@@ -343,12 +344,60 @@ export function scoreTranscriptHeuristic(
 /**
  * Optional SpaceXAI refinement. Falls back to heuristic if no key / failure.
  */
+/**
+ * Re-score the criteria the principal has set an agency standard on.
+ *
+ * This is what makes a correction a loop rather than an edit: a standard set
+ * on one conversation changes how the next one is judged, and the rep is told
+ * which standard applied and who set it. Deliberately applied to the heuristic
+ * output only — the eval fixtures call scoreTranscriptHeuristic directly, so
+ * the human-agreement numbers are measured on the uncorrected scorer.
+ */
+async function applyAgencyStandards(
+  base: PracticeScore,
+): Promise<PracticeScore> {
+  const standards = await activeAgencyStandards();
+  if (standards.length === 0) return base;
+
+  const byCriterion = new Map(standards.map((g) => [g.criterionId, g]));
+  const applied: NonNullable<PracticeScore["appliedGuidance"]> = [];
+
+  const criteria = base.criteria.map((c) => {
+    const g = byCriterion.get(c.id);
+    if (!g) return c;
+    applied.push({
+      criterionLabel: c.label,
+      reason: g.reason,
+      byName: g.byName,
+    });
+    return {
+      ...c,
+      score: g.managerScore,
+      notes: `${c.notes} — adjusted by agency standard.`,
+    };
+  });
+
+  if (applied.length === 0) return base;
+
+  const earned = criteria.reduce((sum, c) => sum + c.score * c.max, 0);
+  const max = criteria.reduce((sum, c) => sum + c.max, 0);
+
+  return {
+    ...base,
+    criteria,
+    overall: Math.round((earned / max) * 100),
+    appliedGuidance: applied,
+  };
+}
+
 export async function scoreTranscript(
   turns: TranscriptTurn[],
   scenarioId = "price-objection",
 ): Promise<PracticeScore> {
   const playbook = await getPlaybook();
-  const base = scoreTranscriptHeuristic(turns, scenarioId, playbook);
+  const base = await applyAgencyStandards(
+    scoreTranscriptHeuristic(turns, scenarioId, playbook),
+  );
   const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) return base;
 
