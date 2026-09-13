@@ -10,7 +10,7 @@ export function getSupabaseAdmin(): SupabaseClient {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !key) {
     throw new Error(
-      "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local (service_role from Dashboard → Settings → API).",
+      "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local (local) or Vercel Environment Variables (deploy). Service role is under Dashboard → Settings → API.",
     );
   }
   return createClient(url, key, {

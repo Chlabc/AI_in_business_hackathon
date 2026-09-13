@@ -13,7 +13,7 @@ export async function POST(req: Request, ctx: Ctx) {
       return NextResponse.json(
         {
           error:
-            "Supabase service role key missing. Add SUPABASE_SERVICE_ROLE_KEY to .env.local.",
+            "Supabase service role key missing. Set SUPABASE_SERVICE_ROLE_KEY in .env.local (local) or Vercel Environment Variables (deploy), then redeploy.",
         },
         { status: 503 },
       );
