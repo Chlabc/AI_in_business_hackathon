@@ -515,8 +515,9 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           </h2>
           <p className="mt-2 text-sm text-muted">
             Unchecked items stay on the live playbook. Firm facts default on.
-            Talk-track edits default on when that track is empty (e.g. after
-            Clear), otherwise off so you review coaching copy before Publish.
+            Talk-tracks are filled from the document when possible, otherwise
+            common-sense plays grounded in the extracted rates/anchors (so a
+            new company doc doesn’t keep old scripts). Empty tracks auto-accept.
           </p>
           <ul className="mt-4 space-y-3">
             {proposals.map((p) => (

@@ -139,6 +139,141 @@ function pickFeeTalkTrackPatch(
 }
 
 /**
+ * When AI is unavailable, invent coaching plays for every empty talk-track
+ * from extracted firm facts (rates + anchors + never-dos) — not stale defaults.
+ */
+export function synthesizeTalkTracksFromFacts(
+  current: FirmPlaybook,
+  patch: Partial<FirmPlaybook>,
+  existing: Partial<PlaybookTalkTrack>[],
+): Partial<PlaybookTalkTrack>[] {
+  const list = patch.standardPermFeePct ?? current.standardPermFeePct;
+  const floor = patch.feeFloorPct ?? current.feeFloorPct;
+  const competitor = patch.competitorQuotePct ?? current.competitorQuotePct;
+  const firm = patch.firmName ?? current.firmName;
+  const anchors = (patch.valueAnchors ?? current.valueAnchors).slice(0, 4);
+  const feeExisting = existing.find((t) => t.objectionType === "fee");
+  const neverFromDoc = feeExisting?.neverDo?.length
+    ? feeExisting.neverDo
+    : [
+        "Do not match a competitor quote in the first response",
+        "Do not go below the floor without manager approval",
+      ];
+  const valueLine =
+    anchors[0] ?? "the concrete value you deliver in the campaign";
+
+  const templates: Record<
+    string,
+    Omit<Partial<PlaybookTalkTrack>, "id" | "objectionType">
+  > = {
+    fee: {
+      approvedPlay:
+        feeExisting?.approvedPlay ??
+        `Ask what “too expensive” is measured against, restate ${valueLine}, then hold near ${list}% (floor ${floor}%). Trade scope before commission.`,
+      anchorPoints: feeExisting?.anchorPoints ?? anchors,
+      neverDo: neverFromDoc,
+      exampleLine:
+        feeExisting?.exampleLine ??
+        `Before we talk rate — what are you comparing ${list}% to? Here’s how we protect your net proceeds…`,
+    },
+    other_agency: {
+      approvedPlay: `Acknowledge the other relationship, ask what they’re still missing, then contrast ${firm}’s plan and ${valueLine}. Don’t trash the other agent.`,
+      anchorPoints: [
+        ...anchors.slice(0, 2),
+        "What would make you open to a second conversation?",
+        "Where the current campaign may be leaving money on the table",
+      ].filter(Boolean).slice(0, 5),
+      neverDo: [
+        "Don’t badmouth the other agency",
+        "Don’t invent exclusivity the seller hasn’t agreed to",
+      ],
+      exampleLine:
+        "Totally fair you’ve spoken to someone else — what’s the one outcome you’re not sure they’ll deliver?",
+    },
+    just_cvs: {
+      approvedPlay: `Reframe an appraisal-only request into a short discovery: purpose of the estimate, timeline, and how ${firm} would market if they listed. Offer a brief consult, not a free dump.`,
+      anchorPoints: [
+        "Clarify why they want the figure",
+        "Share how appraisals differ from a campaign plan",
+        valueLine,
+      ].filter(Boolean),
+      neverDo: [
+        "Don’t email a number with no conversation",
+        "Don’t commit to listing terms in the first message",
+      ],
+      exampleLine:
+        "Happy to share how we’d appraise it — can I ask what decision the number is feeding?",
+    },
+    timing: {
+      approvedPlay: `Respect “not selling now.” Ask permission to stay useful: market updates, street comps, and a light touch-back when timing changes.`,
+      anchorPoints: [
+        "Confirm timeline without pressure",
+        "Offer low-effort value until they’re ready",
+        "Ask how they’d like follow-up",
+      ],
+      neverDo: [
+        "Don’t push for an immediate listing appointment",
+        "Don’t guilt them about missing the market",
+      ],
+      exampleLine:
+        "No rush — want me to send a quiet update when similar homes nearby move?",
+    },
+    exclusivity: {
+      approvedPlay: `Treat authority/exclusivity concerns as process, not pressure. Explain what a sales authority covers, when it starts, and how ${firm} reports — then invite questions.`,
+      anchorPoints: [
+        "What the authority does and doesn’t lock in",
+        "Reporting and cancellation expectations",
+        "How commission at ${list}% (floor ${floor}%) sits in the agreement",
+      ],
+      neverDo: [
+        "Don’t rush a signature on the first call",
+        "Don’t hide term length or fees",
+      ],
+      exampleLine:
+        "Before any paperwork — want a plain-English walkthrough of the authority and what you can change later?",
+    },
+  };
+
+  // competitor mention for fee never-do when we know a quote
+  if (competitor > 0 && !neverFromDoc.some((n) => /competitor/i.test(n))) {
+    templates.fee.neverDo = [
+      ...(templates.fee.neverDo ?? []),
+      `Don’t match a ~${competitor}% competitor quote in the opening turn`,
+    ].slice(0, 6);
+  }
+
+  const byId = new Map(existing.filter((t) => t.id).map((t) => [t.id!, t]));
+  const out: Partial<PlaybookTalkTrack>[] = [];
+
+  for (const track of current.talkTracks) {
+    const prior = byId.get(track.id);
+    const empty =
+      !prior?.approvedPlay?.trim() &&
+      !(prior?.anchorPoints?.length) &&
+      !(prior?.neverDo?.length) &&
+      !track.approvedPlay.trim() &&
+      track.anchorPoints.length === 0 &&
+      track.neverDo.length === 0;
+    if (!empty && prior) {
+      out.push(prior);
+      continue;
+    }
+    if (!empty && !prior) continue;
+
+    const tmpl = templates[track.objectionType];
+    if (!tmpl) continue;
+    out.push({
+      id: track.id,
+      objectionType: track.objectionType,
+      ...tmpl,
+      ...(prior ?? {}),
+    });
+  }
+
+  return out;
+}
+
+/**
  * Deterministic heuristic import — no LLM required.
  * Same-line keyword matching so short docs don’t assign one rate to every field.
  */

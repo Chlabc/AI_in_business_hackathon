@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { jsonAuthError, requireRole } from "@/lib/auth";
-import {
-  defaultPlaybook,
-  getPlaybook,
-  type PlaybookTalkTrack,
-} from "@/lib/playbook";
+import { getPlaybook, type PlaybookTalkTrack } from "@/lib/playbook";
 import { extractDocumentText } from "@/lib/playbook-doc-extract";
-import { extractPlaybookFromDocument } from "@/lib/playbook-import";
+import {
+  extractPlaybookFromDocument,
+  synthesizeTalkTracksFromFacts,
+} from "@/lib/playbook-import";
 import {
   extractPlaybookWithLlm,
   mergeLlmWithHeuristic,
@@ -168,29 +167,25 @@ export async function POST(request: Request) {
       }
     }
 
+    // Fill any still-empty tracks with common-sense plays grounded in the
+    // extracted firm facts (so a different uploaded playbook doesn’t keep
+    // stale default scripts).
+    talkTrackPatches = synthesizeTalkTracksFromFacts(
+      current,
+      patch,
+      talkTrackPatches,
+    );
+    if (talkTrackPatches.length > 1) {
+      findings.push(
+        `Talk-tracks prepared for ${talkTrackPatches.length} objection types (doc + common sense)`,
+      );
+    }
+
     const proposals = buildProposals(current, patch, {
       talkTrackPatches,
       source,
     });
-    let working = workingFromProposals(current, proposals);
-    // Restore default copy for tracks the document did not fill (e.g. after an
-    // older Clear wiped every talk-track). Fee track comes from the sample PDF.
-    const defaults = defaultPlaybook();
-    working = {
-      ...working,
-      talkTracks: working.talkTracks.map((t) => {
-        const empty =
-          !t.approvedPlay.trim() &&
-          t.anchorPoints.length === 0 &&
-          t.neverDo.length === 0;
-        if (!empty) return t;
-        return (
-          defaults.talkTracks.find(
-            (d) => d.objectionType === t.objectionType || d.id === t.id,
-          ) ?? t
-        );
-      }),
-    };
+    const working = workingFromProposals(current, proposals);
     const draft: PlaybookDraft = {
       working,
       liveUpdatedAt: current.updatedAt,

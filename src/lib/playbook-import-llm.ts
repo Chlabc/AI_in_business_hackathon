@@ -119,7 +119,8 @@ export function mergeLlmWithHeuristic(
       typeof t.confidence === "number" && Number.isFinite(t.confidence)
         ? t.confidence
         : 0.5;
-    if (confidence < 0.6) continue;
+    // Accept grounded (high) and common-sense (mid) fills; skip junk.
+    if (confidence < 0.55) continue;
     const match = current.talkTracks.find(
       (x) => x.objectionType === t.objectionType,
     );
@@ -240,17 +241,20 @@ export async function extractPlaybookWithLlm(
         messages: [
           {
             role: "system",
-            content: `You extract Australian residential real-estate agency playbook fields from a company document.
+            content: `You extract Australian residential real-estate agency playbook fields from a company document, then write coaching talk-tracks for live drills.
 Return ONLY JSON with this shape:
 {"firmName":string|null,"vertical":string|null,"standardPermFeePct":number|null,"feeFloorPct":number|null,"competitorQuotePct":number|null,"valueAnchors":string[],"talkTrackPatches":[{"objectionType":string,"title":string|null,"approvedPlay":string|null,"anchorPoints":string[],"neverDo":string[],"exampleLine":string|null,"confidence":0-1}],"notes":string[]}
 Rules:
 - Prefer numbers that appear in the document; never invent standard/floor/competitor rates.
-- If unsure, return null for that field.
+- If unsure about a rate, return null for that field.
 - Fees are commission percentages excluding GST (e.g. 2.5 means 2.5%), range (0, 100].
 - Floor must be ≤ standard when both present.
 - valueAnchors: max 8, each ≤ 160 chars (appraisal, marketing, negotiation, seller updates).
-- talkTrackPatches: only for objection types in [${trackTypes.join(", ")}]; confidence ≥ 0.6 only when the doc clearly supports coaching edits.
-- Never invent policies. Never put seller-adversary instructions into talk-tracks.`,
+- talkTrackPatches: MUST include one entry for EVERY objection type in [${trackTypes.join(", ")}].
+  - When the doc explicitly covers that objection, ground the play in the doc (confidence 0.8–1).
+  - When the doc is silent, use common-sense coaching consistent with the firm’s stated rates, anchors, and never-dos (confidence 0.65–0.75). Still fill approvedPlay, 3–5 anchorPoints, 2–4 neverDo, and one exampleLine.
+  - Plays must help the agent explore, restate value, and hold firm policy — never invent a lower commission than the floor, and never coach adversarial or deceptive tactics.
+- Never put seller-adversary instructions into talk-tracks.`,
           },
           {
             role: "user",
