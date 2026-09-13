@@ -389,12 +389,6 @@ body {
 
 .flashcard-rotor {
   display: grid;
-  transform-style: preserve-3d;
-  transform-origin: center;
-  transition: transform 420ms ease-in-out;
-}
-.flashcard-rotor[data-flipped="true"] {
-  transform: rotateY(180deg);
 }
 
 /* Same warm frosted-acrylic material as the employee credential (ui.md §7):
@@ -435,8 +429,6 @@ body {
     inset -1px 0 2px color-mix(in srgb, #ccecf2 24%, transparent),
     inset 0 -2px 4px color-mix(in srgb, var(--fc-ink) 20%, transparent);
   transform-origin: center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 /* Clipped specular sheen. Content sits above it via z-index below. */
@@ -479,7 +471,6 @@ body {
 /* The answer face keeps the same material, tinted green so the two sides
    are instantly distinguishable. */
 .flashcard-back {
-  transform: rotateY(180deg);
   background:
     linear-gradient(
       145deg,
@@ -495,12 +486,6 @@ body {
   .flashcard-face::after {
     transition: none;
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flashcard-rotor {
-    transition: none;
   }
 }
 

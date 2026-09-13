@@ -228,14 +228,6 @@
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  transform: rotateY(0deg);
-  transform-origin: center;
-  transform-style: preserve-3d;
-  transition: transform 420ms ease-in-out;
-}
-
-.credentialRotor[data-flipped="true"] {
-  transform: rotateY(180deg);
 }
 
 .credentialFace.repProfile {
@@ -270,8 +262,6 @@
   backdrop-filter: blur(22px) saturate(124%);
   -webkit-backdrop-filter: blur(22px) saturate(124%);
   transform-origin: center;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .credentialFace.repProfile::before {
@@ -325,15 +315,7 @@
   color: var(--credential-bronze);
 }
 
-.credentialBack {
-  transform: rotateY(180deg);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .credentialRotor {
-    transition: none;
-  }
-
   .credentialFace.repProfile::after {
     transition: none;
     transform: none;
