@@ -86,6 +86,11 @@ export function AttemptHistory({ attempts }: { attempts: PracticeAttempt[] }) {
                 </td>
                 <td className="py-2 pr-3 font-semibold text-foreground">
                   {a.score.overall}
+                  {a.calibration && a.calibration.overrides.length > 0 ? (
+                    <span className="ml-1 text-xs font-medium text-accent">
+                      (calibrated)
+                    </span>
+                  ) : null}
                 </td>
                 <td className="py-2">
                   <span

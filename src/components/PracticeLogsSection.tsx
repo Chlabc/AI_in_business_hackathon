@@ -27,14 +27,17 @@ type SessionDetail = {
 };
 
 type PracticeLogsSectionProps = {
-  repId: string;
-  repName: string;
+  agents: { id: string; name: string }[];
+  initialRepId: string;
 };
 
 export function PracticeLogsSection({
-  repId,
-  repName,
+  agents,
+  initialRepId,
 }: PracticeLogsSectionProps) {
+  const [repId, setRepId] = useState(initialRepId);
+  const repName =
+    agents.find((a) => a.id === repId)?.name ?? agents[0]?.name ?? "Agent";
   const [items, setItems] = useState<LogItem[]>([]);
   const [available, setAvailable] = useState<boolean | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
@@ -48,6 +51,8 @@ export function PracticeLogsSection({
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setOpenId(null);
+    setDetail(null);
     try {
       const res = await fetch(
         `/api/practice/sessions?repId=${encodeURIComponent(repId)}`,
@@ -108,13 +113,26 @@ export function PracticeLogsSection({
         Review drills, then calibrate the coach
       </h2>
       <p className="mt-2 max-w-3xl text-sm text-muted">
-        Open a timestamped session to read the transcript and rubric. If a score
-        is wrong, disagree with a criterion, explain why, and optionally make it{" "}
-        <strong className="font-medium text-foreground">
-          {repName.split(/\s+/)[0]}&apos;s agency standard
-        </strong>
-        . Progress KPIs below still only appear when the agent shares them.
+        Pick an agent, open a timestamped session to read the transcript and
+        rubric, then disagree if the score is wrong. Optionally make the fix
+        your{" "}
+        <strong className="font-medium text-foreground">agency standard</strong>
+        . Progress KPI cards below still only appear when that agent shares.
       </p>
+      <label className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
+        Agent
+        <select
+          className="rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground outline-none focus:border-accent"
+          value={repId}
+          onChange={(e) => setRepId(e.target.value)}
+        >
+          {agents.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       {banner ? (
         <p className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted">
@@ -152,11 +170,16 @@ export function PracticeLogsSection({
                   </p>
                   <p className="mt-0.5 text-xs text-muted">
                     {new Date(item.createdAt).toLocaleString()} · score{" "}
-                    {item.overall}%
+                    <span className="font-semibold text-foreground">
+                      {item.overall}%
+                      {item.calibrationCount > 0 ? (
+                        <span className="font-medium text-accent">
+                          {" "}
+                          (calibrated)
+                        </span>
+                      ) : null}
+                    </span>
                     {item.cueMode ? ` · cues ${item.cueMode}` : ""}
-                    {item.calibrationCount > 0
-                      ? ` · ${item.calibrationCount} override${item.calibrationCount === 1 ? "" : "s"}`
-                      : ""}
                   </p>
                 </div>
                 <span className="text-xs font-medium text-accent">

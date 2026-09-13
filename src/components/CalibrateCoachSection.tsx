@@ -92,11 +92,16 @@ export function CalibrateCoachSection({
                   </p>
                   <p className="mt-0.5 text-xs text-muted">
                     {new Date(item.createdAt).toLocaleString()} · score{" "}
-                    {item.overall}%
+                    <span className="font-semibold text-foreground">
+                      {item.overall}%
+                      {item.calibrationCount > 0 ? (
+                        <span className="font-medium text-accent">
+                          {" "}
+                          (calibrated)
+                        </span>
+                      ) : null}
+                    </span>
                     {item.cueMode ? ` · cues ${item.cueMode}` : ""}
-                    {item.calibrationCount > 0
-                      ? ` · ${item.calibrationCount} override${item.calibrationCount === 1 ? "" : "s"}`
-                      : ""}
                   </p>
                 </div>
                 <button
