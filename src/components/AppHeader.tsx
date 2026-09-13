@@ -19,7 +19,6 @@ import { navForRole } from "@/lib/auth-nav";
 
 type AppHeaderProps = {
   user?: SessionUser | null;
-  focus?: string;
   /** "marketing" is the public landing page — no rep context, one clear CTA. */
   variant?: "app" | "marketing";
 };
@@ -62,7 +61,6 @@ function ThemeToggle() {
 
 export function AppHeader({
   user = null,
-  focus,
   variant = "app",
 }: AppHeaderProps) {
   const pathname = usePathname();
@@ -139,15 +137,6 @@ export function AppHeader({
             <span className="truncate font-medium text-foreground">
               {identityLabel}
             </span>
-            {focus ? (
-              <>
-                <span className="text-border">|</span>
-                <span className="truncate text-muted">
-                  Focus:{" "}
-                  <span className="font-medium text-accent">{focus}</span>
-                </span>
-              </>
-            ) : null}
           </div>
         </div>
 
@@ -190,14 +179,6 @@ export function AppHeader({
       <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-2 px-4 pb-3 text-xs sm:px-6 lg:hidden">
         <div className="flex gap-3 text-muted">
           <span className="text-foreground">{identityLabel}</span>
-          {focus ? (
-            <>
-              <span>·</span>
-              <span>
-                Focus: <span className="text-accent">{focus}</span>
-              </span>
-            </>
-          ) : null}
         </div>
         <nav className="flex flex-wrap gap-1">
           {nav.map((item) => {

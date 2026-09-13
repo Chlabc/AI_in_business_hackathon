@@ -12,7 +12,7 @@ const difficultyPill: Record<string, string> = {
 
 export default function TrainingPage() {
   return (
-    <AppShell focus="Scenario selection">
+    <AppShell>
       <Link href="/coach" className="text-sm text-muted hover:text-accent">
         ← Back to your diagnosis
       </Link>

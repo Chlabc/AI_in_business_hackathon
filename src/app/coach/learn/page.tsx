@@ -14,7 +14,7 @@ export default async function LearnPage() {
   const questions = buildQuiz(playbook);
 
   return (
-    <AppShell focus="Firm facts">
+    <AppShell>
       <Link href="/coach" className="text-sm text-muted hover:text-accent">
         ← Back to your diagnosis
       </Link>

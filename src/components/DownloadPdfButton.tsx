@@ -365,7 +365,7 @@ export function DownloadPdfButton({
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         setRgb(doc, COLOR.muted);
-        doc.text("Cornerman · AI-assisted sales practice · fictional demo data", PAGE_MARGIN, FOOTER_Y);
+        doc.text("Cornerman · AI-assisted sales practice", PAGE_MARGIN, FOOTER_Y);
         doc.text(`Page ${i} of ${total}`, PAGE_WIDTH - PAGE_MARGIN, FOOTER_Y, { align: "right" });
       }
     }

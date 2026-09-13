@@ -25,7 +25,7 @@ export default async function ManagerPage() {
   );
 
   return (
-    <AppShell focus="Team progress">
+    <AppShell>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm text-muted">Manager home</span>
         <span className="rounded border border-border bg-card px-3 py-1 text-xs text-muted">

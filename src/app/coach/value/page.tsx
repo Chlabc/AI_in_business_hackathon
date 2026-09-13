@@ -40,7 +40,7 @@ export default async function ValuePage() {
 
 function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
   return (
-    <AppShell focus="My progress">
+    <AppShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow">Step 3 of 3 · Track</p>
@@ -121,7 +121,7 @@ function ManagerEvidence({
   ];
 
   return (
-    <AppShell focus="Evidence">
+    <AppShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow">For managers and evaluators</p>
