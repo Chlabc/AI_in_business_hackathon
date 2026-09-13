@@ -348,37 +348,38 @@ async function ensureAlexDemoAttempts(
 }
 
 /**
- * List attempts for a rep. Merges local file store with Supabase
- * `practice_sessions` so Progress / KPIs see the same drills as manager logs
- * (Vercel /tmp alone is incomplete across instances).
+ * List attempts for a rep.
+ * When Supabase is configured, **read from Supabase only** (source of truth).
+ * File store is a local/dev fallback when cloud isn't set up.
  */
 export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
-  let all = await readAll();
-  all = await ensureAlexDemoAttempts(all);
-  const byId = new Map<string, PracticeAttempt>();
-  for (const a of all) {
-    if (a.repId === repId) byId.set(a.id, a);
-  }
-
   try {
     const {
       listPracticeAttemptsForRep,
       practiceSessionsAvailable,
     } = await import("@/lib/practice-sessions");
+
     if (practiceSessionsAvailable()) {
-      const cloud = await listPracticeAttemptsForRep(repId, 50);
-      for (const a of cloud) {
-        // Cloud wins on id clash — it's the durable store on Vercel.
-        byId.set(a.id, a);
+      let cloud = await listPracticeAttemptsForRep(repId, 50);
+      // Seed demos into cloud if this rep has nothing yet (first Team/Progress hit).
+      if (cloud.length === 0) {
+        await ensureAlexDemoAttempts(await readAll());
+        cloud = await listPracticeAttemptsForRep(repId, 50);
       }
+      return cloud.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     }
   } catch (err) {
-    console.error("[attempts] listAttempts supabase merge failed", err);
+    console.error(
+      "[attempts] listAttempts supabase read failed; falling back to file",
+      err,
+    );
   }
 
-  return [...byId.values()].sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
-  );
+  let all = await readAll();
+  all = await ensureAlexDemoAttempts(all);
+  return all
+    .filter((a) => a.repId === repId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export type PracticeTrendPoint = {
