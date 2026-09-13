@@ -14,6 +14,7 @@ import {
   ScenariosIcon,
   ScoreIcon,
 } from "@/components/NavIcons";
+import { InboxBell } from "@/components/InboxBell";
 import { useTheme } from "@/components/ThemeProvider";
 import type { SessionUser } from "@/lib/auth-types";
 import { navForRole } from "@/lib/auth-nav";
@@ -172,6 +173,7 @@ export function AppHeader({
             </button>
           ) : null}
           <div className="mx-1 hidden h-4 w-px bg-border lg:block" />
+          {user?.role === "employee" ? <InboxBell /> : null}
           <ThemeToggle />
         </div>
       </div>

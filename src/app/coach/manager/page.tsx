@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { ConversionChart } from "@/components/ConversionChart";
+import { LeaveNoteButton } from "@/components/LeaveNoteButton";
 import { ManagerReportPdfButton } from "@/components/ManagerReportPdfButton";
 import { PageHeader } from "@/components/PageHeader";
 import { FIRM, DEMO_REP_ID, getRep } from "@/data/seed";
@@ -62,6 +63,7 @@ export default async function ManagerPage() {
                 <th className="px-5 py-3 font-medium">Weakest skill</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Sessions</th>
+                <th className="px-5 py-3 font-medium">Coach</th>
               </tr>
             </thead>
             <tbody>
@@ -92,6 +94,9 @@ export default async function ManagerPage() {
                       )}
                     </td>
                     <td className="px-5 py-3">{row.sessionsCompleted}</td>
+                    <td className="px-5 py-3">
+                      <LeaveNoteButton repId={row.id} repName={row.name} />
+                    </td>
                   </tr>
                 );
               })}
