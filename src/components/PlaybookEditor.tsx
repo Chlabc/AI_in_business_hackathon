@@ -495,7 +495,11 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           </button>
         </div>
         {importing ? (
-          <p className="mt-3 text-sm font-medium text-amber-800 dark:text-amber-200">
+          <p className="mt-3 inline-flex items-center gap-2 rounded-md border border-amber-700/50 bg-amber-500 px-3 py-1.5 text-sm font-semibold text-amber-950">
+            <span
+              aria-hidden
+              className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-amber-950"
+            />
             Processing document…
           </p>
         ) : null}
