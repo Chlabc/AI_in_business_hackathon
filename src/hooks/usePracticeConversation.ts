@@ -3,6 +3,7 @@
 import { Conversation } from "@elevenlabs/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PracticeScenario } from "@/data/scenarios";
+import { CUE_MODE_STORAGE_KEY, parseCueMode } from "@/lib/cue-reactivity";
 import {
   explainElevenLabsError,
   formatUnknownError,
@@ -64,6 +65,15 @@ async function probeMicrophone(): Promise<void> {
  * Owns the ElevenLabs voice session for one scenario mount.
  * Parent should remount with key={scenario.id} when the scenario changes.
  */
+/** CoachStrip owns the cue mode and persists it here; read it back at submit. */
+function readCueMode() {
+  try {
+    return parseCueMode(localStorage.getItem(CUE_MODE_STORAGE_KEY));
+  } catch {
+    return "soft" as const;
+  }
+}
+
 export function usePracticeConversation(scenario: PracticeScenario) {
   const [turns, setTurns] = useState<TranscriptTurn[]>([]);
   const turnsRef = useRef<TranscriptTurn[]>([]);
@@ -202,6 +212,9 @@ export function usePracticeConversation(scenario: PracticeScenario) {
             conversationId: cid,
             scenarioId: scenarioRef.current.id,
             turns: snapshot.map(({ role, text }) => ({ role, text })),
+            // Read at submit time, so it reflects the mode actually used for
+            // the drill rather than whatever it was set to when the page loaded.
+            cueMode: readCueMode(),
           }),
         });
         const data = (await res.json()) as {

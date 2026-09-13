@@ -7,6 +7,28 @@ import { seatPrice } from "@/lib/money";
 const PER_PAGE = 4;
 
 /**
+ * How much help was on screen for a drill.
+ *
+ * Scoring well while reading the approved play off a cue card is not the same
+ * as scoring well without it, so the two are shown differently — "Unaided" is
+ * the one that means the behaviour transferred.
+ */
+function CueBadge({ mode }: { mode?: "off" | "soft" | "full" }) {
+  if (!mode) {
+    return <span className="text-xs text-muted">—</span>;
+  }
+  const map = {
+    off: { label: "Unaided", cls: "border-ok/30 bg-ok-soft text-ok" },
+    soft: { label: "Hints", cls: "border-border bg-background text-muted" },
+    full: { label: "Guided", cls: "border-border bg-background text-muted" },
+  } as const;
+  const { label, cls } = map[mode];
+  return (
+    <span className={`rounded border px-2 py-0.5 text-xs ${cls}`}>{label}</span>
+  );
+}
+
+/**
  * The attempt history, paged inside the panel.
  *
  * Listing every attempt made the progress panel grow without limit, which
@@ -40,6 +62,7 @@ export function AttemptHistory({ attempts }: { attempts: PracticeAttempt[] }) {
             <tr>
               <th className="pb-2 pr-3 font-medium">#</th>
               <th className="pb-2 pr-3 font-medium">When</th>
+              <th className="pb-2 pr-3 font-medium">Help</th>
               <th className="pb-2 pr-3 font-medium">Score /100</th>
               <th className="pb-2 font-medium">Price</th>
             </tr>
@@ -57,6 +80,9 @@ export function AttemptHistory({ attempts }: { attempts: PracticeAttempt[] }) {
                     browser's local time is the value we actually want shown. */}
                 <td className="py-2 pr-3 text-muted" suppressHydrationWarning>
                   {new Date(a.createdAt).toLocaleString()}
+                </td>
+                <td className="py-2 pr-3">
+                  <CueBadge mode={a.cueMode} />
                 </td>
                 <td className="py-2 pr-3 font-semibold text-foreground">
                   {a.score.overall}
