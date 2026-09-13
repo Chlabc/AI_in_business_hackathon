@@ -26,7 +26,7 @@ export function PracticeBriefing({
         Tips
       </h2>
       {whyThis ? (
-        <p className="mt-3 rounded-lg border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-foreground">
+        <p className="mt-3 rounded-lg border border-accent/30 bg-accent-soft px-4 py-3 text-sm leading-relaxed text-foreground">
           <span className="font-semibold text-accent">Your biggest issue: </span>
           {whyThis}
         </p>
@@ -34,7 +34,8 @@ export function PracticeBriefing({
       <h3 className="display-serif mt-5 text-2xl text-accent sm:text-3xl">
         {talkTrack.title}
       </h3>
-      <p className="mt-3 max-w-3xl leading-relaxed text-muted">
+      <p className="mt-3 rounded-lg border border-accent/30 bg-accent-soft px-4 py-3 text-sm leading-relaxed text-foreground">
+        <span className="font-semibold text-accent">Solution: </span>
         {talkTrack.approvedPlay}
       </p>
 
