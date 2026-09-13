@@ -70,7 +70,7 @@ export function CoachStrip({
             How much help do you want?
           </p>
           <p className="mt-0.5 text-xs text-muted">
-Work down to <strong className="text-foreground">Unaided</strong> —
+            Work down to <strong className="text-foreground">Unaided</strong> —
             that&apos;s the one that proves it stuck. Recorded with your score.
             Tips stay on your screen only.
           </p>
