@@ -63,7 +63,12 @@ export function defaultPlaybook(): FirmPlaybook {
   };
 }
 
-/** Empty live knowledge — keeps firm identity + talk-track shells so judges can reparse a sample PDF from scratch. */
+/**
+ * Empty firm facts for a clean reparse of the sample PDF.
+ * Clears pricing / anchors / FAQ and the fee talk-track (what the sample
+ * covers). Other objection talk-tracks keep their defaults so Practice cues
+ * for those scenarios are not wiped.
+ */
 export function blankPlaybook(): FirmPlaybook {
   const base = defaultPlaybook();
   return {
@@ -72,13 +77,17 @@ export function blankPlaybook(): FirmPlaybook {
     feeFloorPct: 0,
     competitorQuotePct: 0,
     valueAnchors: [],
-    talkTracks: base.talkTracks.map((t) => ({
-      ...t,
-      approvedPlay: "",
-      anchorPoints: [],
-      neverDo: [],
-      exampleLine: "",
-    })),
+    talkTracks: base.talkTracks.map((t) =>
+      t.objectionType === "fee"
+        ? {
+            ...t,
+            approvedPlay: "",
+            anchorPoints: [],
+            neverDo: [],
+            exampleLine: "",
+          }
+        : t,
+    ),
     faqNotes: "",
     updatedAt: new Date().toISOString(),
   };

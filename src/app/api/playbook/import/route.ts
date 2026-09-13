@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { jsonAuthError, requireRole } from "@/lib/auth";
-import { getPlaybook, type PlaybookTalkTrack } from "@/lib/playbook";
+import {
+  defaultPlaybook,
+  getPlaybook,
+  type PlaybookTalkTrack,
+} from "@/lib/playbook";
 import { extractDocumentText } from "@/lib/playbook-doc-extract";
 import { extractPlaybookFromDocument } from "@/lib/playbook-import";
 import {
@@ -168,7 +172,25 @@ export async function POST(request: Request) {
       talkTrackPatches,
       source,
     });
-    const working = workingFromProposals(current, proposals);
+    let working = workingFromProposals(current, proposals);
+    // Restore default copy for tracks the document did not fill (e.g. after an
+    // older Clear wiped every talk-track). Fee track comes from the sample PDF.
+    const defaults = defaultPlaybook();
+    working = {
+      ...working,
+      talkTracks: working.talkTracks.map((t) => {
+        const empty =
+          !t.approvedPlay.trim() &&
+          t.anchorPoints.length === 0 &&
+          t.neverDo.length === 0;
+        if (!empty) return t;
+        return (
+          defaults.talkTracks.find(
+            (d) => d.objectionType === t.objectionType || d.id === t.id,
+          ) ?? t
+        );
+      }),
+    };
     const draft: PlaybookDraft = {
       working,
       liveUpdatedAt: current.updatedAt,
