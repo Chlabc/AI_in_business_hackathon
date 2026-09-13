@@ -34,7 +34,7 @@ export default async function CoachPage() {
     return <div className="px-6 py-12 text-muted">Rep not found.</div>;
   }
 
-  const { rep, firm, kpis, diagnosis, talkTrack, recentCalls } = dash;
+  const { rep, kpis, diagnosis, recentCalls } = dash;
   const attempts = await listAttempts(repId);
   const practice = practiceKpisFromAttempts(attempts);
   kpis.practice = practice;
@@ -114,20 +114,6 @@ export default async function CoachPage() {
           </strong>{" "}
           part of the conversation.
         </p>
-        <div className="mt-7 flex flex-wrap items-center gap-4">
-          <Link
-            href="/coach/practice?scenario=price-objection"
-            className="btn-lift inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-lg font-semibold text-accent-fg transition hover:opacity-90"
-          >
-            Practice this now
-          </Link>
-          <Link
-            href="/coach/practice"
-            className="text-sm font-medium text-muted transition hover:text-accent"
-          >
-            Or pick a different scenario →
-          </Link>
-        </div>
       </section>
 
       {/* 5 — evidence panel */}
@@ -187,73 +173,26 @@ export default async function CoachPage() {
               </div>
             ))}
           </div>
+          <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-border pt-5">
+            <Link
+              href="/coach/practice?scenario=price-objection"
+              className="btn-lift inline-flex h-11 items-center justify-center rounded-full bg-accent px-6 text-base font-semibold text-accent-fg transition hover:opacity-90"
+            >
+              Practice this now
+            </Link>
+            <Link
+              href="/coach/practice"
+              className="text-sm font-medium text-muted transition hover:text-accent"
+            >
+              Or choose a scenario →
+            </Link>
+          </div>
         </section>
       </div>
 
-      {/* 7 — what to do next */}
-      <section className={colors.guidance}>
-        <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-          What to do next
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          What {firm.name} says to do here
-        </p>
-        <h3 className="display-serif mt-5 text-2xl text-accent sm:text-3xl">
-          {talkTrack.title}
-        </h3>
-        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
-          {talkTrack.approvedPlay}
-        </p>
-
-        <div className={colors.pricing}>
-          <div>
-            <p className="text-sm text-muted">List price</p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">
-              {seatPriceFull(firm.standardPermFeePct)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-muted">Approval floor</p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">
-              {seatPrice(firm.feeFloorPct)}
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              Going below this needs approval.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className={colors.approved}>
-            <p className="text-base font-semibold text-ok">Do this</p>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted">
-              {talkTrack.anchorPoints.map((p) => (
-                <li key={p} className="flex gap-2 leading-relaxed">
-                  <span aria-hidden className="text-ok">
-                    ✓
-                  </span>
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className={colors.avoid}>
-            <p className="text-base font-semibold text-danger">Never do this</p>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted">
-              {talkTrack.neverDo.map((p) => (
-                <li key={p} className="flex gap-2 leading-relaxed">
-                  <span aria-hidden className="text-danger">
-                    ✕
-                  </span>
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* 8 — paired stage weakness and practice progress.
+      {/* Stage weakness + practice progress — pulled up after moving the
+          playbook briefing onto Practice. */}
+      {/* paired stage weakness and practice progress.
              items-start so the stage card is only as tall as its five rows.
              Stretching it to match the progress panel just moved the empty
              space inside the card. The progress panel keeps its own height in
