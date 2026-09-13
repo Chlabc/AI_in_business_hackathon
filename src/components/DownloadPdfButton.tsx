@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { getScenario } from "@/data/scenarios";
 import type { PracticeScore } from "@/lib/rubric";
 
 type DownloadPdfButtonProps = {
   score: PracticeScore;
   whatYouSaid?: string[];
   repName?: string;
+  /** Soft / Full / off — how much help was on screen. */
+  cueMode?: string | null;
   /** Omit from PDF when empty / undefined. */
   reflection?: { whatWentWrong?: string; nextTime?: string };
 };
@@ -53,6 +56,7 @@ export function DownloadPdfButton({
   score,
   whatYouSaid = [],
   repName = "Rep",
+  cueMode = null,
   reflection,
 }: DownloadPdfButtonProps) {
   const [busy, setBusy] = useState(false);
@@ -63,33 +67,48 @@ export function DownloadPdfButton({
     const { jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     let y = 0;
+    const scenario = getScenario(score.scenarioId);
+    const scenarioTitle = scenario?.title ?? score.scenarioId.replace(/-/g, " ");
+    const generatedAt = new Date();
+    const dateLabel = generatedAt.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    const timeLabel = generatedAt.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     function drawHeader() {
       setFill(doc, COLOR.navy);
-      doc.rect(0, 0, PAGE_WIDTH, 30, "F");
+      doc.rect(0, 0, PAGE_WIDTH, 32, "F");
       setFill(doc, COLOR.gold);
-      doc.rect(0, 30, PAGE_WIDTH, 1.2, "F");
+      doc.rect(0, 32, PAGE_WIDTH, 1.2, "F");
       doc.setFont("helvetica", "bold");
       doc.setFontSize(17);
       doc.setTextColor(255, 255, 255);
-      doc.text("CORNERMAN", PAGE_MARGIN, 14);
+      doc.text("CORNERMAN", PAGE_MARGIN, 13);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       setRgb(doc, COLOR.headerText);
-      doc.text("SALES PRACTICE REPORT", PAGE_MARGIN, 21.5);
+      doc.text("REAL ESTATE PRACTICE REPORT", PAGE_MARGIN, 20);
+      doc.text("Northline · agent coaching debrief", PAGE_MARGIN, 26.5);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
       doc.text(repName, PAGE_WIDTH - PAGE_MARGIN, 13, { align: "right" });
-      const dateLabel = new Date().toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-      doc.text(dateLabel, PAGE_WIDTH - PAGE_MARGIN, 19, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      setRgb(doc, COLOR.headerText);
+      doc.text(dateLabel, PAGE_WIDTH - PAGE_MARGIN, 20, { align: "right" });
+      doc.text(timeLabel, PAGE_WIDTH - PAGE_MARGIN, 26.5, { align: "right" });
     }
 
     function newPage() {
       doc.addPage();
       drawHeader();
-      y = 44;
+      y = 46;
     }
 
     function ensureSpace(need: number) {
@@ -163,6 +182,41 @@ export function DownloadPdfButton({
       doc.lines(deltas, start[0], start[1], [1, 1], "F", true);
     }
 
+    function sessionSummary() {
+      sectionTitle("Session summary");
+      const rows: [string, string][] = [
+        ["Agent", repName],
+        ["Scenario", scenarioTitle],
+        ["Scenario id", score.scenarioId],
+        ["Overall score", `${score.overall} / 100`],
+        ["Fee outcome", score.heldFee ? "Held near standard" : "Softened / moved on fee"],
+        [
+          "Lowest fee offered",
+          score.feeOfferedPct !== null ? `${score.feeOfferedPct}%` : "None stated",
+        ],
+        ["Cue help on screen", cueMode ? String(cueMode) : "Not recorded"],
+        ["Scoring method", score.method],
+        ["Talk-track", score.talkTrackId],
+        ["Generated", `${dateLabel} · ${timeLabel}`],
+      ];
+      const rowH = 6.2;
+      ensureSpace(rows.length * rowH + 4);
+      for (const [label, value] of rows) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        setRgb(doc, COLOR.muted);
+        doc.text(label, PAGE_MARGIN, y);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.5);
+        setRgb(doc, COLOR.ink);
+        doc.text(value, PAGE_MARGIN + 48, y, {
+          maxWidth: CONTENT_WIDTH - 50,
+        });
+        y += rowH;
+      }
+      y += 3;
+    }
+
     /** Overall score: semi-circular donut gauge (tier-colored) + a fee/context side panel. */
     function scoreSection() {
       sectionTitle("Overall score");
@@ -212,17 +266,75 @@ export function DownloadPdfButton({
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8.5);
       setRgb(doc, COLOR.muted);
-      doc.text(
-        score.feeOfferedPct !== null ? `Lowest offered: ${score.feeOfferedPct}%` : "No explicit fee offered",
-        panelX,
-        py
-      );
-      py += 6;
-      doc.text(`Scenario: ${score.scenarioId.replace(/-/g, " ")}`, panelX, py);
-      py += 6;
-      doc.text(`Scoring method: ${score.method}`, panelX, py);
+      const sideLines = [
+        score.feeOfferedPct !== null
+          ? `Lowest offered: ${score.feeOfferedPct}%`
+          : "No explicit fee offered",
+        `Scenario: ${scenarioTitle}`,
+        `Method: ${score.method}`,
+        cueMode ? `Cues: ${cueMode}` : "Cues: not recorded",
+      ];
+      for (const line of sideLines) {
+        doc.text(line, panelX, py, { maxWidth: panelW });
+        py += 6;
+      }
 
       y += gaugeHeight;
+    }
+
+    /** Clean criterion table — Criterion | Score | Pts | Notes */
+    function rubricTable() {
+      sectionTitle("Rubric table");
+      const cols = {
+        criterion: PAGE_MARGIN,
+        score: PAGE_MARGIN + 62,
+        pts: PAGE_MARGIN + 82,
+        notes: PAGE_MARGIN + 100,
+      };
+      const notesW = PAGE_WIDTH - PAGE_MARGIN - cols.notes;
+
+      ensureSpace(12);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      setRgb(doc, COLOR.muted);
+      doc.text("CRITERION", cols.criterion, y);
+      doc.text("SCORE", cols.score, y);
+      doc.text("PTS", cols.pts, y);
+      doc.text("NOTES", cols.notes, y);
+      y += 2;
+      setDraw(doc, COLOR.hairline);
+      doc.setLineWidth(0.3);
+      doc.line(PAGE_MARGIN, y, PAGE_WIDTH - PAGE_MARGIN, y);
+      y += 5;
+
+      for (const c of score.criteria) {
+        const noteLines = doc.splitTextToSize(c.notes || "—", notesW);
+        const rowH = Math.max(7, noteLines.length * 4 + 3);
+        ensureSpace(rowH + 2);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        setRgb(doc, COLOR.ink);
+        doc.text(c.label, cols.criterion, y, { maxWidth: 58 });
+
+        const color = tierColor(c.score);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        setRgb(doc, color);
+        doc.text(`${Math.round(c.score * 100)}%`, cols.score, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        setRgb(doc, COLOR.muted);
+        doc.text(`${Math.round(c.score * c.max)}/${c.max}`, cols.pts, y);
+
+        doc.setFontSize(8);
+        doc.text(noteLines, cols.notes, y);
+        y += rowH;
+        setDraw(doc, COLOR.hairline);
+        doc.setLineWidth(0.2);
+        doc.line(PAGE_MARGIN, y - 2, PAGE_WIDTH - PAGE_MARGIN, y - 2);
+      }
+      y += 4;
     }
 
     const SHORT_LABEL: Record<string, string> = {
@@ -365,28 +477,56 @@ export function DownloadPdfButton({
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         setRgb(doc, COLOR.muted);
-        doc.text("Cornerman · AI-assisted sales practice", PAGE_MARGIN, FOOTER_Y);
-        doc.text(`Page ${i} of ${total}`, PAGE_WIDTH - PAGE_MARGIN, FOOTER_Y, { align: "right" });
+        doc.text(
+          `Cornerman · ${scenarioTitle} · ${repName}`,
+          PAGE_MARGIN,
+          FOOTER_Y,
+        );
+        doc.text(`Page ${i} of ${total}`, PAGE_WIDTH - PAGE_MARGIN, FOOTER_Y, {
+          align: "right",
+        });
       }
     }
 
     // --- Build the document ---
     drawHeader();
-    y = 44;
+    y = 46;
 
+    sessionSummary();
     scoreSection();
-    y += 6;
-    radarChart();
     y += 4;
 
-    sectionTitle("What you said");
-    bulletList(whatYouSaid.length > 0 ? whatYouSaid.slice(-3) : ["(No transcript captured)"]);
+    const agency = score.agencyStandardsApplied ?? [];
+    if (agency.length > 0) {
+      sectionTitle("Agency scoring standards applied");
+      bulletList(
+        agency.map(
+          (a) =>
+            `${a.label} — “${a.reason}” (set by ${a.setByName})`,
+        ),
+      );
+      y += 2;
+    }
+
+    rubricTable();
+    y += 2;
+    radarChart();
+    y += 2;
+    rubricChart();
+    y += 2;
+
+    sectionTitle("What you said (recent turns)");
+    bulletList(
+      whatYouSaid.length > 0
+        ? whatYouSaid.slice(-8)
+        : ["(No transcript captured)"],
+    );
     y += 2;
 
     sectionTitle("Approved talk-track");
     calloutBox(score.approvedPlayReminder);
 
-    sectionTitle("Feedback");
+    sectionTitle("Coach feedback");
     bulletList(score.feedback);
     y += 2;
 
@@ -404,10 +544,18 @@ export function DownloadPdfButton({
       y += 2;
     }
 
-    rubricChart();
+    sectionTitle("How to use this report");
+    bulletList([
+      "Compare weak criteria to the approved talk-track and rehearse the suggested response.",
+      "If cues were Soft/Full, try the same scenario with cues Off to test unaided skill.",
+      "Share this PDF with your principal only if you want coaching on this drill.",
+      "Principals can open Practice logs to review the transcript and calibrate scoring.",
+    ]);
 
     stampFooters();
-    doc.save(`cornerman-practice-${score.scenarioId}-${Date.now()}.pdf`);
+    doc.save(
+      `cornerman-${score.scenarioId}-${repName.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}.pdf`,
+    );
     } finally {
       setBusy(false);
     }

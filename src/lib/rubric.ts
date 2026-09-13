@@ -121,6 +121,14 @@ export type CriterionScore = {
   notes: string;
 };
 
+/** Manager agency standard that shaped this score (shown to the rep). */
+export type AgencyStandardApplied = {
+  criterionId: RubricCriterionId;
+  label: string;
+  reason: string;
+  setByName: string;
+};
+
 export type PracticeScore = {
   overall: number; // 0–100
   heldFee: boolean;
@@ -133,4 +141,13 @@ export type PracticeScore = {
   method: "heuristic" | "llm+heuristic";
   talkTrackId: string;
   scenarioId: string;
+  /** Present when agency scoring standards adjusted one or more criteria. */
+  agencyStandardsApplied?: AgencyStandardApplied[];
 };
+
+export function overallFromCriteria(criteria: CriterionScore[]): number {
+  const earned = criteria.reduce((sum, c) => sum + c.score * c.max, 0);
+  const max = criteria.reduce((sum, c) => sum + c.max, 0);
+  if (max <= 0) return 0;
+  return Math.round((earned / max) * 100);
+}

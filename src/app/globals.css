@@ -438,12 +438,16 @@ body {
   justify-content: center;
   text-align: center;
   gap: 1.25rem;
-  min-height: 15rem;
+  /* Match .deck min-height so faces (and prev/next arrows) stay put. */
+  min-height: 20rem;
+  height: 20rem;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
   padding: clamp(1.25rem, 3vw, 2rem);
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, white 52%, var(--fc-border));
   color: var(--fc-ink);

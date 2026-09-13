@@ -236,7 +236,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
     },
   ];
 
-  return specs.map((s) => {
+  const feeAttempts = specs.map((s) => {
     const c = criteria(s.partial);
     return {
       id: s.id,
@@ -274,4 +274,84 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       },
     };
   });
+
+  /** Seeded calibrate target: low "next step" so principals can disagree. */
+  const refusalCriteria: CriterionScore[] = [
+    {
+      id: "respected_refusal",
+      label: "Respected the refusal",
+      score: 0.9,
+      max: 30,
+      notes: "Stopped pitching after the clear no.",
+    },
+    {
+      id: "asked_clarifying_q",
+      label: "Asked one useful question",
+      score: 0.7,
+      max: 20,
+      notes: "Asked about timing.",
+    },
+    {
+      id: "agreed_next_step",
+      label: "Agreed an appropriate next step",
+      score: 0.3,
+      max: 25,
+      notes: "Coach treated follow-up permission as weak — calibrate candidate.",
+    },
+    {
+      id: "used_approved_play",
+      label: "Used approved play ideas",
+      score: 0.6,
+      max: 15,
+      notes: "Partial overlap with re-engagement track.",
+    },
+    {
+      id: "anchored_value",
+      label: "Left something of value",
+      score: 0.5,
+      max: 10,
+      notes: "Light market note only.",
+    },
+  ];
+
+  const calibrateTarget: PracticeAttempt = {
+    id: "demo_alex_calibrate_refusal",
+    createdAt: "2026-03-18T10:00:00.000Z",
+    repId: DEMO_REP_ID,
+    conversationId: null,
+    cueMode: "soft",
+    turns: [
+      {
+        role: "agent",
+        text: "Thanks, but we're not thinking of selling right now.",
+      },
+      {
+        role: "user",
+        text: "Understood — I won't push. Would it be okay if I checked in later with a local market update when timing is better?",
+      },
+      {
+        role: "agent",
+        text: "Sure, a later check-in is fine.",
+      },
+    ],
+    score: {
+      overall: overallFrom(refusalCriteria),
+      heldFee: true,
+      feeOfferedPct: null,
+      criteria: refusalCriteria,
+      feedback: [
+        "Strength — Respected the refusal.",
+        "Agreed an appropriate next step: coach treated follow-up permission as weak.",
+      ],
+      approvedPlayReminder:
+        "Ask about their selling timeframe, offer one local market insight, and seek permission for a later check-in.",
+      suggestedResponse:
+        "Totally fair. Mind if I leave a brief suburb update and ask permission to check in when you're ready?",
+      method: "heuristic",
+      talkTrackId: "tt_timing",
+      scenarioId: "not-interested",
+    },
+  };
+
+  return [...feeAttempts, calibrateTarget];
 }

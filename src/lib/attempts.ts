@@ -4,7 +4,11 @@ import { buildAlexDemoAttempts } from "@/data/demo-attempts";
 import { DEMO_REP_ID } from "@/data/seed";
 import type { CueMode } from "@/lib/cue-reactivity";
 import { dataStorePath } from "@/lib/file-store";
-import type { PracticeScore } from "@/lib/rubric";
+import {
+  overallFromCriteria,
+  type PracticeScore,
+  type RubricCriterionId,
+} from "@/lib/rubric";
 import type { TranscriptTurn } from "@/lib/score";
 
 /** Rep-owned debrief after a scored drill — never sent to manager PDF. */
@@ -12,6 +16,19 @@ export type AttemptReflection = {
   whatWentWrong: string;
   nextTime: string;
   savedAt: string;
+};
+
+/** Manager override of one criterion on a scored attempt. */
+export type AttemptCalibrationOverride = {
+  criterionId: RubricCriterionId;
+  originalScore: number;
+  overriddenScore: number;
+  originalOverall: number;
+  reason: string;
+  scope: "attempt" | "agency";
+  byEmail: string;
+  byName: string;
+  createdAt: string;
 };
 
 export type PracticeAttempt = {
@@ -29,6 +46,9 @@ export type PracticeAttempt = {
    * difference between practising and copying.
    */
   cueMode?: CueMode;
+  calibration?: {
+    overrides: AttemptCalibrationOverride[];
+  };
 };
 
 const STORE = dataStorePath("practice-attempts.json");
@@ -88,6 +108,109 @@ export async function updateAttemptReflection(
   return all[idx];
 }
 
+export async function getAttemptById(
+  attemptId: string,
+): Promise<PracticeAttempt | null> {
+  let all = await readAll();
+  all = await ensureAlexDemoAttempts(all);
+  return all.find((a) => a.id === attemptId) ?? null;
+}
+
+/**
+ * Manager calibration: override one criterion, recalc overall, append audit.
+ */
+export async function updateAttemptCalibration(
+  attemptId: string,
+  input: {
+    criterionId: RubricCriterionId;
+    overriddenScore: 0 | 0.5 | 1;
+    reason: string;
+    scope: "attempt" | "agency";
+    byEmail: string;
+    byName: string;
+  },
+): Promise<PracticeAttempt | null> {
+  const reason = input.reason.trim();
+  if (!reason) throw new Error("Reason is required.");
+  if (reason.length > 500) throw new Error("Reason is too long (max 500).");
+
+  const all = await readAll();
+  // Ensure demo arc exists before calibrating seeded ids.
+  const withDemo = await ensureAlexDemoAttempts(all);
+  const idx = withDemo.findIndex((a) => a.id === attemptId);
+  if (idx < 0) return null;
+
+  const attempt = withDemo[idx]!;
+  const criterion = attempt.score.criteria.find(
+    (c) => c.id === input.criterionId,
+  );
+  if (!criterion) throw new Error("Criterion not found on this attempt.");
+
+  const originalOverall = attempt.score.overall;
+  const originalScore = criterion.score;
+  const criteria = attempt.score.criteria.map((c) =>
+    c.id === input.criterionId
+      ? {
+          ...c,
+          score: input.overriddenScore,
+          notes: `Manager override (${input.byName}): ${reason}`,
+        }
+      : c,
+  );
+  const overall = overallFromCriteria(criteria);
+  const override: AttemptCalibrationOverride = {
+    criterionId: input.criterionId,
+    originalScore,
+    overriddenScore: input.overriddenScore,
+    originalOverall,
+    reason,
+    scope: input.scope,
+    byEmail: input.byEmail,
+    byName: input.byName,
+    createdAt: new Date().toISOString(),
+  };
+
+  const prev = attempt.calibration?.overrides ?? [];
+  withDemo[idx] = {
+    ...attempt,
+    score: {
+      ...attempt.score,
+      criteria,
+      overall,
+    },
+    calibration: { overrides: [...prev, override] },
+  };
+  await writeAll(withDemo);
+  return withDemo[idx]!;
+}
+
+/** Manager calibrate list — criteria yes, transcript/reflection no. */
+export type CalibrateAttemptSummary = {
+  id: string;
+  repId: string;
+  createdAt: string;
+  scenarioId: string;
+  overall: number;
+  cueMode?: CueMode;
+  criteria: PracticeScore["criteria"];
+  calibrationCount: number;
+};
+
+export function toCalibrateSummary(
+  attempt: PracticeAttempt,
+): CalibrateAttemptSummary {
+  return {
+    id: attempt.id,
+    repId: attempt.repId,
+    createdAt: attempt.createdAt,
+    scenarioId: attempt.score.scenarioId,
+    overall: attempt.score.overall,
+    cueMode: attempt.cueMode,
+    criteria: attempt.score.criteria,
+    calibrationCount: attempt.calibration?.overrides.length ?? 0,
+  };
+}
+
 /**
  * Plant Alex’s demo improvement arc when missing (fresh /tmp on Vercel, or
  * only ad-hoc test drills). Idempotent once `demo_alex_*` ids exist.
@@ -98,10 +221,23 @@ async function ensureAlexDemoAttempts(
   const hasDemoArc = all.some(
     (a) => a.repId === DEMO_REP_ID && a.id.startsWith("demo_alex_"),
   );
-  if (hasDemoArc) return all;
+  const calibrateId = "demo_alex_calibrate_refusal";
+  const hasCalibrate = all.some((a) => a.id === calibrateId);
+
+  if (hasDemoArc && hasCalibrate) return all;
+
   const seeded = buildAlexDemoAttempts();
-  const withoutAlex = all.filter((a) => a.repId !== DEMO_REP_ID);
-  const next = [...withoutAlex, ...seeded];
+  if (!hasDemoArc) {
+    const withoutAlex = all.filter((a) => a.repId !== DEMO_REP_ID);
+    const next = [...withoutAlex, ...seeded];
+    await writeAll(next);
+    return next;
+  }
+
+  // Existing demo arc but missing calibrate seed — append only that row.
+  const calibrate = seeded.find((a) => a.id === calibrateId);
+  if (!calibrate) return all;
+  const next = [...all, calibrate];
   await writeAll(next);
   return next;
 }

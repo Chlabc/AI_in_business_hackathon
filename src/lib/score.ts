@@ -342,15 +342,17 @@ export function scoreTranscriptHeuristic(
 
 /**
  * Optional SpaceXAI refinement. Falls back to heuristic if no key / failure.
+ * Agency scoring standards (manager calibration) apply last.
  */
 export async function scoreTranscript(
   turns: TranscriptTurn[],
   scenarioId = "price-objection",
 ): Promise<PracticeScore> {
+  const { applyAgencyStandards } = await import("@/lib/scoring-standards");
   const playbook = await getPlaybook();
   const base = scoreTranscriptHeuristic(turns, scenarioId, playbook);
   const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) return base;
+  if (!apiKey) return applyAgencyStandards(base, turns);
 
   try {
     const talkTrack = getPlaybookTalkTrack(playbook, "fee");
@@ -385,19 +387,19 @@ Rules: feedback must be behavioural and grounded in the approved talk-track. Nev
         ],
       }),
     });
-    if (!res.ok) return base;
+    if (!res.ok) return applyAgencyStandards(base, turns);
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
     };
     const content = data.choices?.[0]?.message?.content ?? "";
     const match = content.match(/\{[\s\S]*\}/);
-    if (!match) return base;
+    if (!match) return applyAgencyStandards(base, turns);
     const parsed = JSON.parse(match[0]) as {
       overall?: number;
       feedback?: string[];
       heldFee?: boolean;
     };
-    return {
+    const merged: PracticeScore = {
       ...base,
       overall:
         typeof parsed.overall === "number"
@@ -410,7 +412,8 @@ Rules: feedback must be behavioural and grounded in the approved talk-track. Nev
         : base.feedback,
       method: "llm+heuristic",
     };
+    return applyAgencyStandards(merged, turns);
   } catch {
-    return base;
+    return applyAgencyStandards(base, turns);
   }
 }

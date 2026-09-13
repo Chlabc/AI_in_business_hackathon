@@ -14,6 +14,7 @@ type FeedbackCardProps = {
   score: PracticeScore;
   whatYouSaid?: string[];
   repName?: string;
+  cueMode?: string | null;
   attemptId?: string | null;
   attemptPersisted?: boolean;
 };
@@ -29,6 +30,7 @@ export function FeedbackCard({
   score,
   whatYouSaid = [],
   repName = "Alex Chen",
+  cueMode = null,
   attemptId = null,
   attemptPersisted = false,
 }: FeedbackCardProps) {
@@ -91,6 +93,8 @@ export function FeedbackCard({
   const fieldClass =
     "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
 
+  const agency = score.agencyStandardsApplied ?? [];
+
   return (
     <section className="surface-card overflow-hidden rounded-xl">
       <div className="border-b border-border bg-ok-soft/50 px-5 py-4 sm:px-6">
@@ -120,6 +124,26 @@ export function FeedbackCard({
           </div>
         </div>
       </div>
+
+      {agency.length > 0 ? (
+        <div className="border-b border-border bg-accent-soft/60 px-5 py-4 sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+            Scored using your agency&apos;s standard
+          </p>
+          <ul className="mt-2 space-y-2">
+            {agency.map((a) => (
+              <li key={a.criterionId} className="text-sm text-foreground">
+                <span className="font-medium">{a.label}</span>
+                {" — "}
+                <span className="text-muted">&ldquo;{a.reason}&rdquo;</span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  Set by {a.setByName}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="grid border-b border-border md:grid-cols-2">
         <div className="border-b border-border p-5 md:border-b-0 md:border-r md:p-6">
@@ -168,12 +192,13 @@ export function FeedbackCard({
           Rubric breakdown
         </h3>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[480px] text-left text-sm">
+          <table className="w-full min-w-[520px] text-left text-sm">
             <thead>
               <tr className="border-b border-border text-xs uppercase tracking-wider text-muted">
                 <th className="pb-2 pr-3 font-medium">Criterion</th>
-                <th className="pb-2 pr-3 font-medium">Notes</th>
-                <th className="pb-2 text-right font-medium">Pts</th>
+                <th className="pb-2 pr-3 font-medium">Score</th>
+                <th className="pb-2 pr-3 text-right font-medium">Pts</th>
+                <th className="pb-2 font-medium">Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -188,10 +213,13 @@ export function FeedbackCard({
                       />
                     </div>
                   </td>
-                  <td className="py-3 pr-3 text-muted">{c.notes}</td>
-                  <td className="py-3 text-right font-mono text-xs text-muted">
+                  <td className="py-3 pr-3 tabular-nums text-muted">
+                    {Math.round(c.score * 100)}%
+                  </td>
+                  <td className="py-3 pr-3 text-right font-mono text-xs text-muted">
                     {Math.round(c.score * c.max)}/{c.max}
                   </td>
+                  <td className="py-3 text-muted">{c.notes || "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -267,6 +295,7 @@ export function FeedbackCard({
             score={score}
             whatYouSaid={whatYouSaid}
             repName={repName}
+            cueMode={cueMode}
             reflection={hasReflection ? reflection : undefined}
           />
         </div>

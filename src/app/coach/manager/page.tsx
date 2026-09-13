@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/AppShell";
 import { ConversionChart } from "@/components/ConversionChart";
+import { PracticeLogsSection } from "@/components/PracticeLogsSection";
 import { LeaveNoteButton } from "@/components/LeaveNoteButton";
 import { ManagerReportPdfButton } from "@/components/ManagerReportPdfButton";
 import { PageHeader } from "@/components/PageHeader";
@@ -105,6 +106,11 @@ export default async function ManagerPage() {
         </div>
       </section>
 
+      <PracticeLogsSection
+        repId={DEMO_REP_ID}
+        repName={rep?.name ?? liveAe.name}
+      />
+
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="surface-card rounded-xl p-6">
           <ConversionChart
@@ -155,7 +161,8 @@ export default async function ManagerPage() {
               </div>
               <p className="text-sm text-muted">{practice.trendLabel}</p>
               <p className="text-xs text-muted">
-                Transcripts intentionally omitted. Shared{" "}
+                KPI summary only — open Practice logs above for transcripts and
+                calibration. Shared{" "}
                 {new Date(share.updatedAt).toLocaleString()}.
               </p>
             </div>

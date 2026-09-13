@@ -462,7 +462,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         ) : null}
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <a
-            href="/samples/northline-playbook-sample.pdf"
+            href="/samples/northline-playbook-sample.pdf?v=20260914b"
             download="northline-playbook-sample.pdf"
             className="rounded-md border border-border px-3 py-2 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent"
           >

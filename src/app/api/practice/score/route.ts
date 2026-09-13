@@ -6,6 +6,7 @@ import {
 } from "@/lib/auth";
 import { saveAttempt, type PracticeAttempt } from "@/lib/attempts";
 import { parseCueMode } from "@/lib/cue-reactivity";
+import { tryUpsertPracticeSession } from "@/lib/practice-sessions";
 import { scoreTranscript, type TranscriptTurn } from "@/lib/score";
 
 export async function POST(request: Request) {
@@ -68,10 +69,19 @@ export async function POST(request: Request) {
         conversationId: body.conversationId ?? null,
         turns,
         score,
+        cueMode: parseCueMode(body.cueMode),
       };
     }
 
-    return NextResponse.json({ attempt, score, persisted });
+    // Durable manager log (transcript + score) — best-effort alongside file store.
+    const cloud = await tryUpsertPracticeSession(attempt);
+
+    return NextResponse.json({
+      attempt,
+      score,
+      persisted,
+      sessionLogged: cloud.ok,
+    });
   } catch (e) {
     return jsonAuthError(e) ?? NextResponse.json({ error: "Error" }, { status: 500 });
   }
