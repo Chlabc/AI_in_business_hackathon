@@ -3,14 +3,17 @@ import { getScenario } from "@/data/scenarios";
 import { DEMO_REP_ID } from "@/data/seed";
 import { TEAM } from "@/data/team";
 import {
-  getAttemptById,
   listAttempts,
+  resolveAttempt,
   toCalibrateSummary,
   updateAttemptCalibration,
+  type PracticeAttempt,
 } from "@/lib/attempts";
 import { jsonAuthError, requireRole } from "@/lib/auth";
 import type { RubricCriterionId } from "@/lib/rubric";
 import {
+  getPracticeSession,
+  listPracticeSessionsForRep,
   practiceSessionsAvailable,
   updatePracticeSessionCalibration,
 } from "@/lib/practice-sessions";
@@ -18,6 +21,57 @@ import { upsertAgencyStandard } from "@/lib/scoring-standards";
 
 function knownRepId(repId: string): boolean {
   return repId === DEMO_REP_ID || TEAM.some((t) => t.id === repId);
+}
+
+function sessionToAttempt(session: {
+  id: string;
+  createdAt: string;
+  repId: string;
+  conversationId: string | null;
+  turns: PracticeAttempt["turns"];
+  score: PracticeAttempt["score"];
+  cueMode: string | null;
+  reflection: PracticeAttempt["reflection"] | null;
+  calibration: PracticeAttempt["calibration"] | null;
+}): PracticeAttempt {
+  return {
+    id: session.id,
+    createdAt: session.createdAt,
+    repId: session.repId,
+    conversationId: session.conversationId,
+    turns: session.turns,
+    score: session.score,
+    cueMode: (session.cueMode as PracticeAttempt["cueMode"]) ?? undefined,
+    reflection: session.reflection ?? undefined,
+    calibration: session.calibration ?? undefined,
+  };
+}
+
+/** Merge file + Supabase attempts so the calibrate list matches Practice logs. */
+async function listCalibrateAttempts(
+  repId: string,
+): Promise<PracticeAttempt[]> {
+  const byId = new Map<string, PracticeAttempt>();
+
+  const fileAttempts = await listAttempts(repId);
+  for (const a of fileAttempts) byId.set(a.id, a);
+
+  if (practiceSessionsAvailable()) {
+    try {
+      const summaries = await listPracticeSessionsForRep(repId, 30);
+      for (const s of summaries) {
+        if (byId.has(s.id)) continue;
+        const full = await getPracticeSession(s.id);
+        if (full) byId.set(s.id, sessionToAttempt(full));
+      }
+    } catch (err) {
+      console.error("[calibrate] supabase list merge failed", err);
+    }
+  }
+
+  return [...byId.values()].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
 }
 
 export async function GET(request: Request) {
@@ -28,8 +82,8 @@ export async function GET(request: Request) {
     if (!knownRepId(repId)) {
       return NextResponse.json({ error: "Unknown rep" }, { status: 404 });
     }
-    const attempts = await listAttempts(repId);
-    const items = attempts.slice(0, 20).map((a) => {
+    const attempts = await listCalibrateAttempts(repId);
+    const items = attempts.slice(0, 30).map((a) => {
       const summary = toCalibrateSummary(a);
       const scenario = getScenario(summary.scenarioId);
       return {
@@ -101,9 +155,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const existing = await getAttemptById(attemptId);
+    const existing = await resolveAttempt(attemptId);
     if (!existing) {
-      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+      return NextResponse.json(
+        {
+          error:
+            "Attempt not found. Open the session from Practice logs (Supabase) or wait for redeploy, then try again.",
+        },
+        { status: 404 },
+      );
     }
 
     const overriddenScore = targetToScore(targetRaw);

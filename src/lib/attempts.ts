@@ -130,20 +130,30 @@ async function hydrateAttemptFromSupabase(
       reflection: session.reflection ?? undefined,
       calibration: session.calibration ?? undefined,
     };
-  } catch {
+  } catch (err) {
+    console.error("[attempts] hydrate from supabase failed", attemptId, err);
     return null;
   }
+}
+
+/**
+ * Resolve an attempt for manager tools. Prefer Supabase (durable on Vercel),
+ * then local file store (incl. seeded demo ids).
+ */
+export async function resolveAttempt(
+  attemptId: string,
+): Promise<PracticeAttempt | null> {
+  const cloud = await hydrateAttemptFromSupabase(attemptId);
+  if (cloud) return cloud;
+  let all = await readAll();
+  all = await ensureAlexDemoAttempts(all);
+  return all.find((a) => a.id === attemptId) ?? null;
 }
 
 export async function getAttemptById(
   attemptId: string,
 ): Promise<PracticeAttempt | null> {
-  let all = await readAll();
-  all = await ensureAlexDemoAttempts(all);
-  const local = all.find((a) => a.id === attemptId);
-  if (local) return local;
-  // Vercel /tmp is per-instance; manager logs often come from Supabase.
-  return hydrateAttemptFromSupabase(attemptId);
+  return resolveAttempt(attemptId);
 }
 
 /**
@@ -164,13 +174,10 @@ export async function updateAttemptCalibration(
   if (!reason) throw new Error("Reason is required.");
   if (reason.length > 500) throw new Error("Reason is too long (max 500).");
 
-  const all = await readAll();
-  // Ensure demo arc exists before calibrating seeded ids.
-  const withDemo = await ensureAlexDemoAttempts(all);
-  const idx = withDemo.findIndex((a) => a.id === attemptId);
-  if (idx < 0) return null;
+  // Supabase-first — Practice logs list cloud ids that often aren't in /tmp.
+  const attempt = await resolveAttempt(attemptId);
+  if (!attempt) return null;
 
-  const attempt = withDemo[idx]!;
   const criterion = attempt.score.criteria.find(
     (c) => c.id === input.criterionId,
   );
@@ -201,7 +208,7 @@ export async function updateAttemptCalibration(
   };
 
   const prev = attempt.calibration?.overrides ?? [];
-  withDemo[idx] = {
+  const updated: PracticeAttempt = {
     ...attempt,
     score: {
       ...attempt.score,
@@ -210,8 +217,37 @@ export async function updateAttemptCalibration(
     },
     calibration: { overrides: [...prev, override] },
   };
-  await writeAll(withDemo);
-  return withDemo[idx]!;
+
+  // File mirror (best-effort on serverless).
+  try {
+    let all = await ensureAlexDemoAttempts(await readAll());
+    const idx = all.findIndex((a) => a.id === attemptId);
+    if (idx >= 0) all[idx] = updated;
+    else all = [...all, updated];
+    await writeAll(all);
+  } catch (err) {
+    console.error("[attempts] file write after calibrate failed", err);
+  }
+
+  // Durable write — required for the next Vercel instance.
+  const { tryUpsertPracticeSession, updatePracticeSessionCalibration } =
+    await import("@/lib/practice-sessions");
+  const upserted = await tryUpsertPracticeSession(updated);
+  if (!upserted.ok) {
+    // Fallback update if row exists but upsert failed oddly
+    try {
+      await updatePracticeSessionCalibration(attemptId, {
+        score: updated.score,
+        calibration: updated.calibration,
+      });
+    } catch (err) {
+      console.error("[attempts] supabase calibrate sync failed", err);
+      // Still return updated so UI can succeed if at least one store worked;
+      // if neither store kept it, the next load will look stale but not 404.
+    }
+  }
+
+  return updated;
 }
 
 /** Manager calibrate list — criteria yes, transcript/reflection no. */
@@ -257,10 +293,24 @@ async function ensureAlexDemoAttempts(
   if (hasDemoArc && hasCalibrate) return all;
 
   const seeded = buildAlexDemoAttempts();
+  async function mirrorToSupabase(rows: PracticeAttempt[]) {
+    try {
+      const { tryUpsertPracticeSession } = await import(
+        "@/lib/practice-sessions"
+      );
+      for (const row of rows) {
+        await tryUpsertPracticeSession(row);
+      }
+    } catch (err) {
+      console.error("[attempts] demo seed supabase mirror failed", err);
+    }
+  }
+
   if (!hasDemoArc) {
     const withoutAlex = all.filter((a) => a.repId !== DEMO_REP_ID);
     const next = [...withoutAlex, ...seeded];
     await writeAll(next);
+    await mirrorToSupabase(seeded);
     return next;
   }
 
@@ -269,6 +319,7 @@ async function ensureAlexDemoAttempts(
   if (!calibrate) return all;
   const next = [...all, calibrate];
   await writeAll(next);
+  await mirrorToSupabase([calibrate]);
   return next;
 }
 
