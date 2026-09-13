@@ -70,6 +70,8 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   const [pendingPdf, setPendingPdf] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importFindings, setImportFindings] = useState<string[] | null>(null);
+  /** Short post-parse next-step line in the knowledge-draft box (not the findings dump). */
+  const [parseBanner, setParseBanner] = useState<string | null>(null);
 
   const status = useMemo(
     () => draftStatus(livePlaybook, working, proposals),
@@ -134,6 +136,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
     setError(null);
     setMessage(null);
     setImportFindings(null);
+    setParseBanner(null);
     try {
       let res: Response;
       if (pendingPdf) {
@@ -166,14 +169,15 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       setProposals(nextProposals);
       setWorking(nextWorking);
       setMethod(data.method);
+      // Keep findings for method/debug, but UI shows a short next-step status.
       setImportFindings(data.findings ?? []);
       if (typeof data.extractedText === "string" && data.extractedText.trim()) {
         setImportText(data.extractedText);
       }
       setPendingPdf(null);
-      setMessage(
+      setParseBanner(
         lockedOrMessage(nextProposals) ||
-          "Parsed into draft — accept/reject proposals, then Publish to go live.",
+          "Document parsed — scroll down and click Publish when ready.",
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Import failed");
@@ -184,8 +188,10 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
 
   function lockedOrMessage(nextProposals: PlaybookProposal[]) {
     const n = nextProposals.length;
-    if (!n) return "No field changes detected — FAQ may still have been appended.";
-    return `${n} proposal${n === 1 ? "" : "s"} ready. Draft is locked from drills until you Publish.`;
+    if (!n) {
+      return "Document parsed — no field changes detected. Scroll down if you still want to edit, then Publish when ready.";
+    }
+    return `Document parsed — ${n} proposal${n === 1 ? "" : "s"} ready. Scroll down, review what to accept, then click Publish.`;
   }
 
   function onFile(file: File | null) {
@@ -276,6 +282,8 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       setWorking(data);
       setProposals([]);
       setMethod(undefined);
+      setImportFindings(null);
+      setParseBanner(null);
       setMessage(
         "Live. Open Practice as a rep to see updated cues; Start drill uses new buyer prices.",
       );
@@ -307,6 +315,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       setProposals([]);
       setMethod(undefined);
       setImportFindings(null);
+      setParseBanner(null);
       setMessage("Draft discarded. Showing live knowledge.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Discard failed");
@@ -316,25 +325,53 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   const fieldClass =
     "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
 
+  const processing = importing || publishing || savingDraft;
+  const statusTone = error
+    ? "red"
+    : processing
+      ? "orange"
+      : locked
+        ? "orange"
+        : "green";
+  const statusLabel = error
+    ? "Error"
+    : importing
+      ? "Processing…"
+      : publishing
+        ? "Publishing…"
+        : savingDraft
+          ? "Saving…"
+          : locked
+            ? "Draft — not live in drills"
+            : "Live";
+  const statusDotClass =
+    statusTone === "green"
+      ? "bg-ok"
+      : statusTone === "red"
+        ? "bg-danger"
+        : "bg-amber-500";
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
-        {locked ? (
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:text-amber-200">
-            <span aria-hidden>🔒</span> Draft — not live in drills
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-ok/30 bg-ok/10 px-3 py-1.5 text-xs font-semibold text-ok">
-            <span aria-hidden>✅</span> Live
-          </span>
-        )}
+        <span
+          className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${
+            statusTone === "green"
+              ? "border-ok/30 bg-ok/10 text-ok"
+              : statusTone === "red"
+                ? "border-danger/30 bg-danger/10 text-danger"
+                : "border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-200"
+          }`}
+        >
+          <span
+            aria-hidden
+            className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusDotClass} ${processing ? "animate-pulse" : ""}`}
+          />
+          {statusLabel}
+        </span>
         {method ? (
           <span className="text-xs text-muted">Last parse: {method}</span>
         ) : null}
-        <p className="w-full text-sm text-muted sm:w-auto">
-          Publishing updates Learn, cue cards, scoring, and the next voice
-          drill. Employees never edit this.
-        </p>
       </div>
 
       <section className="surface-card rounded-xl p-5 sm:p-6">
@@ -343,18 +380,19 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           Company document → knowledge draft
         </h2>
         <p className="mt-2 text-sm text-muted">
-          Paste pricing / value notes or upload{" "}
+          Publishing updates Learn, cue cards, scoring, and the next voice
+          drill. Employees never edit this. Paste pricing / value notes or
+          upload{" "}
           <code className="text-xs">.pdf</code> /{" "}
           <code className="text-xs">.txt</code> /{" "}
-          <code className="text-xs">.md</code>. PDFs must have a text layer
-          (not a scan). Prefer{" "}
+          <code className="text-xs">.md</code> (text-layer PDFs only). Prefer{" "}
           <strong className="font-medium text-foreground">
             Download sample PDF
           </strong>{" "}
-          first if you want to try parsing without your own file. Parse builds a{" "}
-          <strong className="font-medium text-foreground">locked draft</strong>{" "}
-          with accept/reject proposals. Talk-track AI edits stay off until you
-          accept them. Nothing reaches drills until Publish.
+          to try parsing first. Parse builds a{" "}
+          <strong className="font-medium text-foreground">locked draft</strong>
+          ; talk-track AI edits stay off until you accept them. Nothing reaches
+          drills until Publish.
         </p>
         <textarea
           className={`${fieldClass} mt-4 min-h-[140px] font-mono text-xs`}
@@ -413,16 +451,16 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
             Rules only
           </button>
         </div>
-        <p className="mt-2 text-xs text-muted">
-          Download the sample, then Upload it and hit Parse / Rules only to try
-          extraction without writing your own doc first.
-        </p>
-        {importFindings ? (
-          <ul className="mt-3 space-y-1 text-xs text-muted">
-            {importFindings.map((f) => (
-              <li key={f}>· {f}</li>
-            ))}
-          </ul>
+        {importing ? (
+          <p className="mt-3 text-sm font-medium text-amber-800 dark:text-amber-200">
+            Processing document…
+          </p>
+        ) : null}
+        {!importing && parseBanner ? (
+          <p className="mt-3 text-sm font-medium text-ok">{parseBanner}</p>
+        ) : null}
+        {error ? (
+          <p className="mt-3 text-sm font-medium text-danger">{error}</p>
         ) : null}
       </section>
 
