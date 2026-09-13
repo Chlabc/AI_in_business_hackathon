@@ -3,7 +3,7 @@ import { findDemoAccount, defaultPathForRole } from "@/data/users";
 import { sessionCookieOptions, signSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
-  let body: { email?: string };
+  let body: { email?: string; password?: string };
   try {
     body = await request.json();
   } catch {
@@ -11,12 +11,18 @@ export async function POST(request: Request) {
   }
 
   const email = body.email?.trim() ?? "";
+  // Demo auth: any non-empty password is accepted for allowlisted emails.
+  const password = typeof body.password === "string" ? body.password : "";
+  if (!password) {
+    return NextResponse.json({ error: "Password is required." }, { status: 400 });
+  }
+
   const account = findDemoAccount(email);
   if (!account) {
     return NextResponse.json(
       {
         error:
-          "Unrecognized email. Use alex@northline.demo or jordan@northline.demo.",
+          "Unrecognized work email. For the demo, use an employee or manager address from the note below the form.",
       },
       { status: 401 },
     );
