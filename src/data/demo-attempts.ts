@@ -446,6 +446,84 @@ export function buildPriyaDemoAttempts(): PracticeAttempt[] {
       talkTrackId: "tt_exclusivity",
       opening: "Can we pause on the exclusive and think overnight?",
     },
+    {
+      id: "demo_priya_04",
+      createdAt: "2026-09-14T10:00:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.75,
+        clarify: 0.75,
+        value: 0.7,
+        held: 0.9,
+        play: 0.65,
+        cave: 0.9,
+        notes: {
+          explored_objection: "Treated timing as discovery, not pressure.",
+        },
+      },
+      feedback: [
+        "Good restraint on timing.",
+        "Ask how they want follow-up next time.",
+      ],
+      userLine:
+        "No rush — want me to send a quiet update when similar homes nearby move?",
+      scenarioId: "not-interested",
+      talkTrackId: "tt_timing",
+      opening: "We're not selling right now — maybe next year.",
+    },
+    {
+      id: "demo_priya_05",
+      createdAt: "2026-09-16T14:20:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.8,
+        clarify: 0.85,
+        value: 0.8,
+        held: 0.95,
+        play: 0.8,
+        cave: 1,
+        notes: {
+          used_approved_play: "Turned appraisal-only into a consult.",
+        },
+      },
+      feedback: [
+        "Strength — Clarified why they want the figure.",
+        "Didn't dump a number with no conversation.",
+      ],
+      userLine:
+        "Happy to share how we'd appraise it — can I ask what decision the number is feeding?",
+      scenarioId: "need-to-think",
+      talkTrackId: "tt_just_cvs",
+      opening: "Can you just send an appraisal estimate by email?",
+    },
+    {
+      id: "demo_priya_06",
+      createdAt: "2026-09-18T09:45:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.9,
+        clarify: 0.9,
+        value: 0.9,
+        held: 1,
+        play: 0.9,
+        cave: 1,
+        notes: {
+          used_approved_play: "Locked a clear next step with permission.",
+        },
+      },
+      feedback: [
+        "Strength — Clean close to next step.",
+        "Held list throughout.",
+      ],
+      userLine:
+        "I'll send the authority options tonight and book a 15-minute call Friday to decide together — sound fair?",
+      scenarioId: "need-to-think",
+      talkTrackId: "tt_exclusivity",
+      opening: "I'm closer, but I still want overnight to think.",
+    },
   ];
 
   return specs.map((s) => {
@@ -564,6 +642,85 @@ export function buildMarcusDemoAttempts(): PracticeAttempt[] {
       scenarioId: "competitor",
       talkTrackId: "tt_other_agency",
       opening: "I'm comparing two agencies and fee is the main gap.",
+    },
+    {
+      id: "demo_marcus_04",
+      createdAt: "2026-09-13T11:00:00.000Z",
+      heldFee: false,
+      feeOfferedPct: 2.2,
+      partial: {
+        explored: 0.55,
+        clarify: 0.5,
+        value: 0.45,
+        held: 0.35,
+        play: 0.45,
+        cave: 0.4,
+        notes: {
+          held_fee: "Offered 2.2% after competitor name-drop.",
+        },
+      },
+      feedback: [
+        "Still leading with discount when they mention the other agency.",
+        "Ask what outcome is missing first.",
+      ],
+      userLine:
+        "If they're at 1.75%, we can sit around 2.2% and throw in premium photos.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening: "Their package looks the same but cheaper.",
+    },
+    {
+      id: "demo_marcus_05",
+      createdAt: "2026-09-15T16:00:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.75,
+        clarify: 0.75,
+        value: 0.7,
+        held: 0.85,
+        play: 0.7,
+        cave: 0.85,
+        notes: {
+          explored_objection: "Asked what the other pitch skips.",
+          held_fee: "Held 2.5% and contrasted marketing.",
+        },
+      },
+      feedback: [
+        "Strength — Explored before pricing.",
+        "Strength — Held list.",
+      ],
+      userLine:
+        "What's missing from their plan on open homes and negotiation? We stay at 2.5% because that work is included.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening: "Convince me you're worth the higher fee.",
+    },
+    {
+      id: "demo_marcus_06",
+      createdAt: "2026-09-17T12:30:00.000Z",
+      heldFee: true,
+      feeOfferedPct: null as number | null,
+      partial: {
+        explored: 0.8,
+        clarify: 0.8,
+        value: 0.75,
+        held: 0.9,
+        play: 0.75,
+        cave: 0.9,
+        notes: {
+          used_approved_play: "Contrast without badmouthing.",
+        },
+      },
+      feedback: [
+        "Clean competitive conversation.",
+        "Keep that explore → value → hold order.",
+      ],
+      userLine:
+        "I'm not here to talk them down — I want to know what result you still need. Our fee stays 2.5%; here's how the campaign protects it.",
+      scenarioId: "competitor",
+      talkTrackId: "tt_other_agency",
+      opening: "I've nearly signed with the other agency.",
     },
   ];
 

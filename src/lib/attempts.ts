@@ -328,18 +328,34 @@ async function ensureAlexDemoAttempts(
     }
   }
 
-  if (!hasPriya) {
+  {
     const seeded = buildPriyaDemoAttempts();
-    next = next.filter((a) => a.repId !== "rep_demo_priya");
-    next.push(...seeded);
-    toMirror.push(...seeded);
+    if (!hasPriya) {
+      next = next.filter((a) => a.repId !== "rep_demo_priya");
+      next.push(...seeded);
+      toMirror.push(...seeded);
+    } else {
+      const missing = seeded.filter((s) => !next.some((a) => a.id === s.id));
+      if (missing.length) {
+        next.push(...missing);
+        toMirror.push(...missing);
+      }
+    }
   }
 
-  if (!hasMarcus) {
+  {
     const seeded = buildMarcusDemoAttempts();
-    next = next.filter((a) => a.repId !== "rep_demo_marcus");
-    next.push(...seeded);
-    toMirror.push(...seeded);
+    if (!hasMarcus) {
+      next = next.filter((a) => a.repId !== "rep_demo_marcus");
+      next.push(...seeded);
+      toMirror.push(...seeded);
+    } else {
+      const missing = seeded.filter((s) => !next.some((a) => a.id === s.id));
+      if (missing.length) {
+        next.push(...missing);
+        toMirror.push(...missing);
+      }
+    }
   }
 
   await writeAll(next);
