@@ -1,42 +1,42 @@
-Northline — Internal pricing & value FAQ
-========================================
-Company name: Northline
-Vertical: B2B workflow SaaS for mid-market ops teams
+Northline — Internal commission & listing FAQ
+=============================================
+Agency name: Northline
+Vertical: Australian residential real estate
 
-PRICING
--------
-List seat price: $135/seat/mo
-Floor (approval required below): $95
-Competitor often quotes: $85/seat/mo
+COMMISSION (ex GST; marketing separate)
+---------------------------------------
+Standard commission: 2.5%
+Floor (principal approval required below): 2%
+Competitor often quotes: 1.75%
 
-Notes for AEs:
-- Do not open with a discount. Discover what “too expensive” means first.
-- Annual prepay and multi-year can trade before touching list.
-- Never invent pricing below the $95 floor without VP Finance.
+Notes for agents:
+- Do not open with a discount. Discover what the lower quote includes first.
+- Clarify appraisal quality, marketing spend, and negotiation support before moving fee.
+- Never invent a commission below the 2% floor without principal approval.
 
 VALUE ANCHORS
 -------------
-- Time-to-value under 14 days with a dedicated CSM
-- SOC2 Type II + SSO included on every plan
-- 99.9% uptime SLA with service credits
-- Migration playbook for teams leaving spreadsheets or legacy tools
-- Shared success plan with quarterly business reviews
+- Local comparable sales to support the appraisal
+- A tailored property marketing and inspection plan
+- Buyer qualification, negotiation support and regular seller updates
+- Clear campaign timeline with open-home cadence
+- Transparent marketing schedule and spend options
 
 FEE OBJECTION — APPROVED PLAY (optional AI cue patch)
 -----------------------------------------------------
-When a buyer says list is too high vs a competitor quote:
-1) Clarify what failed rollout costs them this quarter.
-2) Anchor on CSM + time-to-value, not features.
-3) Offer annual prepay before moving seat price.
-Never: match the competitor number in the first reply.
+When a seller says commission is too high vs another agency:
+1) Ask what the lower quote includes (marketing, appraisal depth, after-sale support).
+2) Anchor on local evidence, the campaign plan, and negotiation.
+3) Review campaign scope before discussing a concession.
+Never: match the competitor % in the first reply.
 
-SECURITY / FAQ DUMP
--------------------
-Q: Do you support SSO?
-A: Yes — SAML and OIDC on Growth and above.
+LISTING / FAQ DUMP
+------------------
+Q: Is an appraisal a formal valuation?
+A: No — it is an estimate based on local comparables and property condition, not a bank valuation.
 
-Q: Where is data hosted?
-A: US-East primary; EU residency available on Enterprise.
+Q: Who pays for marketing?
+A: Marketing is separate from commission unless a campaign package says otherwise.
 
-Q: Can we pilot?
-A: 30-day pilot on one team with success criteria agreed up front — not unlimited free seats.
+Q: Can we do a no-obligation appraisal?
+A: Yes — with agreed success criteria; do not pressure sellers who clearly refuse.

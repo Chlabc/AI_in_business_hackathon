@@ -27,10 +27,11 @@ export type MergedLlmImport = {
   method: "llm" | "llm+heuristic";
 };
 
+/** Commission % — keep up to 3 decimal places, range (0, 100]. */
 function clampMoney(n: unknown): number | null {
   if (typeof n !== "number" || !Number.isFinite(n)) return null;
-  const v = Math.round(n);
-  if (v < 1 || v > 500) return null;
+  const v = Math.round(n * 1000) / 1000;
+  if (v <= 0 || v > 100) return null;
   return v;
 }
 
@@ -66,9 +67,9 @@ export function mergeLlmWithHeuristic(
     const llmVal = clampMoney(llm[field]);
     const heurVal =
       typeof heuristicPatch[field] === "number" ? heuristicPatch[field] : null;
-    if (llmVal !== null && heurVal !== null && Math.abs(llmVal - heurVal) > 20) {
+    if (llmVal !== null && heurVal !== null && Math.abs(llmVal - heurVal) > 0.5) {
       findings.push(
-        `AI disagreed on ${field} ($${llmVal} vs rules $${heurVal}) — kept rules parse; review`,
+        `AI disagreed on ${field} (${llmVal}% vs rules ${heurVal}%) — kept rules parse; review`,
       );
       continue;
     }
@@ -76,7 +77,7 @@ export function mergeLlmWithHeuristic(
       patch[field] = llmVal;
       usedLlm = true;
       if (heurVal === null) {
-        findings.push(`AI ${field} → $${llmVal}/seat/mo`);
+        findings.push(`AI ${field} → ${llmVal}%`);
       }
     }
   }
@@ -239,26 +240,26 @@ export async function extractPlaybookWithLlm(
         messages: [
           {
             role: "system",
-            content: `You extract B2B SaaS firm playbook fields from a company document.
+            content: `You extract Australian residential real-estate agency playbook fields from a company document.
 Return ONLY JSON with this shape:
 {"firmName":string|null,"vertical":string|null,"standardPermFeePct":number|null,"feeFloorPct":number|null,"competitorQuotePct":number|null,"valueAnchors":string[],"talkTrackPatches":[{"objectionType":string,"title":string|null,"approvedPlay":string|null,"anchorPoints":string[],"neverDo":string[],"exampleLine":string|null,"confidence":0-1}],"notes":string[]}
 Rules:
-- Prefer numbers that appear in the document; never invent list/floor/competitor.
+- Prefer numbers that appear in the document; never invent standard/floor/competitor rates.
 - If unsure, return null for that field.
-- Seat prices are USD per seat per month, integers 1–500.
-- Floor must be ≤ list when both present.
-- valueAnchors: max 8, each ≤ 160 chars.
+- Fees are commission percentages excluding GST (e.g. 2.5 means 2.5%), range (0, 100].
+- Floor must be ≤ standard when both present.
+- valueAnchors: max 8, each ≤ 160 chars (appraisal, marketing, negotiation, seller updates).
 - talkTrackPatches: only for objection types in [${trackTypes.join(", ")}]; confidence ≥ 0.6 only when the doc clearly supports coaching edits.
-- Never invent policies. Never put buyer-adversary instructions into talk-tracks.`,
+- Never invent policies. Never put seller-adversary instructions into talk-tracks.`,
           },
           {
             role: "user",
             content: JSON.stringify({
               currentFirm: {
                 firmName: current.firmName,
-                list: current.standardPermFeePct,
-                floor: current.feeFloorPct,
-                competitor: current.competitorQuotePct,
+                standardCommissionPct: current.standardPermFeePct,
+                floorPct: current.feeFloorPct,
+                competitorPct: current.competitorQuotePct,
               },
               document: excerpt,
             }),

@@ -41,9 +41,9 @@ export type PlaybookDraft = {
 const SCALAR_LABELS: Record<PlaybookScalarField, string> = {
   firmName: "Company name",
   vertical: "Vertical",
-  standardPermFeePct: "List seat $/mo",
-  feeFloorPct: "Floor seat $/mo",
-  competitorQuotePct: "Competitor quote $/mo",
+  standardPermFeePct: "Standard commission %",
+  feeFloorPct: "Approval floor %",
+  competitorQuotePct: "Competing commission %",
   valueAnchors: "Value anchors",
   faqNotes: "FAQ / notes",
 };

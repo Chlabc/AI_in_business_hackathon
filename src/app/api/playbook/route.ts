@@ -4,6 +4,7 @@ import {
   savePlaybook,
   type FirmPlaybook,
 } from "@/lib/playbook";
+import { clearPlaybookDraft } from "@/lib/playbook-draft";
 import { jsonAuthError, requireRole, requireUser } from "@/lib/auth";
 
 export async function GET() {
@@ -16,6 +17,7 @@ export async function GET() {
   }
 }
 
+/** Publish: write live playbook and clear any manager draft. */
 export async function PUT(request: Request) {
   try {
     await requireRole("manager");
@@ -26,6 +28,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
     const playbook = await savePlaybook(body);
+    await clearPlaybookDraft();
     return NextResponse.json(playbook);
   } catch (e) {
     return (

@@ -1,5 +1,5 @@
 /**
- * Run: npx tsx src/lib/playbook-draft.selftest.ts
+ * Run from repo root: npx tsx --tsconfig tsconfig.json src/lib/playbook-draft.selftest.ts
  */
 import { defaultPlaybook } from "@/lib/playbook";
 import {
@@ -17,16 +17,20 @@ const live = defaultPlaybook();
 const proposals = buildProposals(
   live,
   {
-    standardPermFeePct: 120,
-    feeFloorPct: 90,
-    competitorQuotePct: 75,
-    valueAnchors: ["New anchor A", ...live.valueAnchors].slice(0, 8),
+    standardPermFeePct: 2.75,
+    feeFloorPct: 2.1,
+    competitorQuotePct: 1.8,
+    valueAnchors: ["New campaign cadence anchor", ...live.valueAnchors].slice(
+      0,
+      8,
+    ),
   },
   {
     talkTrackPatches: [
       {
         id: live.talkTracks[0]!.id,
-        approvedPlay: "Ask what too expensive means before moving price.",
+        approvedPlay:
+          "Ask what the lower commission includes before discussing any concession.",
       },
     ],
     source: "heuristic",
@@ -40,7 +44,7 @@ assert(list?.accepted === true, "firm facts default accepted");
 assert(track?.accepted === false, "talk-tracks default rejected");
 
 const working = workingFromProposals(live, proposals);
-assert(working.standardPermFeePct === 120, "accepted list applied");
+assert(working.standardPermFeePct === 2.75, "accepted list applied");
 assert(
   working.talkTracks[0]!.approvedPlay === live.talkTracks[0]!.approvedPlay,
   "rejected talk-track must not change working",
@@ -53,11 +57,10 @@ const published = applyAcceptedProposals(
   ),
 );
 assert(
-  published.talkTracks[0]!.approvedPlay.includes("too expensive"),
+  published.talkTracks[0]!.approvedPlay.includes("lower commission"),
   "accepted talk-track should publish",
 );
 
-// Uncheck anchors — should not appear
 const noAnchors = applyAcceptedProposals(
   live,
   proposals.map((p) =>
@@ -65,8 +68,8 @@ const noAnchors = applyAcceptedProposals(
   ),
 );
 assert(
-  !noAnchors.valueAnchors.includes("New anchor A"),
+  !noAnchors.valueAnchors.includes("New campaign cadence anchor"),
   "unchecked anchors must not publish",
 );
 
-console.log("playbook-draft.selftest: ok");
+console.log("playbook-draft.selftest: ok (real-estate %)");
