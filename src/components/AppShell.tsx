@@ -4,8 +4,6 @@ import type { SessionUser } from "@/lib/auth-types";
 
 type AppShellProps = {
   children: React.ReactNode;
-  /** Override display name focus line (optional). */
-  focus?: string;
   /** Optional right-side header slot (e.g. share status) */
   headerExtra?: React.ReactNode;
   /** Force a user (tests); otherwise reads session cookie. */
@@ -19,7 +17,6 @@ type AppShellProps = {
  */
 export async function AppShell({
   children,
-  focus,
   headerExtra,
   user: userProp,
   variant,
@@ -28,7 +25,7 @@ export async function AppShell({
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <AppHeader user={user} focus={focus} variant={variant} />
+      <AppHeader user={user} variant={variant} />
       {headerExtra}
       {/* Marketing pages lay out their own full-bleed bands, so the shell gets
           out of the way — no max-width, no padding, no gap. Boxed cards inside a
@@ -36,9 +33,8 @@ export async function AppShell({
       {variant === "marketing" ? (
         <main className="page-enter flex w-full flex-1 flex-col">{children}</main>
       ) : (
-        {/* page-enter omitted on app shell: its translateY fill-mode leaves a
-            transform on <main> that flattens preserve-3d and mirrors HAHA flip cards. */}
         <main className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:gap-8 lg:px-10 xl:px-12">
+          {/* No page-enter: leftover translateY on main flattens 3D flip cards. */}
           {children}
         </main>
       )}

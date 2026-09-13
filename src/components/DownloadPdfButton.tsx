@@ -7,6 +7,8 @@ type DownloadPdfButtonProps = {
   score: PracticeScore;
   whatYouSaid?: string[];
   repName?: string;
+  /** Omit from PDF when empty / undefined. */
+  reflection?: { whatWentWrong?: string; nextTime?: string };
 };
 
 // Navy is the brand/structural color (headers, titles, text). Tier colors
@@ -51,6 +53,7 @@ export function DownloadPdfButton({
   score,
   whatYouSaid = [],
   repName = "Rep",
+  reflection,
 }: DownloadPdfButtonProps) {
   const [busy, setBusy] = useState(false);
 
@@ -362,7 +365,7 @@ export function DownloadPdfButton({
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         setRgb(doc, COLOR.muted);
-        doc.text("Cornerman · AI-assisted sales practice", PAGE_MARGIN, FOOTER_Y);
+        doc.text("Cornerman · AI-assisted sales practice · fictional demo data", PAGE_MARGIN, FOOTER_Y);
         doc.text(`Page ${i} of ${total}`, PAGE_WIDTH - PAGE_MARGIN, FOOTER_Y, { align: "right" });
       }
     }
@@ -389,6 +392,17 @@ export function DownloadPdfButton({
 
     sectionTitle("Suggested response — rehearse this");
     calloutBox(`“${score.suggestedResponse}”`, { italic: true });
+
+    const went = reflection?.whatWentWrong?.trim() ?? "";
+    const next = reflection?.nextTime?.trim() ?? "";
+    if (went || next) {
+      sectionTitle("Self-reflection");
+      const lines: string[] = [];
+      if (went) lines.push(`What went wrong: ${went}`);
+      if (next) lines.push(`Next time I will: ${next}`);
+      bulletList(lines);
+      y += 2;
+    }
 
     rubricChart();
 
