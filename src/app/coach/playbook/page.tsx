@@ -2,21 +2,25 @@ import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
 import { PlaybookEditor } from "@/components/PlaybookEditor";
 import { getPlaybook } from "@/lib/playbook";
+import { getPlaybookDraft } from "@/lib/playbook-draft";
 
 export const dynamic = "force-dynamic";
 
 export default async function PlaybookPage() {
-  const playbook = await getPlaybook();
+  const [playbook, draft] = await Promise.all([
+    getPlaybook(),
+    getPlaybookDraft(),
+  ]);
 
   return (
     <AppShell>
       <PageHeader
         eyebrow="Playbook"
         title="Firm knowledge"
-        description="Dump and edit approved SaaS pricing, talk-tracks, and FAQ here. AEs use this in drills via live cue cards and scoring — they don’t edit it. You never open ElevenLabs; we wire thin firm facts into the voice client automatically."
+        description="Upload or edit approved SaaS pricing, talk-tracks, and FAQ. Parse into a locked draft, accept proposals, then Publish — AEs pick up changes in Learn, cue cards, scoring, and the next voice drill. Thin firm facts go to ElevenLabs automatically; coaching tips never do."
       />
 
-      <PlaybookEditor initial={playbook} />
+      <PlaybookEditor live={playbook} initialDraft={draft} />
     </AppShell>
   );
 }

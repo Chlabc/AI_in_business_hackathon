@@ -9,8 +9,8 @@ type PageHeaderProps = {
 };
 
 /**
- * Shared top chrome for coach tabs so Profile / Learn / Practice / Progress
- * (and manager Team / Playbook / Evidence) open the same way.
+ * Shared top chrome for coach tabs — employee (Profile / Learn / Practice /
+ * Progress) and manager (Team / Playbook / Evidence) open the same way.
  */
 export function PageHeader({
   eyebrow,
