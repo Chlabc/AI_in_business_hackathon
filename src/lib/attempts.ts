@@ -403,6 +403,12 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
       /** % of drills scoring >= 70 (usable "success" proxy — not CRM win rate). */
       strongDrillRate: null as number | null,
       weakestCriterionLabel: null as string | null,
+      weakestCriterionId: null as string | null,
+      criterionAverages: [] as {
+        id: string;
+        label: string;
+        avgPct: number;
+      }[],
       trendLabel: "No practice attempts yet — start a drill to track KPIs",
       trend: [] as PracticeTrendPoint[],
     };
@@ -444,14 +450,25 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
     }
   }
   let weakestCriterionLabel: string | null = null;
+  let weakestCriterionId: string | null = null;
   let weakestAvg = Number.POSITIVE_INFINITY;
-  for (const row of sums.values()) {
+  const criterionAverages: {
+    id: string;
+    label: string;
+    /** Mean criterion score as 0–100 (rubric criteria are 0–1). */
+    avgPct: number;
+  }[] = [];
+  for (const [id, row] of sums.entries()) {
     const avg = row.total / row.n;
+    const avgPct = Math.round(avg * 1000) / 10;
+    criterionAverages.push({ id, label: row.label, avgPct });
     if (avg < weakestAvg) {
       weakestAvg = avg;
       weakestCriterionLabel = row.label;
+      weakestCriterionId = id;
     }
   }
+  criterionAverages.sort((a, b) => a.avgPct - b.avgPct);
 
   const trend: PracticeTrendPoint[] = chronological.map((a, i) => {
     const d = new Date(a.createdAt);
@@ -473,6 +490,8 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
     concessionRate,
     strongDrillRate,
     weakestCriterionLabel,
+    weakestCriterionId,
+    criterionAverages,
     trendLabel,
     trend,
   };

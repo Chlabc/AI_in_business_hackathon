@@ -115,52 +115,103 @@ function RepProgress({
           <h2 className="text-lg font-semibold text-foreground">
             Where you struggle
           </h2>
-          {practice.attempts > 0 && practice.weakestCriterionLabel ? (
-            <p className="mt-4 text-sm text-foreground">
-              <span className="text-muted">Weakest: </span>
-              <strong className="font-medium text-danger">
-                {practice.weakestCriterionLabel}
-              </strong>
-              {practice.avgScore !== null
-                ? ` · avg ${practice.avgScore}/100`
-                : null}
-            </p>
+          {practice.attempts > 0 && practice.criterionAverages.length > 0 ? (
+            <>
+              <p className="mt-1 text-sm text-muted">
+                Average across {practice.attempts} scored drill
+                {practice.attempts === 1 ? "" : "s"} (each criterion 0–100).
+                Focus practice on the lowest bar.
+              </p>
+              <ul className="mt-4 space-y-2">
+                {practice.criterionAverages.map((c) => {
+                  const weakest = c.id === practice.weakestCriterionId;
+                  return (
+                    <li
+                      key={c.id}
+                      className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
+                    >
+                      <span
+                        className={`w-40 shrink-0 leading-snug ${weakest ? "font-semibold text-danger" : "text-muted"}`}
+                      >
+                        {c.label}
+                      </span>
+                      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-border">
+                        <div
+                          className={`h-full rounded-full ${weakest ? "bg-danger" : "bg-accent/70"}`}
+                          style={{
+                            width: `${Math.min(Math.max(c.avgPct, 0), 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <span
+                        className={
+                          weakest
+                            ? "min-w-[3rem] text-right text-base font-semibold tabular-nums text-danger"
+                            : "min-w-[3rem] text-right font-mono text-sm tabular-nums text-muted"
+                        }
+                      >
+                        {Math.round(c.avgPct)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                Weakest skill:{" "}
+                <strong className="font-medium text-foreground">
+                  {practice.weakestCriterionLabel}
+                </strong>
+                {practice.avgScore !== null
+                  ? ` · overall avg ${practice.avgScore}/100`
+                  : null}
+                {practice.feeHoldRate !== null
+                  ? ` · held fee on ${practice.feeHoldRate}% of drills`
+                  : null}
+                . Use Practice with Soft/Full cues on that criterion, then try
+                Unaided.
+              </p>
+            </>
           ) : kpis && diagnosis ? (
-            <ul className="mt-4 space-y-1.5">
-              {kpis.byStage.map((s) => {
-                const weakest = s.stage === diagnosis.primaryStage;
-                return (
-                  <li
-                    key={s.stage}
-                    className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
-                  >
-                    <span
-                      className={`w-24 capitalize ${weakest ? "font-semibold text-danger" : "text-muted"}`}
+            <>
+              <p className="mt-1 text-sm text-muted">
+                From seeded call outcomes (no scored drills yet).
+              </p>
+              <ul className="mt-4 space-y-1.5">
+                {kpis.byStage.map((s) => {
+                  const weakest = s.stage === diagnosis.primaryStage;
+                  return (
+                    <li
+                      key={s.stage}
+                      className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
                     >
-                      {label(s.stage)}
-                    </span>
-                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
-                      <div
-                        className="h-full rounded-full bg-danger"
-                        style={{
-                          width: `${Math.min(s.lossRate, 100)}%`,
-                          opacity: weakest ? 1 : 0.45,
-                        }}
-                      />
-                    </div>
-                    <span
-                      className={
-                        weakest
-                          ? "min-w-[72px] text-right text-2xl font-semibold text-danger"
-                          : "w-14 text-right font-mono text-muted"
-                      }
-                    >
-                      {pct(s.lossRate)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
+                      <span
+                        className={`w-24 capitalize ${weakest ? "font-semibold text-danger" : "text-muted"}`}
+                      >
+                        {label(s.stage)}
+                      </span>
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
+                        <div
+                          className="h-full rounded-full bg-danger"
+                          style={{
+                            width: `${Math.min(s.lossRate, 100)}%`,
+                            opacity: weakest ? 1 : 0.45,
+                          }}
+                        />
+                      </div>
+                      <span
+                        className={
+                          weakest
+                            ? "min-w-[72px] text-right text-2xl font-semibold text-danger"
+                            : "w-14 text-right font-mono text-muted"
+                        }
+                      >
+                        {pct(s.lossRate)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
           ) : (
             <p className="mt-4 text-sm text-muted">No drill data yet.</p>
           )}
