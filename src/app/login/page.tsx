@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
@@ -47,11 +48,34 @@ function LoginForm() {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-[400px]">
-        <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-tight text-accent">
-            Cornerman
-          </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Link
+            href="/"
+            className="brand-logo mb-5 inline-flex"
+            aria-label="Cornerman home"
+          >
+            <span className="brand-logo-light">
+              <Image
+                src="/cornerman-logo-light.png"
+                alt="Cornerman"
+                width={2172}
+                height={724}
+                sizes="180px"
+                priority
+              />
+            </span>
+            <span className="brand-logo-dark">
+              <Image
+                src="/cornerman-logo-dark.png"
+                alt="Cornerman"
+                width={1672}
+                height={941}
+                sizes="180px"
+                priority
+              />
+            </span>
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Sign in to your account
           </h1>
           <p className="mt-2 text-sm text-muted">
