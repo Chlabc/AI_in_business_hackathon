@@ -76,11 +76,12 @@ export default async function CoachPage() {
 
       <PageHeader
         eyebrow="Profile"
-        title="Where you're losing deals"
+        title={user.name}
         description={
           <>
-            {user.name} · {rep.title} at {rep.agency} · {rep.weeksInRole} weeks
-            in role
+            {rep.title} at {rep.agency} · {rep.weeksInRole} weeks in role. Your
+            credential, recent losses, and performance live here — jump to
+            Practice when you&apos;re ready to drill.
           </>
         }
         action={
