@@ -1,6 +1,6 @@
 import { getScenario } from "@/data/scenarios";
 import {
-  FEE_RUBRIC,
+  rubricForScenario,
   type CriterionScore,
   type PracticeScore,
   type RubricCriterionId,
@@ -98,6 +98,71 @@ function scoreCriterion(
   const soft = softHoldBar(playbook);
 
   switch (id) {
+    case "respected_refusal": {
+      // Pitch language appearing repeatedly AFTER the first turn is the tell:
+      // one pitch is the job, three is not hearing the word no.
+      const laterTurns = turns.filter((t) => t.role === "user").slice(1);
+      const pushes = laterTurns.filter((t) =>
+        /\b(but|however|just|quick|before you go|hear me out|one more|let me|worth|only take)\b/i.test(
+          t.text,
+        ),
+      ).length;
+      const acknowledged =
+        /\b(understood|no problem|totally fair|fair enough|of course|appreciate|respect that|no worries|that's fine|thanks for)\b/i.test(
+          all,
+        );
+      if (pushes >= 2) {
+        return {
+          id,
+          score: 0,
+          notes: `Kept pitching after the no (${pushes} further attempts). A refusal is an answer, not an objection to overcome.`,
+        };
+      }
+      if (acknowledged && pushes === 0) {
+        return {
+          id,
+          score: 1,
+          notes: "Accepted the no and stopped pitching. That's the right call.",
+        };
+      }
+      return {
+        id,
+        score: acknowledged ? 0.7 : 0.4,
+        notes: acknowledged
+          ? "Acknowledged the no, but still pushed once more."
+          : "Didn't clearly acknowledge the refusal.",
+      };
+    }
+    case "agreed_next_step": {
+      const permission =
+        /\b(check back|follow up|get in touch|reach out|next month|next quarter|later in the year|keep in touch|send you|drop you|would it be ok|is it ok if|mind if)\b/i.test(
+          all,
+        );
+      const cleanClose =
+        /\b(thanks for your time|all the best|good luck|won't take any more|leave it there|appreciate you)\b/i.test(
+          all,
+        );
+      if (permission) {
+        return {
+          id,
+          score: 1,
+          notes: "Asked permission to follow up later — a good outcome here.",
+        };
+      }
+      if (cleanClose) {
+        return {
+          id,
+          score: 0.8,
+          notes: "Closed the call cleanly without pressure. Also a pass.",
+        };
+      }
+      return {
+        id,
+        score: 0.3,
+        notes:
+          "No agreed next step. Even a no should end with permission to reconnect, or a clean close.",
+      };
+    }
     case "explored_objection": {
       const hits =
         /what.*(too high|too expensive|mean|against|compar)|compar|competitor|quoted|based on|relative to|include/.test(
@@ -211,7 +276,10 @@ export function scoreTranscriptHeuristic(
 ): PracticeScore {
   const scenario = getScenario(scenarioId);
   const talkTrack = getPlaybookTalkTrack(playbook, scenario.objectionType);
-  const criteria: CriterionScore[] = FEE_RUBRIC.map((c) => {
+  // Fee scenarios keep the original six criteria, so the eval fixtures graded
+  // against them still mean the same thing.
+  const rubric = rubricForScenario(scenario.id);
+  const criteria: CriterionScore[] = rubric.map((c) => {
     const raw = scoreCriterion(c.id, turns, playbook);
     return {
       id: c.id,
