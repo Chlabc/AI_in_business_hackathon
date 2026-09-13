@@ -379,14 +379,18 @@ function BeforeAfterScore({
       ? { border: "border-l-border", text: "text-muted", bar: "bg-muted" }
       : { border: "border-l-danger", text: "text-danger", bar: "bg-danger" };
 
+  const scoreTip = improved
+    ? `Each drill is marked out of 100 against six criteria. Scores rose ${delta} points from the first drill to the latest — that improvement is the product working.`
+    : flat
+      ? "Each drill is marked out of 100 against six criteria. Scores held flat between the first drill and the latest. More reps needed before the trend means anything."
+      : `Each drill is marked out of 100 against six criteria. Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it — with this few attempts it may reflect test sessions more than real practice.`;
+
   return (
     <section className={`surface-card rounded-xl border-l-4 ${tone.border} p-6`}>
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+      <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
         Score across {attemptCount} drills
+        <InfoTip text={scoreTip} />
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        Each drill is marked out of 100 against six criteria.
-      </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-6 sm:gap-10">
         <ScoreBlock label="First drill" score={firstScore} />
@@ -414,14 +418,6 @@ function BeforeAfterScore({
         <ScoreBar label="First" score={firstScore} barClass="bg-muted" />
         <ScoreBar label="Latest" score={latestScore} barClass={tone.bar} />
       </div>
-
-      <p className="mt-5 text-sm leading-relaxed text-muted">
-        {improved
-          ? `Scores rose ${delta} points from the first drill to the latest. That improvement is the product working.`
-          : flat
-            ? "Scores held flat between the first drill and the latest. More reps needed before the trend means anything."
-            : `Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it, with this few attempts it reflects test sessions more than real practice.`}
-      </p>
     </section>
   );
 }
