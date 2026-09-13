@@ -3,7 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgressPanel } from "@/components/ProgressPanel";
 import colors from "@/app/coach/coach.module.css";
-import { DEMO_REP_ID, getRep } from "@/data/seed";
+import { DEMO_REP_ID } from "@/data/seed";
+import { TEAM } from "@/data/team";
 import {
   listAttempts,
   practiceKpisFromAttempts,
@@ -16,7 +17,6 @@ import { loadEvalSnapshot } from "@/lib/load-eval-snapshot";
 import type { Diagnosis, RepKpis } from "@/lib/types";
 import {
   beforeAfterFromAttempts,
-  USER_TEST_PROTOCOL,
   type BeforeAfterEvidence,
 } from "@/lib/value-evidence";
 
@@ -35,23 +35,29 @@ export default async function ValuePage() {
   const user = await getSession();
   const isManager = user?.role === "manager";
 
-  // A manager has no repId of their own. The page used to fall back to the demo
-  // rep and then say "are YOU getting better?" about someone else's drills, so
-  // the two roles now get the question each of them actually has.
+  if (isManager) {
+    // Claim 2 = team aggregate across every agent’s scored drills (not Alex-only).
+    const perRep = await Promise.all(
+      TEAM.map(async (m) => listAttempts(m.id)),
+    );
+    const teamAttempts = perRep.flat();
+    const evidence = beforeAfterFromAttempts(teamAttempts);
+    return (
+      <ManagerEvidence
+        evidence={evidence}
+        agentCount={TEAM.length}
+        snapshot={loadEvalSnapshot()}
+      />
+    );
+  }
+
   const repId = user?.repId ?? DEMO_REP_ID;
   const attempts = await listAttempts(repId);
   const evidence = beforeAfterFromAttempts(attempts);
-  const repName = getRep(repId)?.name ?? "the rep";
   const dash = getRepDashboard(repId);
   const practice = practiceKpisFromAttempts(attempts);
 
-  return isManager ? (
-    <ManagerEvidence
-      evidence={evidence}
-      repName={repName}
-      snapshot={loadEvalSnapshot()}
-    />
-  ) : (
+  return (
     <RepProgress
       evidence={evidence}
       attempts={attempts}
@@ -82,7 +88,6 @@ function RepProgress({
       <PageHeader
         eyebrow="Progress"
         title="Are you actually getting better?"
-        description="Two questions only: is your score going up, and have you stopped discounting? Both come from drills you finished — nothing here is estimated, and we never claim a win rate or a revenue number, because we have no way to measure those."
         action={
           <Link
             href="/coach/practice"
@@ -105,16 +110,22 @@ function RepProgress({
         latePct={evidence.holdRateLatePct}
       />
 
-      {kpis && diagnosis ? (
-        <div className="mt-3 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
-          <section className="surface-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">
-              Where you struggle
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-muted">
-              A sales call has five stages. A longer red bar means more of those
-              calls ended badly.
+      <div className="mt-3 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
+        <section className="surface-card rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-foreground">
+            Where you struggle
+          </h2>
+          {practice.attempts > 0 && practice.weakestCriterionLabel ? (
+            <p className="mt-4 text-sm text-foreground">
+              <span className="text-muted">Weakest: </span>
+              <strong className="font-medium text-danger">
+                {practice.weakestCriterionLabel}
+              </strong>
+              {practice.avgScore !== null
+                ? ` · avg ${practice.avgScore}/100`
+                : null}
             </p>
+          ) : kpis && diagnosis ? (
             <ul className="mt-4 space-y-1.5">
               {kpis.byStage.map((s) => {
                 const weakest = s.stage === diagnosis.primaryStage;
@@ -150,25 +161,19 @@ function RepProgress({
                 );
               })}
             </ul>
-            <p className="mt-4 text-sm leading-relaxed text-muted">
-              It all goes wrong in one place:{" "}
-              <strong className="font-medium text-foreground">
-                {label(diagnosis.primaryStage)}
-              </strong>
-              . The other four stages are fine — which is why there&apos;s only
-              one thing to practise.
-            </p>
-          </section>
+          ) : (
+            <p className="mt-4 text-sm text-muted">No drill data yet.</p>
+          )}
+        </section>
 
-          <ProgressPanel
-            className={colors.progress}
-            heading="Are you improving?"
-            attempts={attempts}
-            feeHoldRate={practice.feeHoldRate}
-            trendLabel={practice.trendLabel}
-          />
-        </div>
-      ) : null}
+        <ProgressPanel
+          className={colors.progress}
+          heading="Are you improving?"
+          attempts={attempts}
+          feeHoldRate={practice.feeHoldRate}
+          trendLabel={practice.trendLabel}
+        />
+      </div>
     </AppShell>
   );
 }
@@ -177,11 +182,11 @@ function RepProgress({
 
 function ManagerEvidence({
   evidence,
-  repName,
+  agentCount,
   snapshot,
 }: {
   evidence: BeforeAfterEvidence;
-  repName: string;
+  agentCount: number;
   snapshot: EvalSnapshot;
 }) {
   const h = snapshot.headlines;
@@ -190,38 +195,27 @@ function ManagerEvidence({
       value: h.scoringOverallPct,
       pass: `${h.scoringOverallAgree}/${h.scoringTotal}`,
       label: "Scoring agrees with a human grader",
-      explain: `On fixed transcripts a person graded by hand, our score landed within ${snapshot.overallAgreementBand} points of theirs.`,
+      explain: `Within ${snapshot.overallAgreementBand} pts of human grades`,
     },
     {
       value: h.diagnosisPct,
       pass: `${h.diagnosisPassed}/${h.diagnosisTotal}`,
       label: "Diagnosis picks the right weak spot",
-      explain:
-        "Given a rep's call history, it named the same stage and objection a human labelled.",
+      explain: "Matches human stage/objection labels",
     },
     {
       value: h.personaPct,
       pass: `${h.personaPassed}/${h.personaTotal}`,
       label: "Guardrails hold",
-      explain:
-        "The AI client never invented a price below the floor, and ignored instructions hidden in a transcript.",
+      explain: "No below-floor prices; ignores planted instructions",
     },
   ];
 
   return (
     <AppShell>
       <PageHeader
-        eyebrow="For principals"
+        eyebrow="Evidence"
         title="Does this tool actually work?"
-        description={
-          <>
-            Two separate claims, kept separate: whether the coach{" "}
-            <strong className="font-medium text-foreground">judges well</strong>
-            , and whether agents{" "}
-            <strong className="font-medium text-foreground">improve</strong>.
-            Every figure is measured, not estimated.
-          </>
-        }
         action={
           <Link
             href="/coach/health"
@@ -261,14 +255,14 @@ function ManagerEvidence({
         </p>
       </section>
 
-      {/* Claim 2 — reps improve. Honest about its small sample. */}
+      {/* Claim 2 — team-wide practice improvement (all agents’ drills). */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
           Claim 2 — reps improve with practice
         </h2>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
-          One rep ({repName}) across {evidence.attemptCount} scored drills —
-          early signal from practice, not a controlled study.
+        <p className="mt-1 text-sm text-muted">
+          Aggregated across {agentCount} agents&apos; scored drills (oldest →
+          newest), not a single rep.
         </p>
         <div className="mt-4 space-y-6">
           <BeforeAfterScore
@@ -282,24 +276,6 @@ function ManagerEvidence({
             latePct={evidence.holdRateLatePct}
           />
         </div>
-      </section>
-
-      <section className="surface-card rounded-xl p-5 sm:p-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          How we would prove claim 2 properly
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          Claim 1 is already measured. Claim 2 needs real reps, so this is the
-          protocol we would run next — written down rather than filled in with
-          invented quotes.
-        </p>
-        <ol className="mt-5 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-muted">
-          {USER_TEST_PROTOCOL.map((step) => (
-            <li key={step}>
-              <span className="text-foreground">{step}</span>
-            </li>
-          ))}
-        </ol>
       </section>
     </AppShell>
   );
@@ -330,13 +306,10 @@ function BeforeAfterScore({
           Not enough data yet
         </p>
         <h2 className="mt-2 text-xl font-semibold text-foreground">
-          Run at least 3 full drills to show a before/after
+          Run at least 3 drills for before/after
         </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          {attemptCount} scored{" "}
-          {attemptCount === 1 ? "attempt" : "attempts"} so far. A drill only
-          counts once you actually speak — starting a session and ending it
-          without talking scores near zero and would make this chart lie.
+        <p className="mt-2 text-sm text-muted">
+          {attemptCount} scored so far.
         </p>
       </section>
     );
