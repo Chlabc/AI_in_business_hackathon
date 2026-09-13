@@ -2,7 +2,6 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { PageHeader } from "@/components/PageHeader";
-import { ProgressPanel } from "@/components/ProgressPanel";
 import { ShareControls } from "@/components/ShareControls";
 import { EmployeeCredential } from "./EmployeeCredential";
 import colors from "./coach.module.css";
@@ -168,79 +167,8 @@ export default async function CoachPage() {
         </ol>
       </section>
 
-      {/* paired stage weakness and practice progress.
-             items-start so the stage card is only as tall as its five rows.
-             Stretching it to match the progress panel just moved the empty
-             space inside the card. The progress panel keeps its own height in
-             check by paging its history rather than listing every attempt. */}
-      <div className="mt-3 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
-        <section className="surface-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-foreground">
-            Where you struggle
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
-            A sales call has five stages. A longer red bar means more of those
-            calls ended badly.
-          </p>
-          <ul className="mt-4 space-y-1.5">
-            {kpis.byStage.map((s) => {
-              const weakest = s.stage === diagnosis.primaryStage;
-              return (
-                <li
-                  key={s.stage}
-                  className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
-                >
-                  <span
-                    className={`w-24 capitalize ${weakest ? "font-semibold text-danger" : "text-muted"}`}
-                  >
-                    {label(s.stage)}
-                  </span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
-                    <div
-                      className="h-full rounded-full bg-danger"
-                      style={{
-                        width: `${Math.min(s.lossRate, 100)}%`,
-                        opacity: weakest ? 1 : 0.45,
-                      }}
-                    />
-                  </div>
-                  <span
-                    className={
-                      weakest
-                        ? "min-w-[72px] text-right text-2xl font-semibold text-danger"
-                        : "w-14 text-right font-mono text-muted"
-                    }
-                  >
-                    {pct(s.lossRate)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-4 text-sm leading-relaxed text-muted">
-            It all goes wrong in one place:{" "}
-            <strong className="font-medium text-foreground">
-              {label(diagnosis.primaryStage)}
-            </strong>
-            . The other four stages are fine — which is why there&apos;s only one
-            thing to practise.
-          </p>
-        </section>
-
-        <ProgressPanel
-          className={colors.progress}
-          heading="Are you improving?"
-          attempts={attempts}
-          feeHoldRate={practice.feeHoldRate}
-          trendLabel={practice.trendLabel}
-        />
-      </div>
-
-      {/* 9 — secondary information */}
+      {/* Secondary: sharing + raw call table */}
       <div className={colors.secondary}>
-        <h2 className="text-base font-medium text-muted">
-          Secondary information
-        </h2>
         <ShareControls
           className={colors.sharing}
           initialShared={share.shareProgressWithManager}
