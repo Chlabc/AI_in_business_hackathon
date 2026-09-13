@@ -347,7 +347,11 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           <code className="text-xs">.pdf</code> /{" "}
           <code className="text-xs">.txt</code> /{" "}
           <code className="text-xs">.md</code>. PDFs must have a text layer
-          (not a scan). Parse builds a{" "}
+          (not a scan). Prefer{" "}
+          <strong className="font-medium text-foreground">
+            Download sample PDF
+          </strong>{" "}
+          first if you want to try parsing without your own file. Parse builds a{" "}
           <strong className="font-medium text-foreground">locked draft</strong>{" "}
           with accept/reject proposals. Talk-track AI edits stay off until you
           accept them. Nothing reaches drills until Publish.
@@ -376,6 +380,13 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           </p>
         ) : null}
         <div className="mt-3 flex flex-wrap items-center gap-3">
+          <a
+            href="/samples/northline-playbook-sample.pdf"
+            download="northline-playbook-sample.pdf"
+            className="rounded-md border border-border px-3 py-2 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent"
+          >
+            Download sample PDF
+          </a>
           <label className="cursor-pointer rounded-md border border-border px-3 py-2 text-sm text-muted hover:border-accent hover:text-foreground">
             Upload PDF or text
             <input
@@ -402,6 +413,10 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
             Rules only
           </button>
         </div>
+        <p className="mt-2 text-xs text-muted">
+          Download the sample, then Upload it and hit Parse / Rules only to try
+          extraction without writing your own doc first.
+        </p>
         {importFindings ? (
           <ul className="mt-3 space-y-1 text-xs text-muted">
             {importFindings.map((f) => (
