@@ -63,6 +63,27 @@ export function defaultPlaybook(): FirmPlaybook {
   };
 }
 
+/** Empty live knowledge — keeps firm identity + talk-track shells so judges can reparse a sample PDF from scratch. */
+export function blankPlaybook(): FirmPlaybook {
+  const base = defaultPlaybook();
+  return {
+    ...base,
+    standardPermFeePct: 0,
+    feeFloorPct: 0,
+    competitorQuotePct: 0,
+    valueAnchors: [],
+    talkTracks: base.talkTracks.map((t) => ({
+      ...t,
+      approvedPlay: "",
+      anchorPoints: [],
+      neverDo: [],
+      exampleLine: "",
+    })),
+    faqNotes: "",
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 function talkTrackToPlaybook(t: TalkTrack): PlaybookTalkTrack {
   return {
     id: t.id,
@@ -154,13 +175,22 @@ export async function savePlaybook(
   if (next.feeFloorPct > next.standardPermFeePct) {
     throw new Error("Fee floor cannot be above standard fee");
   }
+  // 0 is allowed for a cleared knowledge base (judges reparse from blank).
   if (
     !Number.isFinite(next.standardPermFeePct) ||
-    next.standardPermFeePct <= 0 ||
+    next.standardPermFeePct < 0 ||
     next.standardPermFeePct > 100
   ) {
-    throw new Error("Standard commission must be greater than 0% and at most 100%");
+    throw new Error("Standard commission must be between 0% and 100%");
   }
+  await fs.mkdir(path.dirname(STORE), { recursive: true });
+  await fs.writeFile(STORE, JSON.stringify(next, null, 2), "utf8");
+  return next;
+}
+
+/** Wipe live playbook to a blank shell (does not clear draft by itself). */
+export async function clearPlaybookKnowledge(): Promise<FirmPlaybook> {
+  const next = blankPlaybook();
   await fs.mkdir(path.dirname(STORE), { recursive: true });
   await fs.writeFile(STORE, JSON.stringify(next, null, 2), "utf8");
   return next;

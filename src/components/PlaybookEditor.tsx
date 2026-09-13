@@ -61,6 +61,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   );
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openTrack, setOpenTrack] = useState<string | null>(
@@ -299,6 +300,46 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
     }
   }
 
+  async function clearKnowledgeBase() {
+    const ok = window.confirm(
+      "Clear the entire knowledge base?\n\nThis wipes live pricing, anchors, talk-track copy, and FAQ, and discards any draft — so you can upload the sample PDF and parse from a blank slate. This cannot be undone.",
+    );
+    if (!ok) return;
+    setClearing(true);
+    setError(null);
+    setMessage(null);
+    setParseBanner(null);
+    try {
+      const res = await fetch("/api/playbook/clear", { method: "POST" });
+      const data = (await res.json()) as {
+        error?: string;
+        playbook?: FirmPlaybook;
+      };
+      if (!res.ok) throw new Error(data.error ?? "Clear failed");
+      const next = data.playbook;
+      if (!next) throw new Error("Clear returned no playbook");
+      setLivePlaybook(next);
+      setWorking(next);
+      setProposals([]);
+      setMethod(undefined);
+      setImportFindings(null);
+      setImportText("");
+      setPendingPdf(null);
+      setMessage(
+        "Knowledge base cleared. Download the sample PDF, upload it, then Parse.",
+      );
+      try {
+        localStorage.setItem("cornerman.playbookUpdatedAt", next.updatedAt);
+      } catch {
+        /* ignore */
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Clear failed");
+    } finally {
+      setClearing(false);
+    }
+  }
+
   async function discardDraft() {
     setError(null);
     setMessage(null);
@@ -325,7 +366,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
   const fieldClass =
     "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
 
-  const processing = importing || publishing || savingDraft;
+  const processing = importing || publishing || savingDraft || clearing;
   const statusTone = error
     ? "red"
     : processing
@@ -339,11 +380,13 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
       ? "Processing…"
       : publishing
         ? "Publishing…"
-        : savingDraft
-          ? "Saving…"
-          : locked
-            ? "Draft — not live in drills"
-            : "Live";
+        : clearing
+          ? "Clearing…"
+          : savingDraft
+            ? "Saving…"
+            : locked
+              ? "Draft — not live in drills"
+              : "Live";
   const statusDotClass =
     statusTone === "green"
       ? "bg-ok"
@@ -723,6 +766,14 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           className="inline-flex h-11 items-center justify-center rounded-md px-4 text-sm font-medium text-muted hover:text-foreground"
         >
           Discard draft
+        </button>
+        <button
+          type="button"
+          onClick={() => void clearKnowledgeBase()}
+          disabled={clearing || publishing || importing}
+          className="inline-flex h-11 items-center justify-center rounded-md border border-danger/40 px-4 text-sm font-medium text-danger transition hover:bg-danger/10 disabled:opacity-60"
+        >
+          {clearing ? "Clearing…" : "Clear knowledge base"}
         </button>
         {message ? <p className="text-sm text-ok">{message}</p> : null}
         {error ? <p className="text-sm text-danger">{error}</p> : null}
