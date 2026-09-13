@@ -108,12 +108,42 @@ export async function updateAttemptReflection(
   return all[idx];
 }
 
+async function hydrateAttemptFromSupabase(
+  attemptId: string,
+): Promise<PracticeAttempt | null> {
+  try {
+    const {
+      getPracticeSession,
+      practiceSessionsAvailable,
+    } = await import("@/lib/practice-sessions");
+    if (!practiceSessionsAvailable()) return null;
+    const session = await getPracticeSession(attemptId);
+    if (!session) return null;
+    return {
+      id: session.id,
+      createdAt: session.createdAt,
+      repId: session.repId,
+      conversationId: session.conversationId,
+      turns: session.turns,
+      score: session.score,
+      cueMode: (session.cueMode as CueMode | null) ?? undefined,
+      reflection: session.reflection ?? undefined,
+      calibration: session.calibration ?? undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function getAttemptById(
   attemptId: string,
 ): Promise<PracticeAttempt | null> {
   let all = await readAll();
   all = await ensureAlexDemoAttempts(all);
-  return all.find((a) => a.id === attemptId) ?? null;
+  const local = all.find((a) => a.id === attemptId);
+  if (local) return local;
+  // Vercel /tmp is per-instance; manager logs often come from Supabase.
+  return hydrateAttemptFromSupabase(attemptId);
 }
 
 /**
@@ -255,18 +285,23 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
     return {
       attempts: 0,
       lastScore: null as number | null,
+      avgScore: null as number | null,
       feeHoldRate: null as number | null,
+      weakestCriterionLabel: null as string | null,
       trendLabel: "No practice attempts yet — start a drill to track KPIs",
     };
   }
-  const lastScore = attempts[0].score.overall;
+  const lastScore = attempts[0]!.score.overall;
+  const avgScore = Math.round(
+    attempts.reduce((sum, a) => sum + a.score.overall, 0) / attempts.length,
+  );
   const holds = attempts.filter((a) => a.score.heldFee).length;
   const feeHoldRate = Math.round((holds / attempts.length) * 1000) / 10;
   const chronological = [...attempts].reverse();
   let trendLabel = "Keep drilling the fee objection.";
   if (chronological.length >= 2) {
-    const first = chronological[0].score.overall;
-    const latest = chronological[chronological.length - 1].score.overall;
+    const first = chronological[0]!.score.overall;
+    const latest = chronological[chronological.length - 1]!.score.overall;
     if (latest > first + 5) {
       trendLabel = `Improving — score ${first} → ${latest} across ${attempts.length} attempts.`;
     } else if (latest < first - 5) {
@@ -277,10 +312,33 @@ export function practiceKpisFromAttempts(attempts: PracticeAttempt[]) {
   } else {
     trendLabel = `First scored attempt: ${lastScore}/100.`;
   }
+
+  // Average each criterion across drills; lowest mean score = weakest skill.
+  const sums = new Map<string, { label: string; total: number; n: number }>();
+  for (const a of attempts) {
+    for (const c of a.score.criteria) {
+      const prev = sums.get(c.id) ?? { label: c.label, total: 0, n: 0 };
+      prev.total += c.score;
+      prev.n += 1;
+      sums.set(c.id, prev);
+    }
+  }
+  let weakestCriterionLabel: string | null = null;
+  let weakestAvg = Number.POSITIVE_INFINITY;
+  for (const row of sums.values()) {
+    const avg = row.total / row.n;
+    if (avg < weakestAvg) {
+      weakestAvg = avg;
+      weakestCriterionLabel = row.label;
+    }
+  }
+
   return {
     attempts: attempts.length,
     lastScore,
+    avgScore,
     feeHoldRate,
+    weakestCriterionLabel,
     trendLabel,
   };
 }
