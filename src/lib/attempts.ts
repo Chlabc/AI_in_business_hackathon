@@ -347,12 +347,38 @@ async function ensureAlexDemoAttempts(
   return next;
 }
 
+/**
+ * List attempts for a rep. Merges local file store with Supabase
+ * `practice_sessions` so Progress / KPIs see the same drills as manager logs
+ * (Vercel /tmp alone is incomplete across instances).
+ */
 export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
   let all = await readAll();
   all = await ensureAlexDemoAttempts(all);
-  return all
-    .filter((a) => a.repId === repId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const byId = new Map<string, PracticeAttempt>();
+  for (const a of all) {
+    if (a.repId === repId) byId.set(a.id, a);
+  }
+
+  try {
+    const {
+      listPracticeAttemptsForRep,
+      practiceSessionsAvailable,
+    } = await import("@/lib/practice-sessions");
+    if (practiceSessionsAvailable()) {
+      const cloud = await listPracticeAttemptsForRep(repId, 50);
+      for (const a of cloud) {
+        // Cloud wins on id clash — it's the durable store on Vercel.
+        byId.set(a.id, a);
+      }
+    }
+  } catch (err) {
+    console.error("[attempts] listAttempts supabase merge failed", err);
+  }
+
+  return [...byId.values()].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
 }
 
 export type PracticeTrendPoint = {

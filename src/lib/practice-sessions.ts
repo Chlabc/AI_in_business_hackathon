@@ -127,6 +127,37 @@ export async function listPracticeSessionsForRep(
   }));
 }
 
+/**
+ * Full-ish rows for Progress / KPIs — one query, no N+1 getPracticeSession.
+ * Turns omitted (empty) unless you need transcripts (use getPracticeSession).
+ */
+export async function listPracticeAttemptsForRep(
+  repId: string,
+  limit = 50,
+): Promise<PracticeAttempt[]> {
+  const sb = getSupabaseAdmin();
+  const { data, error } = await sb
+    .from("practice_sessions")
+    .select(
+      "id, rep_id, scenario_id, created_at, conversation_id, cue_mode, score, turns, reflection, calibration",
+    )
+    .eq("rep_id", repId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(error.message);
+  return ((data as Row[]) ?? []).map((row) => ({
+    id: row.id,
+    createdAt: row.created_at,
+    repId: row.rep_id,
+    conversationId: row.conversation_id,
+    turns: Array.isArray(row.turns) ? row.turns : [],
+    score: row.score,
+    cueMode: (row.cue_mode as PracticeAttempt["cueMode"]) ?? undefined,
+    reflection: row.reflection ?? undefined,
+    calibration: row.calibration ?? undefined,
+  }));
+}
+
 export async function getPracticeSession(
   id: string,
 ): Promise<PracticeSession | null> {
