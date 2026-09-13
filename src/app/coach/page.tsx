@@ -93,30 +93,7 @@ export default async function CoachPage() {
         </Link>
       </div>
 
-      {/* 4 — diagnosis / verdict panel */}
-      <section
-        className={`${colors.verdict} surface-card rounded-xl p-6 lg:p-8`}
-      >
-        <p className="text-xs font-semibold uppercase tracking-wider text-accent">
-          The pattern costing you deals
-        </p>
-        <h2 className="display-serif mt-3 max-w-4xl text-3xl leading-snug text-foreground lg:text-4xl">
-          {diagnosis.headline}
-        </h2>
-        <p className="mt-4 text-sm text-muted">
-          Found across{" "}
-          <strong className="font-medium text-foreground">
-            {kpis.callsAnalysed} calls
-          </strong>
-          , with {diagnosis.confidence} confidence. It shows up most in the{" "}
-          <strong className="font-medium text-foreground">
-            {label(diagnosis.primaryStage)}
-          </strong>{" "}
-          part of the conversation.
-        </p>
-      </section>
-
-      {/* 5 — evidence panel */}
+      {/* Evidence for the diagnosis — the verdict headline lives on Practice. */}
       <section className="surface-card rounded-xl p-6">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
           Why we think that — {diagnosis.evidence.length} recent losses

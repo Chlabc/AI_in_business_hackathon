@@ -5,7 +5,8 @@ import { PracticeSession } from "@/components/PracticeSession";
 import { SCENARIOS, getScenario } from "@/data/scenarios";
 import { DEMO_REP_ID, FIRM } from "@/data/seed";
 import { requireRole } from "@/lib/auth";
-import { diagnoseRep } from "@/lib/diagnosis";
+import colors from "@/app/coach/coach.module.css";
+import { diagnoseRep, getRepDashboard } from "@/lib/diagnosis";
 import { getPlaybook, getPlaybookTalkTrack } from "@/lib/playbook";
 import { applyPlaybookToScenario } from "@/lib/scenario-session";
 
@@ -21,6 +22,10 @@ const difficultyPill: Record<string, string> = {
   Hard: "pill-danger",
 };
 
+function label(value: string) {
+  return value.replaceAll("_", " ");
+}
+
 export default async function PracticePage({ searchParams }: Props) {
   const user = await requireRole("employee");
   const repId = user.repId ?? DEMO_REP_ID;
@@ -28,8 +33,9 @@ export default async function PracticePage({ searchParams }: Props) {
   const scenarioId = params.scenario?.trim() || null;
   const playbook = await getPlaybook();
   const diagnosis = diagnoseRep(repId);
+  const dash = getRepDashboard(repId);
 
-  // No scenario chosen → briefing + picker. With ?scenario= → live drill.
+  // No scenario chosen → verdict + briefing + picker. With ?scenario= → live drill.
   if (!scenarioId) {
     const track =
       getPlaybookTalkTrack(
@@ -60,10 +66,34 @@ export default async function PracticePage({ searchParams }: Props) {
             What do you want to practise?
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
-            Review the approved play for your weak spot, then pick a situation.
-            The highlighted card matches your profile diagnosis.
+            Start from the pattern costing you deals, review the approved play,
+            then pick a situation. The highlighted card matches that diagnosis.
           </p>
         </div>
+
+        {diagnosis && dash ? (
+          <section
+            className={`${colors.verdict} surface-card rounded-xl p-6 lg:p-8`}
+          >
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent">
+              The pattern costing you deals
+            </p>
+            <h2 className="display-serif mt-3 max-w-4xl text-3xl leading-snug text-foreground lg:text-4xl">
+              {diagnosis.headline}
+            </h2>
+            <p className="mt-4 text-sm text-muted">
+              Found across{" "}
+              <strong className="font-medium text-foreground">
+                {dash.kpis.callsAnalysed} calls
+              </strong>
+              , with {diagnosis.confidence} confidence. It shows up most in the{" "}
+              <strong className="font-medium text-foreground">
+                {label(diagnosis.primaryStage)}
+              </strong>{" "}
+              part of the conversation.
+            </p>
+          </section>
+        ) : null}
 
         {track ? (
           <PracticeBriefing
@@ -73,7 +103,7 @@ export default async function PracticePage({ searchParams }: Props) {
             talkTrack={track}
             whyThis={
               diagnosis
-                ? `your profile flags ${diagnosis.primaryObjection.replaceAll("_", " ")} in the ${diagnosis.primaryStage.replaceAll("_", " ")} stage`
+                ? `your profile flags ${label(diagnosis.primaryObjection)} in the ${label(diagnosis.primaryStage)} stage`
                 : null
             }
           />
