@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { InfoTip } from "@/components/InfoTip";
 import type { CriterionScore, PracticeScore, RubricCriterionId } from "@/lib/rubric";
+
+const PAGE_SIZE = 10;
 
 type LogItem = {
   id: string;
@@ -48,12 +50,14 @@ export function PracticeLogsSection({
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     setOpenId(null);
     setDetail(null);
+    setPage(0);
     try {
       const res = await fetch(
         `/api/practice/sessions?repId=${encodeURIComponent(repId)}`,
@@ -78,6 +82,15 @@ export function PracticeLogsSection({
   useEffect(() => {
     void load();
   }, [load]);
+
+  const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageItems = useMemo(() => {
+    const start = safePage * PAGE_SIZE;
+    return items.slice(start, start + PAGE_SIZE);
+  }, [items, safePage]);
+  const rangeStart = items.length === 0 ? 0 : safePage * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(items.length, (safePage + 1) * PAGE_SIZE);
 
   async function openSession(id: string) {
     if (openId === id) {
@@ -144,8 +157,42 @@ export function PracticeLogsSection({
           drill, it shows up here.
         </p>
       ) : (
-        <ul className="mt-4 space-y-3">
-          {items.map((item) => (
+        <>
+        <div className="mt-4 flex flex-wrap items-center justify-end gap-3 text-sm text-muted">
+          <span className="tabular-nums text-foreground">
+            {rangeStart} to {rangeEnd} of {items.length}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Newer logs"
+              disabled={safePage <= 0}
+              onClick={() => {
+                setOpenId(null);
+                setDetail(null);
+                setPage((p) => Math.max(0, p - 1));
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:border-accent disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              aria-label="Older logs"
+              disabled={safePage >= pageCount - 1}
+              onClick={() => {
+                setOpenId(null);
+                setDetail(null);
+                setPage((p) => Math.min(pageCount - 1, p + 1));
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background text-foreground transition hover:border-accent disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+        <ul className="mt-3 space-y-3">
+          {pageItems.map((item) => (
             <li
               key={item.id}
               className="rounded-lg border border-border bg-background"
@@ -208,6 +255,7 @@ export function PracticeLogsSection({
             </li>
           ))}
         </ul>
+        </>
       )}
     </section>
   );

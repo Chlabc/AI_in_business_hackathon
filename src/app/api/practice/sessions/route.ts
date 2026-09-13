@@ -47,11 +47,21 @@ export async function GET(request: Request) {
 
     const available = practiceSessionsAvailable();
     if (!available) {
+      const onVercel = Boolean(process.env.VERCEL);
+      const vercelEnv = process.env.VERCEL_ENV; // production | preview | development
       return NextResponse.json({
         available: false,
         sessions: await fileSessions(),
-        message:
-          "Supabase is not configured, showing local drills. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then run supabase/practice_sessions.sql so transcripts sync for calibration.",
+        config: {
+          hasUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()),
+          hasServiceKey: Boolean(
+            process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+          ),
+          vercelEnv: vercelEnv ?? null,
+        },
+        message: onVercel
+          ? `Supabase env vars are missing in this ${vercelEnv ?? "Vercel"} deploy (hasUrl/hasServiceKey reported in config). In Vercel → Settings → Environment Variables, enable NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY for Preview as well as Production, then Redeploy.`
+          : "Supabase is not configured locally. Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to .env.local.",
       });
     }
 
