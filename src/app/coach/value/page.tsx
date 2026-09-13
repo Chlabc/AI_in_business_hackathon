@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PageHeader } from "@/components/PageHeader";
 import { DEMO_REP_ID, getRep } from "@/data/seed";
 import { listAttempts } from "@/lib/attempts";
 import { getSession } from "@/lib/auth";
@@ -41,34 +42,19 @@ export default async function ValuePage() {
 function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Progress</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Are you actually getting better?
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
-            Two questions only: is your score going up, and have you stopped
-            discounting? Both come from drills you finished — nothing here is
-            estimated, and we never claim a win rate or a revenue number,
-            because we have no way to measure those.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <PageHeader
+        eyebrow="Progress"
+        title="Are you actually getting better?"
+        description="Two questions only: is your score going up, and have you stopped discounting? Both come from drills you finished — nothing here is estimated, and we never claim a win rate or a revenue number, because we have no way to measure those."
+        action={
           <Link
             href="/coach/practice"
             className="inline-flex h-10 items-center rounded-md bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             Run a drill
           </Link>
-          <Link
-            href="/coach"
-            className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted hover:text-foreground"
-          >
-            Profile
-          </Link>
-        </div>
-      </div>
+        }
+      />
 
       <BeforeAfterScore
         attemptCount={evidence.attemptCount}
@@ -122,27 +108,27 @@ function ManagerEvidence({
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">For managers</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Does this tool actually work?
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
+      <PageHeader
+        eyebrow="Evidence"
+        title="Does this tool actually work?"
+        description={
+          <>
             Two separate claims, kept separate: whether the coach{" "}
             <strong className="font-medium text-foreground">judges well</strong>
             , and whether reps{" "}
             <strong className="font-medium text-foreground">improve</strong>.
             Every figure is measured, not estimated.
-          </p>
-        </div>
-        <Link
-          href="/coach/health"
-          className="inline-flex h-10 shrink-0 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
-        >
-          See every test case →
-        </Link>
-      </div>
+          </>
+        }
+        action={
+          <Link
+            href="/coach/health"
+            className="inline-flex h-10 shrink-0 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
+          >
+            See every test case →
+          </Link>
+        }
+      />
 
       {/* Claim 1 — the scorer is accurate. This is the strong evidence. */}
       <section>

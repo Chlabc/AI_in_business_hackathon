@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PageHeader } from "@/components/PageHeader";
 import type { EvalCaseRow } from "@/lib/eval-snapshot";
 import { loadEvalSnapshot } from "@/lib/load-eval-snapshot";
 
@@ -92,22 +93,11 @@ export default function HealthPage() {
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/coach/manager"
-          className="text-sm text-muted hover:text-accent"
-        >
-          ← Manager
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Health</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
-            Does the coaching loop actually work?
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm text-muted lg:text-base">
+      <PageHeader
+        eyebrow="Health"
+        title="Does the coaching loop actually work?"
+        description={
+          <>
             Static snapshot from the last{" "}
             <code className="rounded bg-card px-1.5 py-0.5 text-xs text-foreground">
               npm run eval
@@ -115,17 +105,27 @@ export default function HealthPage() {
             . Same numbers as{" "}
             <code className="rounded bg-card px-1.5 py-0.5 text-xs text-foreground">
               EVAL.md
-            </code>
+            </code>{" "}
             — frozen so results stay stable between eval runs.
-          </p>
-        </div>
-        <p className="text-xs text-muted">
-          Generated{" "}
-          <time dateTime={snapshot.generatedAt}>
-            {new Date(snapshot.generatedAt).toLocaleString()}
-          </time>
-        </p>
-      </div>
+          </>
+        }
+        action={
+          <>
+            <Link
+              href="/coach/value"
+              className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted transition hover:text-foreground"
+            >
+              ← Evidence
+            </Link>
+            <p className="inline-flex h-10 items-center text-xs text-muted">
+              Generated{" "}
+              <time dateTime={snapshot.generatedAt} className="ml-1">
+                {new Date(snapshot.generatedAt).toLocaleString()}
+              </time>
+            </p>
+          </>
+        }
+      />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (

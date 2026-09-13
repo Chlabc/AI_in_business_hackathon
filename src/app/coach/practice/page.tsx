@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PageHeader } from "@/components/PageHeader";
 import { PracticeBriefing } from "@/components/PracticeBriefing";
 import { PracticeSession } from "@/components/PracticeSession";
 import { SCENARIOS, getScenario } from "@/data/scenarios";
@@ -60,16 +61,11 @@ export default async function PracticePage({ searchParams }: Props) {
 
     return (
       <AppShell>
-        <div>
-          <p className="eyebrow">Practice</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            What do you want to practise?
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
-            Start from the pattern costing you deals, review the approved play,
-            then pick a situation. The highlighted card matches that diagnosis.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Practice"
+          title="What do you want to practise?"
+          description="Start from the pattern costing you deals, skim the tips, then pick a situation. The highlighted card matches that diagnosis."
+        />
 
         {diagnosis && dash ? (
           <section
@@ -187,35 +183,33 @@ export default async function PracticePage({ searchParams }: Props) {
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-4 text-sm">
-          <Link href="/coach" className="text-muted transition hover:text-accent">
-            ← Profile
-          </Link>
-          <Link
-            href="/coach/practice"
-            className="text-muted transition hover:text-accent"
-          >
-            All scenarios
-          </Link>
-        </div>
-        <span className="rounded border border-border bg-card px-3 py-1 text-xs text-muted">
-          {scenario.title} · {scenario.difficulty}
-        </span>
-      </div>
-
-      <div>
-        <p className="eyebrow">Live practice</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
-          {scenario.title}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted lg:text-base">
-          {scenario.description} Use cue mode Off / Soft / Full for reactive
-          coach cards. After scoring, use{" "}
-          <strong className="font-medium text-foreground">Practice again</strong>{" "}
-          or pick another scenario.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Live practice"
+        title={scenario.title}
+        description={
+          <>
+            {scenario.description} Use cue mode Off / Soft / Full for reactive
+            coach cards. After scoring, use{" "}
+            <strong className="font-medium text-foreground">
+              Practice again
+            </strong>{" "}
+            or pick another scenario.
+          </>
+        }
+        action={
+          <>
+            <Link
+              href="/coach/practice"
+              className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted transition hover:text-foreground"
+            >
+              ← All scenarios
+            </Link>
+            <span className="inline-flex h-10 items-center rounded-md border border-border bg-card px-3 text-xs text-muted">
+              {scenario.difficulty}
+            </span>
+          </>
+        }
+      />
 
       <PracticeSession
         key={scenario.id}

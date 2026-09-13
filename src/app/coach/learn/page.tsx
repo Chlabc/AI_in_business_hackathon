@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { LearnModule } from "@/components/LearnModule";
+import { PageHeader } from "@/components/PageHeader";
 import { requireRole } from "@/lib/auth";
 import { buildFlashcards, buildQuiz } from "@/lib/learn";
 import { getPlaybook } from "@/lib/playbook";
@@ -15,25 +15,22 @@ export default async function LearnPage() {
 
   return (
     <AppShell>
-      <Link href="/coach" className="text-sm text-muted hover:text-accent">
-        ← Back to profile
-      </Link>
-
-      <div>
-        <p className="eyebrow">Optional warm-up</p>
-        <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-          Know your own prices before you defend them
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
-          You can&apos;t hold a price you can&apos;t remember. These cards drill
-          the handful of facts you need at your fingertips mid-call — what{" "}
-          <strong className="font-medium text-foreground">
-            {playbook.firmName}
-          </strong>{" "}
-          charges, how low you&apos;re allowed to go, and what to point at
-          instead of discounting.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Learn"
+        title="Know your own prices before you defend them"
+        description={
+          <>
+            You can&apos;t hold a price you can&apos;t remember. These cards
+            drill the handful of facts you need at your fingertips mid-call —
+            what{" "}
+            <strong className="font-medium text-foreground">
+              {playbook.firmName}
+            </strong>{" "}
+            charges, how low you&apos;re allowed to go, and what to point at
+            instead of discounting.
+          </>
+        }
+      />
 
       {/* People kept asking what this page was for and where "Northline" came
           from, so the answer sits at the top rather than in a corner pill. */}

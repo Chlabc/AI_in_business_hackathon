@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { OnboardingBanner } from "@/components/OnboardingBanner";
+import { PageHeader } from "@/components/PageHeader";
 import { ProgressPanel } from "@/components/ProgressPanel";
 import { ShareControls } from "@/components/ShareControls";
 import { EmployeeCredential } from "./EmployeeCredential";
@@ -73,25 +74,24 @@ export default async function CoachPage() {
       {/* 2 — optional onboarding banner */}
       <OnboardingBanner className={colors.onboarding} />
 
-      {/* 3 — page context row */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Your profile</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Where you&apos;re losing deals
-          </h1>
-          <p className="mt-2 text-sm text-muted">
+      <PageHeader
+        eyebrow="Profile"
+        title="Where you're losing deals"
+        description={
+          <>
             {user.name} · {rep.title} at {rep.agency} · {rep.weeksInRole} weeks
             in role
-          </p>
-        </div>
-        <Link
-          href="/coach/value"
-          className="rounded border border-accent/30 bg-accent-soft px-3 py-1 text-xs font-semibold text-accent transition hover:opacity-90"
-        >
-          Progress →
-        </Link>
-      </div>
+          </>
+        }
+        action={
+          <Link
+            href="/coach/value"
+            className="inline-flex h-10 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
+          >
+            Progress →
+          </Link>
+        }
+      />
 
       {/* Credential + snapshot — vertically centered as a pair */}
       <div className={colors.profilePerformance}>
