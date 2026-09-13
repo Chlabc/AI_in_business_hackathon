@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { InfoTip } from "@/components/InfoTip";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgressPanel } from "@/components/ProgressPanel";
 import colors from "@/app/coach/coach.module.css";
@@ -22,7 +23,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-function pct(n: number | null | undefined, fallback = "—") {
+function pct(n: number | null | undefined, fallback = "-") {
   if (n === null || n === undefined) return fallback;
   return `${n}%`;
 }
@@ -277,10 +278,10 @@ function ManagerEvidence({
         }
       />
 
-      {/* Claim 1 — the scorer is accurate. This is the strong evidence. */}
+      {/* Claim 1 - the scorer is accurate. This is the strong evidence. */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Claim 1 — the coach judges calls the way a human would
+          Claim 1 - the coach judges calls the way a human would
         </h2>
         <div className="mt-3 grid gap-3 lg:grid-cols-3">
           {checks.map((c) => (
@@ -306,10 +307,10 @@ function ManagerEvidence({
         </p>
       </section>
 
-      {/* Claim 2 — team-wide practice improvement (all agents’ drills). */}
+      {/* Claim 2 - team-wide practice improvement (all agents’ drills). */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Claim 2 — reps improve with practice
+          Claim 2 - reps improve with practice
         </h2>
         <p className="mt-1 text-sm text-muted">
           Aggregated across {agentCount} agents&apos; scored drills (oldest →
@@ -334,7 +335,7 @@ function ManagerEvidence({
 
 /**
  * The headline claim. Shows the direction of travel in colour and shape, so it
- * reads before the numbers do — and says plainly when there isn't enough data,
+ * reads before the numbers do - and says plainly when there isn't enough data,
  * rather than dressing up a drop as a result.
  */
 function BeforeAfterScore({
@@ -416,7 +417,7 @@ function BeforeAfterScore({
           ? `Scores rose ${delta} points from the first drill to the latest. That improvement is the product working.`
           : flat
             ? "Scores held flat between the first drill and the latest. More reps needed before the trend means anything."
-            : `Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it — with this few attempts it reflects test sessions more than real practice.`}
+            : `Scores fell ${Math.abs(delta)} points. We report this as-is rather than hiding it - with this few attempts it reflects test sessions more than real practice.`}
       </p>
     </section>
   );
@@ -427,7 +428,7 @@ function ScoreBlock({ label, score }: { label: string; score: number | null }) {
     <div>
       <p className="text-xs uppercase tracking-wider text-muted">{label}</p>
       <p className="mt-1 text-5xl font-semibold tabular-nums text-foreground">
-        {score ?? "—"}
+        {score ?? "-"}
       </p>
     </div>
   );
@@ -452,7 +453,7 @@ function ScoreBar({
         />
       </div>
       <span className="w-12 shrink-0 text-right font-mono tabular-nums text-muted">
-        {score ?? "—"}
+        {score ?? "-"}
       </span>
     </div>
   );
@@ -489,7 +490,7 @@ function PriceHold({
         Did they stop discounting?
       </h2>
       <p className="mt-1 text-sm leading-relaxed text-muted">
-        How often a drill ended at or near list price — their first half of
+        How often a drill ended at or near list price - their first half of
         attempts against their second half.
       </p>
 
@@ -501,7 +502,7 @@ function PriceHold({
           <p className="mt-2 text-sm leading-relaxed text-muted">
             In all scored drills the price was held, first to last. There is no
             before-and-after to show here because there was never a discount to
-            stop — this metric only becomes interesting once someone caves in a
+            stop - this metric only becomes interesting once someone caves in a
             drill.
           </p>
         </div>
@@ -511,7 +512,7 @@ function PriceHold({
           <HoldBar label="Later drills" value={late} tone="strong" />
           {unchanged ? (
             <p className="text-sm text-muted">
-              Unchanged at {earlyPct}% — more drills needed before this means
+              Unchanged at {earlyPct}% - more drills needed before this means
               anything.
             </p>
           ) : null}
