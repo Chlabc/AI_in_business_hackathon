@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { InfoTip } from "@/components/InfoTip";
 import type { CriterionScore, PracticeScore, RubricCriterionId } from "@/lib/rubric";
 
 type LogItem = {
