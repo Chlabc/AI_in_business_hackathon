@@ -1,5 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { buildAlexDemoAttempts } from "@/data/demo-attempts";
+import { DEMO_REP_ID } from "@/data/seed";
 import type { CueMode } from "@/lib/cue-reactivity";
 import { dataStorePath } from "@/lib/file-store";
 import type { PracticeScore } from "@/lib/rubric";
@@ -86,8 +88,27 @@ export async function updateAttemptReflection(
   return all[idx];
 }
 
+/**
+ * Plant Alex’s demo improvement arc when missing (fresh /tmp on Vercel, or
+ * only ad-hoc test drills). Idempotent once `demo_alex_*` ids exist.
+ */
+async function ensureAlexDemoAttempts(
+  all: PracticeAttempt[],
+): Promise<PracticeAttempt[]> {
+  const hasDemoArc = all.some(
+    (a) => a.repId === DEMO_REP_ID && a.id.startsWith("demo_alex_"),
+  );
+  if (hasDemoArc) return all;
+  const seeded = buildAlexDemoAttempts();
+  const withoutAlex = all.filter((a) => a.repId !== DEMO_REP_ID);
+  const next = [...withoutAlex, ...seeded];
+  await writeAll(next);
+  return next;
+}
+
 export async function listAttempts(repId: string): Promise<PracticeAttempt[]> {
-  const all = await readAll();
+  let all = await readAll();
+  all = await ensureAlexDemoAttempts(all);
   return all
     .filter((a) => a.repId === repId)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));

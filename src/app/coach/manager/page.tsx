@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/AppShell";
 import { ConversionChart } from "@/components/ConversionChart";
 import { ManagerReportPdfButton } from "@/components/ManagerReportPdfButton";
+import { PageHeader } from "@/components/PageHeader";
 import { FIRM, DEMO_REP_ID, getRep } from "@/data/seed";
 import { TEAM, TEAM_AVERAGE_CONVERSION } from "@/data/team";
 import { getSession } from "@/lib/auth";
@@ -26,42 +27,30 @@ export default async function ManagerPage() {
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="text-sm text-muted">Manager home</span>
-        <span className="rounded border border-border bg-card px-3 py-1 text-xs text-muted">
-          Manager view · no raw transcripts
-        </span>
-      </div>
-
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="eyebrow">Manager</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
-            Team overview
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm text-muted lg:text-base">
-            Development tool, not surveillance. Alex&apos;s practice summary
-            only appears when they choose to share it.
-          </p>
-        </div>
-        <ManagerReportPdfButton
-          managerName={session?.name ?? "Manager"}
-          firmLabel={`${FIRM.name} · ${FIRM.vertical}`}
-          teamAverageConversion={TEAM_AVERAGE_CONVERSION}
-          team={teamForPdf}
-          focusRepName={rep?.name ?? liveAe.name}
-          share={{
-            shareProgressWithManager: share.shareProgressWithManager,
-            updatedAt: share.updatedAt,
-          }}
-          practice={{
-            attempts: practice.attempts,
-            lastScore: practice.lastScore,
-            feeHoldRate: practice.feeHoldRate,
-            trendLabel: practice.trendLabel,
-          }}
-        />
-      </div>
+      <PageHeader
+        eyebrow="Team"
+        title="Team overview"
+        description="Development tool, not surveillance. Alex's practice summary only appears when they choose to share it."
+        action={
+          <ManagerReportPdfButton
+            managerName={session?.name ?? "Manager"}
+            firmLabel={`${FIRM.name} · ${FIRM.vertical}`}
+            teamAverageConversion={TEAM_AVERAGE_CONVERSION}
+            team={teamForPdf}
+            focusRepName={rep?.name ?? liveAe.name}
+            share={{
+              shareProgressWithManager: share.shareProgressWithManager,
+              updatedAt: share.updatedAt,
+            }}
+            practice={{
+              attempts: practice.attempts,
+              lastScore: practice.lastScore,
+              feeHoldRate: practice.feeHoldRate,
+              trendLabel: practice.trendLabel,
+            }}
+          />
+        }
+      />
 
       <section className="surface-card overflow-hidden rounded-xl">
         <div className="overflow-x-auto">

@@ -1,10 +1,19 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { PageHeader } from "@/components/PageHeader";
+import { ProgressPanel } from "@/components/ProgressPanel";
+import colors from "@/app/coach/coach.module.css";
 import { DEMO_REP_ID, getRep } from "@/data/seed";
-import { listAttempts } from "@/lib/attempts";
+import {
+  listAttempts,
+  practiceKpisFromAttempts,
+  type PracticeAttempt,
+} from "@/lib/attempts";
 import { getSession } from "@/lib/auth";
+import { getRepDashboard } from "@/lib/diagnosis";
 import type { EvalSnapshot } from "@/lib/eval-snapshot";
 import { loadEvalSnapshot } from "@/lib/load-eval-snapshot";
+import type { Diagnosis, RepKpis } from "@/lib/types";
 import {
   beforeAfterFromAttempts,
   USER_TEST_PROTOCOL,
@@ -12,6 +21,15 @@ import {
 } from "@/lib/value-evidence";
 
 export const dynamic = "force-dynamic";
+
+function pct(n: number | null | undefined, fallback = "—") {
+  if (n === null || n === undefined) return fallback;
+  return `${n}%`;
+}
+
+function label(value: string) {
+  return value.replaceAll("_", " ");
+}
 
 export default async function ValuePage() {
   const user = await getSession();
@@ -24,6 +42,8 @@ export default async function ValuePage() {
   const attempts = await listAttempts(repId);
   const evidence = beforeAfterFromAttempts(attempts);
   const repName = getRep(repId)?.name ?? "the rep";
+  const dash = getRepDashboard(repId);
+  const practice = practiceKpisFromAttempts(attempts);
 
   return isManager ? (
     <ManagerEvidence
@@ -32,43 +52,46 @@ export default async function ValuePage() {
       snapshot={loadEvalSnapshot()}
     />
   ) : (
-    <RepProgress evidence={evidence} />
+    <RepProgress
+      evidence={evidence}
+      attempts={attempts}
+      practice={practice}
+      diagnosis={dash?.diagnosis ?? null}
+      kpis={dash?.kpis ?? null}
+    />
   );
 }
 
 /* ── Rep: am I improving? ─────────────────────────────────────────────── */
 
-function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
+function RepProgress({
+  evidence,
+  attempts,
+  practice,
+  diagnosis,
+  kpis,
+}: {
+  evidence: BeforeAfterEvidence;
+  attempts: PracticeAttempt[];
+  practice: ReturnType<typeof practiceKpisFromAttempts>;
+  diagnosis: Diagnosis | null;
+  kpis: RepKpis | null;
+}) {
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Progress</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Are you actually getting better?
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
-            Two questions only: is your score going up, and have you stopped
-            discounting? Both come from drills you finished — nothing here is
-            estimated, and we never claim a win rate or a revenue number,
-            because we have no way to measure those.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      <PageHeader
+        eyebrow="Progress"
+        title="Are you actually getting better?"
+        description="Two questions only: is your score going up, and have you stopped discounting? Both come from drills you finished — nothing here is estimated, and we never claim a win rate or a revenue number, because we have no way to measure those."
+        action={
           <Link
             href="/coach/practice"
             className="inline-flex h-10 items-center rounded-md bg-accent px-4 text-sm font-semibold text-accent-fg"
           >
             Run a drill
           </Link>
-          <Link
-            href="/coach"
-            className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted hover:text-foreground"
-          >
-            Profile
-          </Link>
-        </div>
-      </div>
+        }
+      />
 
       <BeforeAfterScore
         attemptCount={evidence.attemptCount}
@@ -81,6 +104,71 @@ function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
         earlyPct={evidence.holdRateEarlyPct}
         latePct={evidence.holdRateLatePct}
       />
+
+      {kpis && diagnosis ? (
+        <div className="mt-3 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
+          <section className="surface-card rounded-xl p-6">
+            <h2 className="text-lg font-semibold text-foreground">
+              Where you struggle
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              A sales call has five stages. A longer red bar means more of those
+              calls ended badly.
+            </p>
+            <ul className="mt-4 space-y-1.5">
+              {kpis.byStage.map((s) => {
+                const weakest = s.stage === diagnosis.primaryStage;
+                return (
+                  <li
+                    key={s.stage}
+                    className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
+                  >
+                    <span
+                      className={`w-24 capitalize ${weakest ? "font-semibold text-danger" : "text-muted"}`}
+                    >
+                      {label(s.stage)}
+                    </span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
+                      <div
+                        className="h-full rounded-full bg-danger"
+                        style={{
+                          width: `${Math.min(s.lossRate, 100)}%`,
+                          opacity: weakest ? 1 : 0.45,
+                        }}
+                      />
+                    </div>
+                    <span
+                      className={
+                        weakest
+                          ? "min-w-[72px] text-right text-2xl font-semibold text-danger"
+                          : "w-14 text-right font-mono text-muted"
+                      }
+                    >
+                      {pct(s.lossRate)}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              It all goes wrong in one place:{" "}
+              <strong className="font-medium text-foreground">
+                {label(diagnosis.primaryStage)}
+              </strong>
+              . The other four stages are fine — which is why there&apos;s only
+              one thing to practise.
+            </p>
+          </section>
+
+          <ProgressPanel
+            className={colors.progress}
+            heading="Are you improving?"
+            attempts={attempts}
+            feeHoldRate={practice.feeHoldRate}
+            trendLabel={practice.trendLabel}
+          />
+        </div>
+      ) : null}
     </AppShell>
   );
 }
@@ -122,27 +210,27 @@ function ManagerEvidence({
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">For managers</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Does this tool actually work?
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted lg:text-base">
+      <PageHeader
+        eyebrow="Evidence"
+        title="Does this tool actually work?"
+        description={
+          <>
             Two separate claims, kept separate: whether the coach{" "}
             <strong className="font-medium text-foreground">judges well</strong>
             , and whether reps{" "}
             <strong className="font-medium text-foreground">improve</strong>.
             Every figure is measured, not estimated.
-          </p>
-        </div>
-        <Link
-          href="/coach/health"
-          className="inline-flex h-10 shrink-0 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
-        >
-          See every test case →
-        </Link>
-      </div>
+          </>
+        }
+        action={
+          <Link
+            href="/coach/health"
+            className="inline-flex h-10 shrink-0 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
+          >
+            See every test case →
+          </Link>
+        }
+      />
 
       {/* Claim 1 — the scorer is accurate. This is the strong evidence. */}
       <section>

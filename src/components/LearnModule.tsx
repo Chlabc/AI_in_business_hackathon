@@ -97,8 +97,8 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
           </div>
 
           <div className="deck-slot deck-current">
-            {/* One face at a time — CSS 3D dual-face flip mirrors text in
-                Chromium; keep HAHA glass look without rotateY. */}
+            {/* Same flip mechanic as EmployeeCredential: faces rotate on their
+                own (no preserve-3d parent); visibility swaps mid-spin. */}
             <div className="flashcard">
               <button
                 type="button"
@@ -108,28 +108,30 @@ export function LearnModule({ firmName, cards, questions }: LearnModuleProps) {
                   flipped ? "Hide the answer" : `Show the answer: ${card.front}`
                 }
               />
-              <div className="flashcard-rotor">
-                {!flipped ? (
-                  <div className="flashcard-face">
-                    <span className="pill pill-accent w-fit">{card.tag}</span>
-                    <p className="text-lg font-medium leading-relaxed sm:text-2xl">
-                      {card.front}
-                    </p>
-                    <span className="inline-flex h-11 w-fit items-center rounded-full bg-accent px-6 text-sm font-semibold text-accent-fg">
-                      Show the answer
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flashcard-face flashcard-back">
-                    <span className="pill pill-ok w-fit">Answer</span>
-                    <p className="text-lg font-medium leading-relaxed sm:text-2xl">
-                      {card.back}
-                    </p>
-                    <span className="inline-flex h-11 w-fit items-center rounded-full border border-border bg-card px-6 text-sm font-semibold text-muted">
-                      Flip back
-                    </span>
-                  </div>
-                )}
+              <div
+                className={`flashcard-rotor${flipped ? " flashcard-flipped" : ""}`}
+              >
+                <div className="flashcard-face" aria-hidden={flipped}>
+                  <span className="pill pill-accent w-fit">{card.tag}</span>
+                  <p className="text-lg font-medium leading-relaxed sm:text-2xl">
+                    {card.front}
+                  </p>
+                  <span className="inline-flex h-11 w-fit items-center rounded-full bg-accent px-6 text-sm font-semibold text-accent-fg">
+                    Show the answer
+                  </span>
+                </div>
+                <div
+                  className="flashcard-face flashcard-back"
+                  aria-hidden={!flipped}
+                >
+                  <span className="pill pill-ok w-fit">Answer</span>
+                  <p className="text-lg font-medium leading-relaxed sm:text-2xl">
+                    {card.back}
+                  </p>
+                  <span className="inline-flex h-11 w-fit items-center rounded-full border border-border bg-card px-6 text-sm font-semibold text-muted">
+                    Flip back
+                  </span>
+                </div>
               </div>
             </div>
           </div>

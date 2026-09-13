@@ -331,25 +331,17 @@ body {
   }
 }
 
-/* ── Flashcard flip ─────────────────────────────────────────────────────
-   Mirrors the employee credential's structure (ui.md §6): perspective and
-   clipping on the wrapper, transform on the rotor, both faces in the same
-   grid cell so the card never resizes mid-flip. */
+/* ── Flashcards — same flip mechanic as EmployeeCredential ──────────────
+   Faces rotate on themselves (no preserve-3d parent). Visibility swaps at
+   mid-spin so Chromium never shows a mirrored front. */
 .flashcard {
   position: relative;
-  /* Card proportions, not a full-width banner — a study card should look like
-     something you could hold. */
   width: 100%;
   max-width: 34rem;
   margin-inline: auto;
   min-width: 0;
   overflow: clip;
   border-radius: 1rem;
-  perspective: 1200px;
-  /* Credential-only warm palette (ui.md §4), scoped so it never leaks out.
-     The card stays warm and light in BOTH app themes, so the semantic tokens
-     used by text and pills inside it are redefined here — otherwise dark mode
-     would paint light text onto a light card. */
   --fc-ivory: #f7f3eb;
   --fc-ink: #20344b;
   --fc-muted: #6f665c;
@@ -389,17 +381,17 @@ body {
 
 .flashcard-rotor {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+  border-radius: inherit;
 }
 
-/* Same warm frosted-acrylic material as the employee credential (ui.md §7):
-   translucent ivory base, a luminous top/left rim, a cool refraction on the
-   right, and a clipped diagonal sheen above it. */
 .flashcard-face {
   position: relative;
   grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
-  /* Centred both ways — a study card reads better balanced than top-left. */
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -420,7 +412,7 @@ body {
       rgb(255 255 255 / 9%) 42%,
       color-mix(in srgb, var(--fc-ivory) 18%, transparent) 72%
     ),
-    color-mix(in srgb, var(--fc-ivory) 92%, transparent);
+    color-mix(in srgb, var(--fc-ivory) 68%, transparent);
   backdrop-filter: blur(22px) saturate(124%);
   -webkit-backdrop-filter: blur(22px) saturate(124%);
   box-shadow:
@@ -429,9 +421,39 @@ body {
     inset -1px 0 2px color-mix(in srgb, #ccecf2 24%, transparent),
     inset 0 -2px 4px color-mix(in srgb, var(--fc-ink) 20%, transparent);
   transform-origin: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(0deg);
+  visibility: visible;
+  transition:
+    transform 420ms ease-in-out,
+    visibility 0s linear 210ms;
 }
 
-/* Clipped specular sheen. Content sits above it via z-index below. */
+.flashcard-face.flashcard-back {
+  transform: rotateY(-180deg);
+  visibility: hidden;
+  background:
+    linear-gradient(
+      145deg,
+      rgb(255 255 255 / 34%),
+      rgb(255 255 255 / 9%) 42%,
+      color-mix(in srgb, var(--ok-soft) 22%, transparent) 72%
+    ),
+    color-mix(in srgb, var(--ok-soft) 82%, var(--fc-ivory));
+  border-color: color-mix(in srgb, var(--ok) 26%, var(--fc-border));
+}
+
+.flashcard-flipped > .flashcard-face {
+  transform: rotateY(180deg);
+  visibility: hidden;
+}
+
+.flashcard-flipped > .flashcard-back {
+  transform: rotateY(0deg);
+  visibility: visible;
+}
+
 .flashcard-face::after {
   content: "";
   position: absolute;
@@ -462,27 +484,16 @@ body {
   }
 }
 
-/* Text and controls above the sheen. */
 .flashcard-face > * {
   position: relative;
   z-index: 1;
 }
 
-/* The answer face keeps the same material, tinted green so the two sides
-   are instantly distinguishable. */
-.flashcard-back {
-  background:
-    linear-gradient(
-      145deg,
-      rgb(255 255 255 / 34%),
-      rgb(255 255 255 / 9%) 42%,
-      color-mix(in srgb, var(--ok-soft) 22%, transparent) 72%
-    ),
-    color-mix(in srgb, var(--ok-soft) 82%, var(--fc-ivory));
-  border-color: color-mix(in srgb, var(--ok) 26%, var(--fc-border));
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .flashcard-face {
+    transition: none;
+  }
+
   .flashcard-face::after {
     transition: none;
     transform: none;

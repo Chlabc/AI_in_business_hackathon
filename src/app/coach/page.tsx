@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { OnboardingBanner } from "@/components/OnboardingBanner";
-import { ProgressPanel } from "@/components/ProgressPanel";
+import { PageHeader } from "@/components/PageHeader";
 import { ShareControls } from "@/components/ShareControls";
 import { EmployeeCredential } from "./EmployeeCredential";
 import colors from "./coach.module.css";
@@ -34,7 +34,7 @@ export default async function CoachPage() {
     return <div className="px-6 py-12 text-muted">Rep not found.</div>;
   }
 
-  const { rep, firm, kpis, diagnosis, talkTrack, recentCalls } = dash;
+  const { rep, kpis, diagnosis, recentCalls } = dash;
   const attempts = await listAttempts(repId);
   const practice = practiceKpisFromAttempts(attempts);
   kpis.practice = practice;
@@ -73,81 +73,27 @@ export default async function CoachPage() {
       {/* 2 — optional onboarding banner */}
       <OnboardingBanner className={colors.onboarding} />
 
-      {/* 3 — page context row */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow">Your profile</p>
-          <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
-            Where you&apos;re losing deals
-          </h1>
-          <p className="mt-2 text-sm text-muted">
-            {user.name} · {rep.title} at {rep.agency} · {rep.weeksInRole} weeks
-            in role
-          </p>
-        </div>
-        <Link
-          href="/coach/value"
-          className="rounded border border-accent/30 bg-accent-soft px-3 py-1 text-xs font-semibold text-accent transition hover:opacity-90"
-        >
-          Progress →
-        </Link>
-      </div>
-
-      {/* 4 — diagnosis / verdict panel */}
-      <section
-        className={`${colors.verdict} surface-card rounded-xl p-6 lg:p-8`}
-      >
-        <p className="text-xs font-semibold uppercase tracking-wider text-accent">
-          The pattern costing you deals
-        </p>
-        <h2 className="display-serif mt-3 max-w-4xl text-3xl leading-snug text-foreground lg:text-4xl">
-          {diagnosis.headline}
-        </h2>
-        <p className="mt-4 text-sm text-muted">
-          Found across{" "}
-          <strong className="font-medium text-foreground">
-            {kpis.callsAnalysed} calls
-          </strong>
-          , with {diagnosis.confidence} confidence. It shows up most in the{" "}
-          <strong className="font-medium text-foreground">
-            {label(diagnosis.primaryStage)}
-          </strong>{" "}
-          part of the conversation.
-        </p>
-        <div className="mt-7 flex flex-wrap items-center gap-4">
+      <PageHeader
+        eyebrow="Profile"
+        title={user.name}
+        description={
+          <>
+            {rep.title} at {rep.agency} · {rep.weeksInRole} weeks in role. Your
+            credential, recent losses, and performance live here — jump to
+            Practice when you&apos;re ready to drill.
+          </>
+        }
+        action={
           <Link
-            href="/coach/practice?scenario=price-objection"
-            className="btn-lift inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-lg font-semibold text-accent-fg transition hover:opacity-90"
+            href="/coach/value"
+            className="inline-flex h-10 items-center rounded-md border border-accent/30 bg-accent-soft px-4 text-sm font-semibold text-accent transition hover:opacity-90"
           >
-            Practice this now
+            Progress →
           </Link>
-          <Link
-            href="/coach/practice"
-            className="text-sm font-medium text-muted transition hover:text-accent"
-          >
-            Or pick a different scenario →
-          </Link>
-        </div>
-      </section>
+        }
+      />
 
-      {/* 5 — evidence panel */}
-      <section className="surface-card rounded-xl p-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Why we think that — {diagnosis.evidence.length} recent losses
-        </h2>
-        <ol className="mt-4 space-y-3">
-          {diagnosis.evidence.map((line, i) => (
-            <li key={line} className="flex gap-3 text-sm text-foreground">
-              <span className="mt-0.5 font-mono text-xs text-muted">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="leading-relaxed">{line}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* 6 — paired identity and performance */}
+      {/* Credential + snapshot — vertically centered as a pair */}
       <div className={colors.profilePerformance}>
         <EmployeeCredential
           key={`${rep.id}:${user.name}`}
@@ -187,145 +133,42 @@ export default async function CoachPage() {
               </div>
             ))}
           </div>
+          <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-border pt-5">
+            <Link
+              href="/coach/practice?scenario=price-objection"
+              className="btn-lift inline-flex h-11 items-center justify-center rounded-full bg-accent px-6 text-base font-semibold text-accent-fg transition hover:opacity-90"
+            >
+              Practice this now
+            </Link>
+            <Link
+              href="/coach/practice"
+              className="text-sm font-medium text-muted transition hover:text-accent"
+            >
+              Or choose a scenario →
+            </Link>
+          </div>
         </section>
       </div>
 
-      {/* 7 — what to do next */}
-      <section className={colors.guidance}>
-        <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-          What to do next
+      {/* Evidence sits under the card + snapshot pair */}
+      <section className="surface-card rounded-xl p-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+          Why we think that — {diagnosis.evidence.length} recent losses
         </h2>
-        <p className="mt-1 text-sm text-muted">
-          What {firm.name} says to do here
-        </p>
-        <h3 className="display-serif mt-5 text-2xl text-accent sm:text-3xl">
-          {talkTrack.title}
-        </h3>
-        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
-          {talkTrack.approvedPlay}
-        </p>
-
-        <div className={colors.pricing}>
-          <div>
-            <p className="text-sm text-muted">List price</p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">
-              {seatPriceFull(firm.standardPermFeePct)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-muted">Approval floor</p>
-            <p className="mt-1 text-2xl font-semibold text-foreground">
-              {seatPrice(firm.feeFloorPct)}
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              Going below this needs approval.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className={colors.approved}>
-            <p className="text-base font-semibold text-ok">Do this</p>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted">
-              {talkTrack.anchorPoints.map((p) => (
-                <li key={p} className="flex gap-2 leading-relaxed">
-                  <span aria-hidden className="text-ok">
-                    ✓
-                  </span>
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className={colors.avoid}>
-            <p className="text-base font-semibold text-danger">Never do this</p>
-            <ul className="mt-2 space-y-1.5 text-sm text-muted">
-              {talkTrack.neverDo.map((p) => (
-                <li key={p} className="flex gap-2 leading-relaxed">
-                  <span aria-hidden className="text-danger">
-                    ✕
-                  </span>
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <ol className="mt-4 space-y-3">
+          {diagnosis.evidence.map((line, i) => (
+            <li key={line} className="flex gap-3 text-sm text-foreground">
+              <span className="mt-0.5 font-mono text-xs text-muted">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="leading-relaxed">{line}</span>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      {/* 8 — paired stage weakness and practice progress.
-             items-start so the stage card is only as tall as its five rows.
-             Stretching it to match the progress panel just moved the empty
-             space inside the card. The progress panel keeps its own height in
-             check by paging its history rather than listing every attempt. */}
-      <div className="mt-3 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
-        <section className="surface-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-foreground">
-            Where you struggle
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
-            A sales call has five stages. A longer red bar means more of those
-            calls ended badly.
-          </p>
-          <ul className="mt-4 space-y-1.5">
-            {kpis.byStage.map((s) => {
-              const weakest = s.stage === diagnosis.primaryStage;
-              return (
-                <li
-                  key={s.stage}
-                  className={`flex items-center gap-3 text-sm ${weakest ? colors.weakestStage : colors.otherStage}`}
-                >
-                  <span
-                    className={`w-24 capitalize ${weakest ? "font-semibold text-danger" : "text-muted"}`}
-                  >
-                    {label(s.stage)}
-                  </span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
-                    <div
-                      className="h-full rounded-full bg-danger"
-                      style={{
-                        width: `${Math.min(s.lossRate, 100)}%`,
-                        opacity: weakest ? 1 : 0.45,
-                      }}
-                    />
-                  </div>
-                  <span
-                    className={
-                      weakest
-                        ? "min-w-[72px] text-right text-2xl font-semibold text-danger"
-                        : "w-14 text-right font-mono text-muted"
-                    }
-                  >
-                    {pct(s.lossRate)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-4 text-sm leading-relaxed text-muted">
-            It all goes wrong in one place:{" "}
-            <strong className="font-medium text-foreground">
-              {label(diagnosis.primaryStage)}
-            </strong>
-            . The other four stages are fine — which is why there&apos;s only one
-            thing to practise.
-          </p>
-        </section>
-
-        <ProgressPanel
-          className={colors.progress}
-          heading="Are you improving?"
-          attempts={attempts}
-          feeHoldRate={practice.feeHoldRate}
-          trendLabel={practice.trendLabel}
-        />
-      </div>
-
-      {/* 9 — secondary information */}
+      {/* Secondary: sharing + raw call table */}
       <div className={colors.secondary}>
-        <h2 className="text-base font-medium text-muted">
-          Secondary information
-        </h2>
         <ShareControls
           className={colors.sharing}
           initialShared={share.shareProgressWithManager}

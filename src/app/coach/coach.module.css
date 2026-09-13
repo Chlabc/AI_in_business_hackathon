@@ -176,7 +176,8 @@
 .profilePerformance {
   display: grid;
   gap: 1.25rem;
-  align-items: stretch;
+  /* Keep the credential and snapshot vertically centered as a pair. */
+  align-items: center;
 }
 
 .credential {
@@ -194,7 +195,7 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  align-self: start;
+  align-self: center;
   border-radius: 1.25rem;
   /* Contain the face reflections without clipping the wrapper's shadow. */
   overflow: clip;
