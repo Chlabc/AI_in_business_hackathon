@@ -127,17 +127,9 @@ function LoginForm() {
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs leading-relaxed text-muted">
-          For demo purposes, you may choose a work email from the perspective of
-          an employee or manager (e.g.{" "}
-          <span className="font-medium text-foreground">
-            alex@northline.demo
-          </span>{" "}
-          or{" "}
-          <span className="font-medium text-foreground">
-            jordan@northline.demo
-          </span>
-          ). Any password works.
+        <p className="mt-6 text-center text-xs text-muted">
+          Demo: alex@northline.demo (employee) or jordan@northline.demo
+          (manager) — any password
         </p>
 
         <p className="mt-4 text-center text-xs text-muted">
