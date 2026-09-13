@@ -18,10 +18,16 @@ type CoachStripProps = {
   connected: boolean;
 };
 
-const MODES: { id: CueMode; label: string }[] = [
-  { id: "off", label: "Off" },
-  { id: "soft", label: "Soft" },
-  { id: "full", label: "Full" },
+/**
+ * Ordered as a progression, not as settings: Guided first, then Hints, then
+ * Unaided. Off/Soft/Full described how much the app does; these describe where
+ * the rep is up to, and the mode is recorded with each attempt so a score can
+ * be read as earned with or without help.
+ */
+const MODES: { id: CueMode; label: string; hint: string }[] = [
+  { id: "full", label: "Guided", hint: "Show me the play and an example line" },
+  { id: "soft", label: "Hints", hint: "Just the anchor points" },
+  { id: "off", label: "Unaided", hint: "No help — test me" },
 ];
 
 function readStoredCueMode(): CueMode {
@@ -61,22 +67,23 @@ export function CoachStrip({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-            Live coach · cue cards
+            How much help do you want?
           </p>
           <p className="mt-0.5 text-xs text-muted">
-            List ${standardFeePct}/seat · floor ${feeFloorPct} · tips stay on
-            your screen only
+            Work down to <strong className="text-foreground">Unaided</strong> —
+            that&apos;s the one that proves it stuck. Recorded with your score.
           </p>
         </div>
         <div
           className="inline-flex rounded-md border border-border bg-card p-0.5"
           role="group"
-          aria-label="Cue mode"
+          aria-label="How much help"
         >
           {MODES.map((m) => (
             <button
               key={m.id}
               type="button"
+              title={m.hint}
               onClick={() => setModePersist(m.id)}
               className={`rounded px-3 py-1.5 text-xs font-semibold transition ${
                 mode === m.id
@@ -90,10 +97,18 @@ export function CoachStrip({
         </div>
       </div>
 
+      {/* The numbers stay visible in every mode — Unaided removes the coaching,
+          not the facts a rep would obviously know about their own product. */}
+      <p className="mt-3 border-t border-border pt-3 text-xs text-muted">
+        List <strong className="text-foreground">${standardFeePct}/seat</strong>{" "}
+        · floor <strong className="text-foreground">${feeFloorPct}</strong> ·
+        anything on this panel is on your screen only, never the client&apos;s
+      </p>
+
       {mode === "off" ? (
         <p className="mt-4 text-sm text-muted">
-          Hints off — exam mode. You still get scored against the approved
-          playbook after the drill.
+          Unaided — no play, no anchor points, no example line. You&apos;re
+          still scored against the approved playbook afterwards.
           {!connected ? " Start the drill when ready." : null}
         </p>
       ) : (

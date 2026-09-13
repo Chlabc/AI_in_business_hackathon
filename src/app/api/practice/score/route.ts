@@ -5,6 +5,7 @@ import {
   requireRole,
 } from "@/lib/auth";
 import { saveAttempt, type PracticeAttempt } from "@/lib/attempts";
+import { parseCueMode } from "@/lib/cue-reactivity";
 import { scoreTranscript, type TranscriptTurn } from "@/lib/score";
 
 export async function POST(request: Request) {
@@ -16,6 +17,7 @@ export async function POST(request: Request) {
       conversationId?: string | null;
       scenarioId?: string;
       turns?: TranscriptTurn[];
+      cueMode?: string;
     };
     try {
       body = await request.json();
@@ -49,6 +51,8 @@ export async function POST(request: Request) {
         conversationId: body.conversationId ?? null,
         turns,
         score,
+        // Validated rather than trusted — this comes from the client.
+        cueMode: parseCueMode(body.cueMode),
       });
     } catch (err) {
       // Vercel serverless FS is often read-only — never block the score card.

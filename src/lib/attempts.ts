@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import type { CueMode } from "@/lib/cue-reactivity";
 import { dataStorePath } from "@/lib/file-store";
 import type { PracticeScore } from "@/lib/rubric";
 import type { TranscriptTurn } from "@/lib/score";
@@ -19,6 +20,13 @@ export type PracticeAttempt = {
   turns: TranscriptTurn[];
   score: PracticeScore;
   reflection?: AttemptReflection;
+  /**
+   * How much help was on screen during the drill.
+   * Without this, a score can't be read as "earned unaided" rather than
+   * "earned while reading the approved play off a cue card" — which is the
+   * difference between practising and copying.
+   */
+  cueMode?: CueMode;
 };
 
 const STORE = dataStorePath("practice-attempts.json");
@@ -53,6 +61,7 @@ export async function saveAttempt(
     turns: attempt.turns,
     score: attempt.score,
     ...(attempt.reflection ? { reflection: attempt.reflection } : {}),
+    ...(attempt.cueMode ? { cueMode: attempt.cueMode } : {}),
   };
   all.push(row);
   await writeAll(all);
