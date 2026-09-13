@@ -309,13 +309,12 @@ function ManagerEvidence({
 
       {/* Claim 2 - team-wide practice improvement (all agents’ drills). */}
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+        <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
           Claim 2 - reps improve with practice
+          <InfoTip
+            text={`Aggregated across ${agentCount} agents' scored drills (oldest → newest), not a single rep.`}
+          />
         </h2>
-        <p className="mt-1 text-sm text-muted">
-          Aggregated across {agentCount} agents&apos; scored drills (oldest →
-          newest), not a single rep.
-        </p>
         <div className="mt-4 space-y-6">
           <BeforeAfterScore
             attemptCount={evidence.attemptCount}
@@ -378,12 +377,10 @@ function BeforeAfterScore({
 
   return (
     <section className={`surface-card rounded-xl border-l-4 ${tone.border} p-6`}>
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+      <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
         Score across {attemptCount} drills
+        <InfoTip text="Each drill is marked out of 100 against six criteria. First vs latest shows whether practice is moving the needle." />
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        Each drill is marked out of 100 against six criteria.
-      </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-6 sm:gap-10">
         <ScoreBlock label="First drill" score={firstScore} />
@@ -486,13 +483,10 @@ function PriceHold({
 
   return (
     <section className="surface-card rounded-xl p-5 sm:p-6">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
+      <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
         Did they stop discounting?
+        <InfoTip text="How often a drill ended at or near list price — the first half of attempts against the second half." />
       </h2>
-      <p className="mt-1 text-sm leading-relaxed text-muted">
-        How often a drill ended at or near list price - their first half of
-        attempts against their second half.
-      </p>
 
       {unchanged && earlyPct === 100 ? (
         <div className="mt-4 rounded-lg border border-border bg-background p-4">
