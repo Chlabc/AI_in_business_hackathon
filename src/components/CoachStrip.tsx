@@ -64,7 +64,7 @@ export function CoachStrip({
             Live coach · cue cards
           </p>
           <p className="mt-0.5 text-xs text-muted">
-            List ${standardFeePct}/seat · floor ${feeFloorPct} · tips stay on
+            Fee {standardFeePct}% · floor {feeFloorPct}% · tips stay on
             your screen only
           </p>
         </div>

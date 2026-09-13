@@ -3,10 +3,10 @@ import { DEMO_REP_ID } from "@/data/seed";
 import type { CriterionScore, RubricCriterionId } from "@/lib/rubric";
 
 const APPROVED =
-  "Ask what ‘too expensive’ is measured against, restate time-to-value / security / CSM, then hold near list. Do not discount in the first response.";
+  "Ask what the lower commission includes, explain the appraisal, marketing and negotiation service, then hold the approved fee. Do not discount in the first response.";
 
 const SUGGESTED =
-  "Before we talk discount — what does a failed rollout cost you in the next quarter? That’s what our time-to-value and CSM cover. Happy to trade annual prepay before we touch list price.";
+  "Before we discuss commission — what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.";
 
 function criteria(partial: {
   explored: number;
@@ -89,7 +89,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       id: "demo_alex_01",
       createdAt: "2026-09-01T10:00:00.000Z",
       heldFee: false,
-      feeOfferedPct: 75,
+      feeOfferedPct: 1.875,
       partial: {
         explored: 0.2,
         clarify: 0.2,
@@ -99,8 +99,8 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         cave: 0,
         notes: {
           explored_objection:
-            "Jumped to discount without exploring the $70 quote.",
-          held_fee: "Offered $75 — below list.",
+            "Jumped to discount without exploring the 1.75% quote.",
+          held_fee: "Offered 1.875% — below list.",
           no_early_cave: "Conceded in the opening turn.",
         },
       },
@@ -108,13 +108,13 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Held near standard fee: Offered a cut too early.",
         "No early cave: Discounted before clarifying.",
       ],
-      userLine: "We can do $75 if that helps you move forward today.",
+      userLine: "We can do 1.875% if that helps you move forward today.",
     },
     {
       id: "demo_alex_02",
       createdAt: "2026-09-03T11:00:00.000Z",
       heldFee: false,
-      feeOfferedPct: 80,
+      feeOfferedPct: 2,
       partial: {
         explored: 0.4,
         clarify: 0.4,
@@ -129,16 +129,16 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         },
       },
       feedback: [
-        "Explored a little, then dropped to $80.",
-        "Missed time-to-value / CSM anchors.",
+        "Explored a little, then dropped to 2%.",
+        "Missed local market evidence / negotiation support anchors.",
       ],
-      userLine: "Okay — $80 is our floor if you sign this quarter.",
+      userLine: "Okay — 2% is our floor if you sign this quarter.",
     },
     {
       id: "demo_alex_03",
       createdAt: "2026-09-05T14:00:00.000Z",
       heldFee: false,
-      feeOfferedPct: 90,
+      feeOfferedPct: 2.25,
       partial: {
         explored: 0.6,
         clarify: 0.6,
@@ -147,8 +147,8 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         play: 0.5,
         cave: 0.6,
         notes: {
-          anchored_value: "Mentioned CSM once; still traded price.",
-          held_fee: "Moved to $90 after pushback.",
+          anchored_value: "Mentioned negotiation support once; still traded price.",
+          held_fee: "Moved to 2.25% after pushback.",
         },
       },
       feedback: [
@@ -156,7 +156,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Approved play only partly used.",
       ],
       userLine:
-        "What is the $70 quote covering? We can meet at $90 with annual prepay.",
+        "What is the 1.75% quote covering? We can meet at 2.25% after reviewing campaign scope.",
     },
     {
       id: "demo_alex_04",
@@ -173,7 +173,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         notes: {
           explored_objection: "Clarified what ‘too expensive’ meant.",
           held_fee: "Held list; offered scope trade instead.",
-          anchored_value: "Anchored on time-to-value and SOC2.",
+          anchored_value: "Anchored on local market evidence and the marketing plan.",
         },
       },
       feedback: [
@@ -182,7 +182,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Used approved play structure.",
       ],
       userLine:
-        "Before we talk discount — what does a failed rollout cost you next quarter? Happy to trade annual prepay, not list price.",
+        "Before discussing commission, what matters most in your sale? Let’s review comparable sales and the campaign scope first.",
     },
     {
       id: "demo_alex_05",
@@ -198,7 +198,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         cave: 1,
         notes: {
           used_approved_play: "Followed explore → value → hold.",
-          held_fee: "Held $100 list throughout.",
+          held_fee: "Held 2.5% list throughout.",
         },
       },
       feedback: [
@@ -207,7 +207,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Clean approved-play structure.",
       ],
       userLine:
-        "CompetitorX at $70 skips our CSM and SLA. List stays $100; we can start one team on annual to de-risk.",
+        "Does the 1.75% include the same marketing and negotiation support? Our commission stays at 2.5%; let’s review the campaign plan together.",
     },
     {
       id: "demo_alex_06",
@@ -223,7 +223,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         cave: 1,
         notes: {
           explored_objection: "Fully explored the competing quote.",
-          held_fee: "Held list; traded seats minimum only.",
+          held_fee: "Held the commission; reviewed campaign scope.",
         },
       },
       feedback: [
@@ -232,7 +232,7 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
         "Strength — Used approved play ideas.",
       ],
       userLine:
-        "What is $70 measured against — same security pack and CSM? We hold $100. I can lock a seat minimum so finance sees a clear path.",
+        "What does the 1.75% include — the same marketing plan and negotiation support? Our commission is 2.5%. Let’s compare the service before deciding.",
     },
   ];
 
@@ -246,17 +246,17 @@ export function buildAlexDemoAttempts(): PracticeAttempt[] {
       turns: [
         {
           role: "agent" as const,
-          text: "Look, I'll be straight with you — $100/seat is too high. CompetitorX already quoted us $70. Why should I pay more?",
+          text: "Look, I'll be straight with you — 2.5% is too high. Another agency already quoted us 1.75%. Why should I pay more?",
         },
         { role: "user" as const, text: s.userLine },
         {
           role: "agent" as const,
-          text: "Still need to see movement on price if we're going to take this to finance.",
+          text: "I still need to understand the fee before discussing it with my partner.",
         },
         {
           role: "user" as const,
           text: s.heldFee
-            ? "List stays $100. Scope or commercial structure is what we can move — not panic discounting."
+            ? "Our commission stays at 2.5%. We can review the campaign scope together before making any decision."
             : "I hear you — let me see what I can do on the number.",
         },
       ],

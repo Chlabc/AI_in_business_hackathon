@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-13T09:42:56.498Z",
+  "generatedAt": "2026-09-13T14:04:20.521Z",
   "overallAgreementBand": 20,
   "headlines": {
     "diagnosisPassed": 5,
@@ -30,13 +30,13 @@
     },
     {
       "id": "just_cvs_heavy",
-      "label": "Rep caves into CV dumps",
+      "label": "Rep caves into appraisal dumps",
       "pass": true,
       "detail": "predicted needs/just_cvs (confidence medium)"
     },
     {
       "id": "timing_heavy",
-      "label": "Rep mishandles not-hiring-now",
+      "label": "Rep mishandles not-selling-now",
       "pass": true,
       "detail": "predicted intro/timing (confidence medium)"
     },
@@ -50,19 +50,19 @@
   "scoring": [
     {
       "id": "early_cave",
-      "label": "Immediate $85 concession",
+      "label": "Immediate 2.125% concession",
       "pass": true,
       "detail": "ai=2 human=10 (Δ8); heldFee ai=false human=false"
     },
     {
       "id": "strong_hold",
-      "label": "Explore + value anchor, hold $100",
+      "label": "Explore + value anchor, hold 2.5%",
       "pass": true,
       "detail": "ai=96 human=88 (Δ8); heldFee ai=true human=true"
     },
     {
       "id": "soft_18",
-      "label": "Some exploration then soft to $90",
+      "label": "Some exploration then soft to 2.25%",
       "pass": true,
       "detail": "ai=87 human=72 (Δ15); heldFee ai=true human=true"
     },
@@ -74,7 +74,7 @@
     },
     {
       "id": "floor_break",
-      "label": "Drops below firm floor to $70",
+      "label": "Drops below firm floor to 1.75%",
       "pass": true,
       "detail": "ai=21 human=28 (Δ7); heldFee ai=false human=false"
     },
@@ -86,13 +86,13 @@
     },
     {
       "id": "competitor_ok",
-      "label": "Competitor scenario — pilot offer",
+      "label": "Competitor scenario — appraisal offer",
       "pass": true,
-      "detail": "ai=70 human=78 (Δ8); heldFee ai=true human=true"
+      "detail": "ai=90 human=78 (Δ12); heldFee ai=true human=true"
     },
     {
       "id": "mention_competitor_pct",
-      "label": "Mentions $70 quote without offering it",
+      "label": "Mentions 1.75% quote without offering it",
       "pass": true,
       "detail": "ai=77 human=84 (Δ7); heldFee ai=true human=true"
     }

@@ -124,7 +124,7 @@ function ManagerEvidence({
     <AppShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow">For managers</p>
+          <p className="eyebrow">For principals</p>
           <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
             Does this tool actually work?
           </h1>

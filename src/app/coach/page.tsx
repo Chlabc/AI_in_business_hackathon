@@ -20,7 +20,8 @@ function pct(n: number | null | undefined, fallback = "—") {
 }
 
 function label(value: string) {
-  return value.replaceAll("_", " ");
+  const labels: Record<string, string> = { fee: "commission", just_cvs: "appraisal request", other_agency: "another agent", exclusivity: "sales authority", needs: "selling plans" };
+  return labels[value] ?? value.replaceAll("_", " ");
 }
 
 export default async function CoachPage() {
@@ -55,8 +56,8 @@ export default async function CoachPage() {
       problem: true,
     },
     {
-      label: "Average seat discount",
-      value: seatPrice(discount),
+      label: "Average commission cut",
+      value: seatPrice(discount).replace("%", " pp"),
       explain: `you ask ${seatPriceFull(kpis.avgFeeAskedPct)} and settle at ${seatPrice(kpis.avgFeeEndedPct)}`,
       problem: true,
     },
@@ -258,7 +259,7 @@ export default async function CoachPage() {
                   <th className="pb-2 pr-3 font-medium">Stage</th>
                   <th className="pb-2 pr-3 font-medium">Objection</th>
                   <th className="pb-2 pr-3 font-medium">Outcome</th>
-                  <th className="pb-2 font-medium">Price per seat</th>
+                  <th className="pb-2 font-medium">Commission</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-foreground">

@@ -1,6 +1,6 @@
 # Cornerman EVAL
 
-Generated: 2026-09-12T16:11:35.932Z
+Generated: 2026-09-13T14:04:20.521Z
 
 Offline harness for hackathon judges — diagnosis accuracy, scoring–human agreement, and persona/guardrail checks. Run with `npm run eval`.
 
@@ -34,7 +34,7 @@ Offline harness for hackathon judges — diagnosis accuracy, scoring–human agr
 | no_questions_defend | ✅ | ai=20 human=30 (Δ10); heldFee ai=true human=true |
 | floor_break | ✅ | ai=21 human=28 (Δ7); heldFee ai=false human=false |
 | robotic_perfect | ✅ | ai=77 human=78 (Δ1); heldFee ai=true human=true |
-| competitor_ok | ✅ | ai=70 human=78 (Δ8); heldFee ai=true human=true |
+| competitor_ok | ✅ | ai=90 human=78 (Δ12); heldFee ai=true human=true |
 | mention_competitor_pct | ✅ | ai=77 human=84 (Δ7); heldFee ai=true human=true |
 
 ## Persona / guardrail

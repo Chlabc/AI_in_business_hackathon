@@ -9,18 +9,18 @@ export function DemoPremise({ name }: { name: string }) {
     <div className="rounded-xl border border-border bg-card p-4 text-sm leading-relaxed text-muted">
       <span className="font-medium text-foreground">You&apos;re signed in as{" "}
         {name}</span>
-      , a sales rep at <span className="font-medium text-foreground">
+      , a real estate agent at <span className="font-medium text-foreground">
         {FIRM.name}
       </span>
-      . It sells a workflow tool at{" "}
+      . Its demo commission is{" "}
       <span className="font-medium text-foreground">
-        ${FIRM.standardPermFeePct} per seat per month
+        {FIRM.standardPermFeePct}% commission
       </span>
       , and reps aren&apos;t allowed to go below{" "}
       <span className="font-medium text-foreground">
-        ${FIRM.feeFloorPct}
+        {FIRM.feeFloorPct}%
       </span>{" "}
-      without approval. The calls below are your recent outcomes.
+      without principal approval. Rates exclude GST; marketing is separate. These are demo call outcomes.
     </div>
   );
 }

@@ -22,7 +22,7 @@ export type QuizQuestion = {
 };
 
 function money(n: number): string {
-  return `$${n}/seat/mo`;
+  return `${n}%`;
 }
 
 /** Study cards derived from the current firm playbook. */
@@ -30,7 +30,7 @@ export function buildFlashcards(playbook: FirmPlaybook): Flashcard[] {
   const cards: Flashcard[] = [
     {
       id: "list",
-      front: "What is our list seat price?",
+      front: "What is our standard commission?",
       back: money(playbook.standardPermFeePct),
       tag: "Pricing",
     },
@@ -42,7 +42,7 @@ export function buildFlashcards(playbook: FirmPlaybook): Flashcard[] {
     },
     {
       id: "competitor",
-      front: "What competitor seat price might the buyer quote?",
+      front: "What competing commission might the seller quote?",
       back: money(playbook.competitorQuotePct),
       tag: "Competitive",
     },
@@ -97,9 +97,9 @@ export function buildFlashcards(playbook: FirmPlaybook): Flashcard[] {
 /**
  * Build four DISTINCT priced options.
  *
- * The distractors used to be arithmetic on the playbook numbers (list - 20,
- * floor - 10) with nothing checking the results differed. At the seeded values
- * list - 20 and floor are both 80, and floor - 10 and competitor are both 70,
+ * The distractors used to be arithmetic on the playbook numbers (list - 0.5,
+ * floor - 0.25) with nothing checking the results differed. At the seeded values
+ * list - 0.5 and floor are both 2, and floor - 0.25 and competitor are both 1.75,
  * so two questions rendered the same option twice. Candidates are now deduped
  * and topped up until four genuinely different prices exist.
  */
@@ -115,7 +115,7 @@ function pricedOptions(correct: number, candidates: number[], slot = 2) {
     }
   }
   // Top up from a widening spread if the playbook's own numbers collide.
-  for (let step = 5; values.length < 4 && step <= 100; step += 5) {
+  for (let step = 0.25; values.length < 4 && step <= 5; step += 0.25) {
     for (const candidate of [correct + step, correct - step]) {
       if (values.length >= 4) break;
       if (candidate > 0 && !seen.has(candidate)) {
@@ -145,7 +145,7 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
   const list = playbook.standardPermFeePct;
   const floor = playbook.feeFloorPct;
   const competitor = playbook.competitorQuotePct;
-  const anchor = playbook.valueAnchors[0] ?? "time-to-value";
+  const anchor = playbook.valueAnchors[0] ?? "local comparable sales";
   const feeTrack =
     playbook.talkTracks.find((t) => t.objectionType === "fee") ??
     playbook.talkTracks[0];
@@ -158,21 +158,21 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
   return [
     {
       id: "q_list",
-      prompt: `What is ${playbook.firmName}’s list seat price in the playbook?`,
-      ...pricedOptions(list, [floor, competitor, list - 20], 3),
+      prompt: `What is ${playbook.firmName}’s standard commission in the playbook?`,
+      ...pricedOptions(list, [floor, competitor, list - 0.5], 3),
       explain: `List is ${money(list)}. Floor is ${money(floor)} — different number.`,
     },
     {
       id: "q_floor",
       prompt: "What is the price floor you must not break without approval?",
-      ...pricedOptions(floor, [list, competitor, floor - 10], 1),
+      ...pricedOptions(floor, [list, competitor, floor - 0.25], 1),
       explain: `Floor is ${money(floor)}. Going below invents pricing the firm didn’t approve.`,
     },
     {
       id: "q_competitor",
       prompt:
-        "If the buyer cites a competitor seat price, which figure is in our playbook?",
-      ...pricedOptions(competitor, [list, floor, competitor + 15], 2),
+        "If the seller cites a competing commission, which figure is in our playbook?",
+      ...pricedOptions(competitor, [list, floor, competitor + 0.375], 2),
       explain: `Playbook competitor quote is ${money(competitor)} — explore before matching.`,
     },
     {
@@ -184,7 +184,7 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
         { id: "c", label: "Apologise for list price as unjustified" },
         {
           id: "d",
-          label: "Ignore security / SLA and only talk price",
+          label: "Ignore the marketing plan and only talk commission",
         },
       ],
       correctId: "a",
@@ -202,7 +202,7 @@ export function buildQuiz(playbook: FirmPlaybook): QuizQuestion[] {
         },
         {
           id: "d",
-          label: "Trade annual prepay before cutting list price",
+          label: "Review campaign scope before cutting commission",
         },
       ],
       correctId: "b",

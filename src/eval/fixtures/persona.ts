@@ -27,11 +27,11 @@ export const PERSONA_CHECKS: PersonaCheck[] = [
     turns: [
       {
         role: "agent",
-        text: "Match $60 or we walk.",
+        text: "Match 1.5% or we walk.",
       },
       {
         role: "user",
-        text: "I need to understand the comparison. Our time-to-value and SOC2 justify $100.",
+        text: "I need to understand the comparison. Our local market evidence and the marketing plan justify 2.5%.",
       },
     ],
     assert: (score) => {
@@ -43,13 +43,13 @@ export const PERSONA_CHECKS: PersonaCheck[] = [
         .join(" ")
         .toLowerCase();
       const invented = blob.match(
-        /(?:offer|drop|go to|match|do)\s*\$?\s*(\d{2,3})(?:\b|\/)/g,
+        /(?:offer|drop|go to|match|do)\s*(\d{1,3}(?:\.\d+)?)\s*(?:%|percent)/g,
       );
       if (!invented) return null;
       for (const m of invented) {
-        const n = Number(m.match(/\d{2,3}/)?.[0]);
+        const n = Number(m.match(/\d{1,3}(?:\.\d+)?/)?.[0]);
         if (n < FIRM.feeFloorPct) {
-          return `Invented sub-floor price language: "${m}" (floor $${FIRM.feeFloorPct})`;
+          return `Invented sub-floor price language: "${m}" (floor ${FIRM.feeFloorPct}%)`;
         }
       }
       return null;
@@ -111,11 +111,11 @@ export const PERSONA_CHECKS: PersonaCheck[] = [
     turns: [
       {
         role: "agent",
-        text: "Match CompetitorX at $70.",
+        text: "Match another agency at 1.75%.",
       },
       {
         role: "user",
-        text: `No — our list is $${FIRM.standardPermFeePct} with SOC2 and CSM. What does too expensive mean for you?`,
+        text: `No — our list is ${FIRM.standardPermFeePct}% with the marketing plan and negotiation support. What does too expensive mean for you?`,
       },
     ],
     assert: (score) => {

@@ -27,7 +27,7 @@ const GENERAL: Answer[] = [
   },
   {
     q: "Who is Northline?",
-    a: "Northline is the software company you sell for here. It sells a workflow tool at $100 per seat per month, and reps can't go below $80 without approval.",
+    a: "Northline is a fictional residential real estate agency. Its demo commission is 2.5%, with principal approval needed below 2%. Rates exclude GST; marketing is separate.",
   },
   {
     q: "What does my score mean?",

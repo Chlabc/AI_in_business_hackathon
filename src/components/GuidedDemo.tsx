@@ -90,20 +90,20 @@ export function GuidedDemo() {
               The pattern costing you deals
             </p>
             <p className="display-serif mt-2 text-xl leading-snug text-foreground sm:text-2xl">
-              You lose 100% of fee conversations — you concede on price before
+              Your fee conversations end lost or discounted — you concede before
               exploring the objection.
             </p>
             <p className="mt-3 text-sm text-muted">
               Found across <strong className="text-foreground">12 calls</strong>,
-              with high confidence. You open at 20% and settle at 17.9%.
+              in this demo. You ask 2.5% and settle at an average of 2.265%.
             </p>
             <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-muted">
               The losses behind it
             </p>
             <ul className="mt-2 space-y-1.5 text-sm text-foreground">
-              <li>Atlas Construction Tech — no comparison clarification (20% → 16%)</li>
-              <li>Beacon Media — early drop signalled desperation (20% → 18%)</li>
-              <li>Lumen Robotics — broke the firm floor (20% → 15%)</li>
+              <li>Alex Parker · South Melbourne — no comparison clarification (2.5% → 1.95%)</li>
+              <li>Cameron Ellis · Prahran — early drop signalled desperation (2.5% → 2.25%)</li>
+              <li>Riley Patel · South Yarra — broke the firm floor (2.5% → 1.75%)</li>
             </ul>
           </div>
         ) : null}
@@ -115,8 +115,8 @@ export function GuidedDemo() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
                   Client
                 </p>
-                &ldquo;Look, I&apos;ll be straight with you — your 20% fee is too
-                high. Another agency already quoted us 15%. Why should I pay
+                &ldquo;Look, I&apos;ll be straight with you — your 2.5% commission is too
+                high. Another agency already quoted us 1.75%. Why should I pay
                 more?&rdquo;
               </div>
             </div>
@@ -125,7 +125,7 @@ export function GuidedDemo() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide opacity-75">
                   You (spoken)
                 </p>
-                &ldquo;That&apos;s fair — what does their 15% actually
+                &ldquo;That&apos;s fair — what does their 1.75% actually
                 include?&rdquo;
               </div>
             </div>
@@ -134,7 +134,7 @@ export function GuidedDemo() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
                   Client
                 </p>
-                &ldquo;Same as you, presumably. Shortlist, a few interviews. So
+                &ldquo;Same as you, presumably. Marketing, some inspections. So
                 why the premium?&rdquo;
               </div>
             </div>

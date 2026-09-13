@@ -69,7 +69,7 @@ export default async function ManagerPage() {
             <thead className="border-b border-border bg-background text-xs uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-3 font-medium">Employee</th>
-                <th className="px-5 py-3 font-medium">Conversion</th>
+                <th className="px-5 py-3 font-medium">Listing conversion</th>
                 <th className="px-5 py-3 font-medium">Weakest skill</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Sessions</th>
@@ -115,7 +115,7 @@ export default async function ManagerPage() {
         <section className="surface-card rounded-xl p-6">
           <ConversionChart
             data={liveAe.kpiHistory}
-            label={`${liveAe.name} — conversion trend`}
+            label={`${liveAe.name} — listing conversion`}
           />
           <p className="mt-2 text-xs text-muted">
             Illustrative measurement alongside training — not proof that

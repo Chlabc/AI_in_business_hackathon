@@ -19,9 +19,9 @@ export const TEAM: TeamMember[] = [
   {
     id: DEMO_REP_ID,
     name: "Alex Chen",
-    role: "Account Executive",
+    role: "Real Estate Agent",
     conversionRate: 22,
-    weakestSkill: "Pricing objection handling",
+    weakestSkill: "Commission objection handling",
     flagged: true,
     sessionsCompleted: 0, // filled live from attempts when rendering
     kpiHistory: [
@@ -35,7 +35,7 @@ export const TEAM: TeamMember[] = [
   {
     id: "rep_demo_priya",
     name: "Priya Nair",
-    role: "Account Executive",
+    role: "Real Estate Agent",
     conversionRate: 29,
     weakestSkill: "Closing and next steps",
     flagged: false,
@@ -51,7 +51,7 @@ export const TEAM: TeamMember[] = [
   {
     id: "rep_demo_marcus",
     name: "Marcus Lee",
-    role: "Account Executive",
+    role: "Real Estate Agent",
     conversionRate: 19,
     weakestSkill: "Competitive positioning",
     flagged: true,

@@ -16,11 +16,11 @@ function moneyHits(text: string): MoneyHit[] {
     if (text[i] === "\n") lineStarts.push(i + 1);
   }
   const re =
-    /\$\s*(\d{1,3}(?:,\d{3})*|\d+)(?:\s*\/\s*(?:seat|user)?\s*(?:\/?\s*mo(?:nth)?)?)?/gi;
+    /\b(\d{1,3}(?:\.\d+)?)\s*(?:%|percent\b|per cent\b)/gi;
   let match: RegExpExecArray | null;
   while ((match = re.exec(text)) !== null) {
     const n = Number(match[1].replace(/,/g, ""));
-    if (!Number.isFinite(n) || n < 1 || n > 500) continue;
+    if (!Number.isFinite(n) || n <= 0 || n > 100) continue;
     const idx = match.index;
     let lineStart = 0;
     for (const s of lineStarts) {
@@ -55,7 +55,7 @@ function pickAnchors(text: string): string[] {
     .map((l) => l.replace(/^[-*•]\s+/, "").replace(/^\d+\.\s+/, "").trim())
     .filter((l) => l.length >= 12 && l.length <= 160);
   const scored = bullets.filter((l) =>
-    /value|sla|soc|uptime|csm|security|time-to|roi|support|guarantee/i.test(l),
+    /value|appraisal|comparable|market|inspection|negotiation|seller|support/i.test(l),
   );
   const chosen = (scored.length >= 2 ? scored : bullets).slice(0, 5);
   return [...new Set(chosen)];
@@ -63,7 +63,7 @@ function pickAnchors(text: string): string[] {
 
 /**
  * Deterministic heuristic import — no LLM required.
- * Same-line keyword matching so short docs don’t assign one $ to every field.
+ * Same-line keyword matching so short docs don’t assign one rate to every field.
  */
 export function extractPlaybookFromDocument(
   rawText: string,
@@ -80,7 +80,7 @@ export function extractPlaybookFromDocument(
   const hits = moneyHits(text);
   const list = pickMoneyNear(
     hits,
-    /\b(list|standard|msrp|seat price|our price|pricing)\b/i,
+    /\b(list|standard|our fee|our commission|pricing)\b/i,
   );
   const floor = pickMoneyNear(
     hits,
@@ -93,15 +93,15 @@ export function extractPlaybookFromDocument(
 
   if (list !== null) {
     patch.standardPermFeePct = list;
-    findings.push(`List seat price → $${list}/seat/mo`);
+    findings.push(`Standard commission → ${list}%`);
   }
   if (floor !== null) {
     patch.feeFloorPct = floor;
-    findings.push(`Fee floor → $${floor}/seat/mo`);
+    findings.push(`Fee floor → ${floor}%`);
   }
   if (competitor !== null) {
     patch.competitorQuotePct = competitor;
-    findings.push(`Competitor quote → $${competitor}/seat/mo`);
+    findings.push(`Competitor quote → ${competitor}%`);
   }
 
   const anchors = pickAnchors(text);
@@ -114,7 +114,7 @@ export function extractPlaybookFromDocument(
   }
 
   const firm = text.match(
-    /(?:company|firm|product)\s*(?:name)?\s*[:\-–]\s*([A-Za-z0-9][A-Za-z0-9 .,&-]{1,60})/i,
+    /(?:company|firm|agency)\s*(?:name)?\s*[:\-–]\s*([A-Za-z0-9][A-Za-z0-9 .,&-]{1,60})/i,
   );
   if (firm?.[1]) {
     patch.firmName = firm[1].trim();

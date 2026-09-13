@@ -28,7 +28,7 @@ export default async function PlaybookPage() {
           Firm knowledge
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted lg:text-base">
-          Dump and edit approved SaaS pricing, talk-tracks, and FAQ here. AEs
+          Edit approved agency commissions, talk-tracks, and FAQ here. Agents
           use this in drills via live cue cards and scoring — they don’t edit
           it. You never open ElevenLabs; we wire thin firm facts into the voice
           client automatically. Real role gates come later with employee /

@@ -26,18 +26,18 @@ function suggestedForScenario(
   if (exampleLine?.trim()) return exampleLine.trim();
   switch (scenarioId) {
     case "competitor":
-      return "I respect that relationship — where are they still leaving gaps? Happy to run a parallel shortlist on one hard-to-fill seat so you can compare without ripping anything up.";
+      return "I respect that relationship — what else do you need from your selling plan? If useful, we can arrange a no-obligation appraisal to compare approaches.";
     case "not-interested":
-      return "Totally fair. If helpful I’ll leave one market note and book a 10-minute check-in next month — no pitch deck, just signal on roles like yours.";
+      return "Totally fair. If helpful I’ll leave one market note and book a 10-minute check-in next month — only if a local property update would be useful.";
     case "need-to-think":
-      return "Makes sense. Shall I send a one-pager and we lock 15 minutes Thursday to decide go / no-go with your co-founder on the call?";
+      return "Makes sense. Shall I send a one-pager and we lock 15 minutes Thursday to decide go / no-go with your partner on the call?";
     case "price-objection":
     default: {
       const anchor =
-        playbook.valueAnchors.find((a) => /time-to-value|SOC2|CSM|SLA/i.test(a)) ??
+        playbook.valueAnchors.find((a) => /comparable|market|negotiation|appraisal/i.test(a)) ??
         playbook.valueAnchors[0] ??
-        "time-to-value";
-      return `Before we talk discount — what does a failed rollout cost next quarter? That’s what ${anchor} protects. ${talkTrackPlay}`;
+        "local market evidence";
+      return `Before we discuss commission — what matters most in choosing your agent? Let’s compare the service, including ${anchor}. ${talkTrackPlay}`;
     }
   }
 }
@@ -56,31 +56,35 @@ function firstUserText(turns: TranscriptTurn[]): string {
 }
 
 /**
- * Detect seat prices ($) or legacy % the rep offers/concedes —
+ * Detect commission percentages the agent offers/concedes —
  * not competitor quotes they only mention.
  */
 function extractOfferedFees(text: string): number[] {
+  const digits: Record<string, string> = {
+    zero: "0", one: "1", two: "2", three: "3", four: "4",
+    five: "5", six: "6", seven: "7", eight: "8", nine: "9", ten: "10",
+  };
+  const normalized = text.replace(
+    /\b(zero|one|two|three|four|five|six|seven|eight|nine|ten)(?: point ((?:(?:zero|one|two|three|four|five|six|seven|eight|nine)\s*)+))?\s*(percent|per cent)\b/gi,
+    (_, whole: string, fraction: string | undefined) =>
+      `${digits[whole.toLowerCase()]}${fraction ? `.${fraction.trim().toLowerCase().split(/\s+/).map((word) => digits[word]).join("")}` : ""}%`,
+  );
   const found: number[] = [];
   const offerPatterns = [
-    /(?:we can do|i can do|how about|let'?s say|drop(?:ping)?(?: it)? to|come down to|meet you at|offer(?:ing)?)\s*\$?\s*(\d{2,3}(?:\.\d+)?)\s*(?:\/\s*(?:user|seat|mo|month))?/gi,
-    /(?:we can do|i can do|how about|let'?s say|drop(?:ping)?(?: it)? to|come down to|meet you at|offer(?:ing)?)\s*(\d{1,2}(?:\.\d+)?)\s*%/g,
-    /(?:we can do|i can do|how about|let'?s say|drop(?:ping)?(?: it)? to|come down to|meet you at|offer(?:ing)?)\s*(\d{1,2}(?:\.\d+)?)\s*percent/g,
+    /(?:we can do|i can do|how about|let'?s say|drop(?:ping)?(?: it)? to|come down to|meet you at|offer(?:ing)?|reduce (?:our |the )?(?:fee|commission) to)\s*(\d{1,3}(?:\.\d+)?)\s*(?:%|percent\b|per cent\b)/gi,
   ];
   for (const re of offerPatterns) {
-    for (const m of text.matchAll(re)) {
+    for (const m of normalized.matchAll(re)) {
       const n = Number(m[1]);
-      // SaaS seat $ (50–200) or legacy recruitment % (10–30)
-      if ((n >= 50 && n <= 200) || (n >= 10 && n <= 30)) found.push(n);
+      if (n > 0 && n <= 100) found.push(n);
     }
   }
   return found;
 }
 
 function softHoldBar(playbook: FirmPlaybook): number {
-  // Seat $ model: soft hold within ~15 of list; legacy % used −2.
-  const list = playbook.standardPermFeePct;
-  const delta = list >= 50 ? 15 : 2;
-  return Math.max(playbook.feeFloorPct, list - delta);
+  // Retain the existing 85% soft-hold threshold in commission units.
+  return Math.max(playbook.feeFloorPct, playbook.standardPermFeePct * 0.85);
 }
 
 function scoreCriterion(
@@ -124,7 +128,7 @@ function scoreCriterion(
     }
     case "anchored_value": {
       const hits =
-        /time[- ]to[- ]value|soc\s*2|sso|scim|csm|uptime|sla|onboard|integrat|roi|14 days|security/.test(
+        /comparable sales|local market|appraisal|marketing|inspection|buyer qualification|negotiation|seller updates/.test(
           all,
         );
       return {
@@ -132,7 +136,7 @@ function scoreCriterion(
         score: hits ? 1 : /value|worth|invest/.test(all) ? 0.4 : 0,
         notes: hits
           ? "Anchored on approved value themes."
-          : "Missed firm anchors (time-to-value / SOC2 / CSM / SLA).",
+          : "Missed firm anchors (local market evidence / marketing / negotiation support).",
       };
     }
     case "held_fee": {
@@ -153,34 +157,34 @@ function scoreCriterion(
         return {
           id,
           score: 0,
-          notes: `Offered $${minOffered} — below firm floor ($${floor}).`,
+          notes: `Offered ${minOffered}% — below firm floor (${floor}%).`,
         };
       }
       if (minOffered < soft) {
         return {
           id,
           score: 0.35,
-          notes: `Moved to $${minOffered} — above floor but soft vs $${std} list.`,
+          notes: `Moved to ${minOffered}% — above floor but soft vs ${std}% list.`,
         };
       }
       if (minOffered < std) {
         return {
           id,
           score: 0.7,
-          notes: `Held near list at $${minOffered}.`,
+          notes: `Held near list at ${minOffered}%.`,
         };
       }
       return {
         id,
         score: 1,
-        notes: `Held the $${std} list ask.`,
+        notes: `Held the ${std}% list ask.`,
       };
     }
     case "used_approved_play": {
       const hits =
-        /pilot|annual|prepay|scope|trial|nda|security pack|must-have|sla|anchor/.test(
+        /appraisal|campaign|scope|sales authority|follow-up|follow up|permission|anchor/.test(
           all,
-        ) || /time[- ]to[- ]value|soc\s*2|csm/.test(all);
+        ) || /comparable sales|marketing|negotiation/.test(all);
       return {
         id,
         score: hits ? 1 : 0.2,
@@ -246,7 +250,7 @@ export function scoreTranscriptHeuristic(
   }
   feedback.push(`Approved play: ${talkTrack.approvedPlay}`);
   feedback.push(
-    `Firm pricing (approved): list $${playbook.standardPermFeePct}/seat/mo, floor $${playbook.feeFloorPct}.`,
+    `Firm pricing (approved): list ${playbook.standardPermFeePct}%, floor ${playbook.feeFloorPct}%.`,
   );
 
   return {
@@ -294,17 +298,17 @@ export async function scoreTranscript(
         messages: [
           {
             role: "system",
-            content: `You score a B2B SaaS price-objection roleplay. Return ONLY JSON:
+            content: `You score a real estate commission-objection roleplay. Return ONLY JSON:
 {"overall":0-100,"feedback":["bullet1","bullet2","bullet3"],"heldFee":true|false}
-Rules: feedback must be behavioural and grounded in the approved talk-track. Never invent seat prices below $${playbook.feeFloorPct}. Never invent policies.`,
+Rules: feedback must be behavioural and grounded in the approved talk-track. Never invent commission rates below ${playbook.feeFloorPct}%. Never invent policies.`,
           },
           {
             role: "user",
             content: JSON.stringify({
               approvedPlay: talkTrack.approvedPlay,
               firm: {
-                listSeatUsd: playbook.standardPermFeePct,
-                floorSeatUsd: playbook.feeFloorPct,
+                standardCommissionPct: playbook.standardPermFeePct,
+                floorCommissionPct: playbook.feeFloorPct,
               },
               heuristic: base,
               transcript: turns.filter((t) => t.role !== "system"),
