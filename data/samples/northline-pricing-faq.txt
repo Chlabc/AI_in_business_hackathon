@@ -1,0 +1,42 @@
+Northline — Internal pricing & value FAQ
+========================================
+Company name: Northline
+Vertical: B2B workflow SaaS for mid-market ops teams
+
+PRICING
+-------
+List seat price: $135/seat/mo
+Floor (approval required below): $95
+Competitor often quotes: $85/seat/mo
+
+Notes for AEs:
+- Do not open with a discount. Discover what “too expensive” means first.
+- Annual prepay and multi-year can trade before touching list.
+- Never invent pricing below the $95 floor without VP Finance.
+
+VALUE ANCHORS
+-------------
+- Time-to-value under 14 days with a dedicated CSM
+- SOC2 Type II + SSO included on every plan
+- 99.9% uptime SLA with service credits
+- Migration playbook for teams leaving spreadsheets or legacy tools
+- Shared success plan with quarterly business reviews
+
+FEE OBJECTION — APPROVED PLAY (optional AI cue patch)
+-----------------------------------------------------
+When a buyer says list is too high vs a competitor quote:
+1) Clarify what failed rollout costs them this quarter.
+2) Anchor on CSM + time-to-value, not features.
+3) Offer annual prepay before moving seat price.
+Never: match the competitor number in the first reply.
+
+SECURITY / FAQ DUMP
+-------------------
+Q: Do you support SSO?
+A: Yes — SAML and OIDC on Growth and above.
+
+Q: Where is data hosted?
+A: US-East primary; EU residency available on Enterprise.
+
+Q: Can we pilot?
+A: 30-day pilot on one team with success criteria agreed up front — not unlimited free seats.

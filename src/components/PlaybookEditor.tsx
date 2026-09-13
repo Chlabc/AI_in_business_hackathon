@@ -137,7 +137,7 @@ export function PlaybookEditor({ initial }: PlaybookEditorProps) {
         </p>
         <textarea
           className={`${fieldClass} mt-4 min-h-[140px] font-mono text-xs`}
-          placeholder={`Example:\nStandard commission: 2.5%\nFloor (approval): 2%\nCompetitor often quotes 1.75%\n- local comparable sales\n- tailored marketing and negotiation support`}
+          placeholder={`Example:\nList seat price: $100/mo\nFloor (approval): $80\nCompetitor often quotes $70\n- time-to-value under 14 days\n- SOC2 Type II + SSO`}
           value={importText}
           onChange={(e) => setImportText(e.target.value)}
         />
@@ -172,10 +172,10 @@ export function PlaybookEditor({ initial }: PlaybookEditorProps) {
       <section className="surface-card rounded-xl p-5 sm:p-6">
         <p className="eyebrow">Firm facts</p>
         <h2 className="mt-1 text-lg font-semibold text-foreground">
-          Commission & agency positioning
+          Pricing & positioning (B2B SaaS)
         </h2>
         <p className="mt-2 text-sm text-muted">
-          Commission rates inform the AI seller and scoring. Coaching
+          Seat prices feed the AI buyer (thin facts only) and scoring. Coaching
           tips below never go into ElevenLabs.
         </p>
 
@@ -197,12 +197,11 @@ export function PlaybookEditor({ initial }: PlaybookEditorProps) {
             />
           </label>
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-            Standard commission %
+            List seat $/mo
             <input
               type="number"
-              min={0.01}
-              max={100}
-              step={0.01}
+              min={1}
+              max={500}
               className={fieldClass}
               value={draft.standardPermFeePct}
               onChange={(e) =>
@@ -211,24 +210,22 @@ export function PlaybookEditor({ initial }: PlaybookEditorProps) {
             />
           </label>
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-            Approval floor %
+            Floor seat $/mo
             <input
               type="number"
-              min={0.01}
-              max={100}
-              step={0.01}
+              min={1}
+              max={500}
               className={fieldClass}
               value={draft.feeFloorPct}
               onChange={(e) => update("feeFloorPct", Number(e.target.value))}
             />
           </label>
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
-            Competing commission %
+            Competitor quote $/mo
             <input
               type="number"
-              min={0.01}
-              max={100}
-              step={0.01}
+              min={1}
+              max={500}
               className={fieldClass}
               value={draft.competitorQuotePct}
               onChange={(e) =>
