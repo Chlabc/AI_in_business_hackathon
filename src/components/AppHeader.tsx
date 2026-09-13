@@ -39,17 +39,31 @@ const NAV_ICONS: Record<string, IconComponent> = {
   "/login": LockIcon,
 };
 
-/** Full lockup (glove + wordmark) from public/cornerman-logo.png. */
+/** Theme-specific lockups; CSS follows pre-paint theme without a flash. */
 function BrandLogo() {
   return (
-    <Image
-      src="/cornerman-logo.png"
-      alt="Cornerman"
-      width={2172}
-      height={724}
-      className="h-9 w-auto"
-      priority
-    />
+    <>
+      <span className="brand-logo-light">
+        <Image
+          src="/cornerman-logo-light.png"
+          alt="Cornerman"
+          width={2172}
+          height={724}
+          sizes="205px"
+          priority
+        />
+      </span>
+      <span className="brand-logo-dark">
+        <Image
+          src="/cornerman-logo-dark.png"
+          alt="Cornerman"
+          width={1672}
+          height={941}
+          sizes="258px"
+          priority
+        />
+      </span>
+    </>
   );
 }
 
