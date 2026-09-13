@@ -43,7 +43,7 @@ function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
     <AppShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow">Step 3 of 3 · Track</p>
+          <p className="eyebrow">Progress</p>
           <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
             Are you actually getting better?
           </h1>
@@ -65,7 +65,7 @@ function RepProgress({ evidence }: { evidence: BeforeAfterEvidence }) {
             href="/coach"
             className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm text-muted hover:text-foreground"
           >
-            Diagnosis
+            Profile
           </Link>
         </div>
       </div>

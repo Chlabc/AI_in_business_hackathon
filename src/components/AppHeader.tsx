@@ -28,11 +28,10 @@ type IconComponent = (props: { className?: string }) => React.ReactElement;
 
 /** Labels come from auth-nav (the source of truth for what a role may see); icons are looked up here. */
 const NAV_ICONS: Record<string, IconComponent> = {
-  "/coach": DiagnosisIcon,
+  "/coach": DiagnosisIcon, // Profile (identity + diagnosis)
   "/coach/learn": LightbulbIcon,
-  "/coach/training": ScenariosIcon,
   "/coach/practice": DrillIcon,
-  "/coach/value": ScoreIcon,
+  "/coach/value": ScoreIcon, // Progress (employee) / Evidence (manager)
   "/coach/manager": ManagerIcon,
   "/coach/playbook": ScenariosIcon,
   "/coach/health": ScoreIcon,

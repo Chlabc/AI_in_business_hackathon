@@ -223,13 +223,13 @@ export function PracticeSession({
               Practice again
             </button>
             <a
-              href="/coach"
+              href="/coach/value"
               className="text-sm font-medium text-muted hover:text-accent"
             >
-              View progress on diagnosis →
+              View progress →
             </a>
             <a
-              href="/coach/training"
+              href="/coach/practice"
               className="text-sm font-medium text-muted hover:text-accent"
             >
               Other scenarios →

@@ -39,9 +39,9 @@ const GENERAL: Answer[] = [
   },
   {
     q: "What order should I do things in?",
-    a: "Diagnosis to see what you keep getting wrong, Drill to practise it out loud, then My progress to check you're improving. Learn is an optional warm-up on your firm's prices.",
+    a: "Profile to see what you keep getting wrong, Practice to pick a situation and run it out loud, then Progress to check you're improving. Learn is an optional warm-up on your firm's prices.",
     href: "/coach",
-    linkLabel: "Go to Diagnosis",
+    linkLabel: "Go to Profile",
   },
 ];
 
@@ -53,14 +53,18 @@ const BY_PAGE: Record<string, Answer[]> = {
     },
     {
       q: "What should I do on this page?",
-      a: "Read the verdict at the top, then press \"Practise this now\". Everything else is background you can look at later.",
+      a: "Read the verdict at the top, then press \"Practice this now\". Everything else is background you can look at later.",
       href: "/coach/practice?scenario=price-objection",
-      linkLabel: "Start the drill",
+      linkLabel: "Start practicing",
     },
   ],
   "/coach/practice": [
     {
-      q: "What do I actually do here?",
+      q: "Which scenario should I pick?",
+      a: "The one matching your profile diagnosis is highlighted — start there. The others are the same live spoken drill with a different kind of client pushback.",
+    },
+    {
+      q: "What do I actually do in a drill?",
       a: "Press the big button, allow the microphone, and talk. The AI client will push back on your price — answer like you would on a real call. When you're done, press the button again and you'll be scored.",
     },
     {
@@ -76,12 +80,6 @@ const BY_PAGE: Record<string, Answer[]> = {
     {
       q: "Why am I memorising prices?",
       a: "Because you can't hold a price you can't remember. Reps cave when they're unsure what they're allowed to charge. These cards are generated from your firm's playbook, not a generic course.",
-    },
-  ],
-  "/coach/training": [
-    {
-      q: "Which one should I pick?",
-      a: "The one matching your diagnosis is highlighted — start there. The others are the same live spoken drill with a different kind of client pushback.",
     },
   ],
   "/coach/value": [

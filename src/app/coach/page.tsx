@@ -76,7 +76,7 @@ export default async function CoachPage() {
       {/* 3 — page context row */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow">Your diagnosis</p>
+          <p className="eyebrow">Your profile</p>
           <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
             Where you&apos;re losing deals
           </h1>
@@ -89,7 +89,7 @@ export default async function CoachPage() {
           href="/coach/value"
           className="rounded border border-accent/30 bg-accent-soft px-3 py-1 text-xs font-semibold text-accent transition hover:opacity-90"
         >
-          Value / evidence →
+          Progress →
         </Link>
       </div>
 
@@ -122,7 +122,7 @@ export default async function CoachPage() {
             Practice this now
           </Link>
           <Link
-            href="/coach/training"
+            href="/coach/practice"
             className="text-sm font-medium text-muted transition hover:text-accent"
           >
             Or pick a different scenario →

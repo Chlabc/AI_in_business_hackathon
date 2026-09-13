@@ -54,10 +54,10 @@ export function OnboardingBanner({ className = "" }: { className?: string }) {
           New here? Here&apos;s what this page does
         </p>
         <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-foreground">
-          Below is your <strong>weakest pattern</strong>, found from your real
+          Below is your <strong>weakest pattern</strong>, found from your recent
           call outcomes. Hit <strong>&ldquo;Practice this now&rdquo;</strong> to
-          drill it live against an AI client — you&apos;ll get scored the moment
-          you finish, and every attempt is tracked further down.
+          drill it live against an AI client — you&apos;ll get scored when you
+          finish, and Progress tracks whether you&apos;re improving.
         </p>
       </div>
       <button

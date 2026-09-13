@@ -16,7 +16,7 @@ export default async function LearnPage() {
   return (
     <AppShell>
       <Link href="/coach" className="text-sm text-muted hover:text-accent">
-        ← Back to your diagnosis
+        ← Back to profile
       </Link>
 
       <div>
