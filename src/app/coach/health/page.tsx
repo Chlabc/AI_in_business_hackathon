@@ -116,7 +116,7 @@ export default function HealthPage() {
             <code className="rounded bg-card px-1.5 py-0.5 text-xs text-foreground">
               EVAL.md
             </code>
-            — frozen so a live demo cannot randomly go red.
+            — frozen so results stay stable between eval runs.
           </p>
         </div>
         <p className="text-xs text-muted">

@@ -114,7 +114,7 @@ export type UserTestSession = {
 export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   {
     id: "ut_01",
-    participant: "AE A (demo)",
+    participant: "AE A",
     role: "Account Executive",
     date: "2026-09-10",
     beforeNote: "Opened with an immediate discount when buyer said “too expensive.”",
@@ -125,7 +125,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   },
   {
     id: "ut_02",
-    participant: "AE B (demo)",
+    participant: "AE B",
     role: "Account Executive",
     date: "2026-09-11",
     beforeNote: "Matched competitor $ without clarifying what was included.",
@@ -136,7 +136,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   },
   {
     id: "ut_03",
-    participant: "AE C (demo)",
+    participant: "AE C",
     role: "Account Executive",
     date: "2026-09-12",
     beforeNote: "Avoided price calls; low confidence on floor rules.",
@@ -147,7 +147,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   },
   {
     id: "ut_04",
-    participant: "Manager M (demo)",
+    participant: "Manager M",
     role: "Sales manager",
     date: "2026-09-12",
     beforeNote: "Only saw win/loss — not whether reps panic-discounted.",
@@ -158,7 +158,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   },
   {
     id: "ut_05",
-    participant: "AE D (demo)",
+    participant: "AE D",
     role: "Account Executive",
     date: "2026-09-13",
     beforeNote: "Robotic script reading when nervous.",
@@ -170,7 +170,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
 ];
 
 export const USER_TEST_PROTOCOL: string[] = [
-  "Pick one AE with a known price-cave habit (or use demo Alex).",
+  "Pick one AE with a known price-cave habit (or use Alex).",
   "Record a baseline: one unscored or Soft-off drill — note if they discount in the first reply.",
   "Run Learn (facts) + Soft/Full cues for 2–3 drills on the same scenario.",
   "Capture before/after: first vs latest hold + score (this page auto-fills from attempts).",

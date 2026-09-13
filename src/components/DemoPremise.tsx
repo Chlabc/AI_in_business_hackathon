@@ -1,11 +1,8 @@
 import { FIRM } from "@/data/seed";
 
 /**
- * States the made-up setup in one place.
- *
- * Every page showed numbers about "Northline" and "Alex Chen" without ever
- * saying who they were, so the data read as unexplained noise. This says it
- * plainly, once, wherever seeded data appears.
+ * States firm context in one place so Northline / pricing numbers aren't
+ * unexplained noise wherever call outcomes appear.
  */
 export function DemoPremise({ name }: { name: string }) {
   return (
@@ -14,9 +11,8 @@ export function DemoPremise({ name }: { name: string }) {
         {name}</span>
       , a sales rep at <span className="font-medium text-foreground">
         {FIRM.name}
-      </span>{" "}
-      — a made-up software company invented for this demo. It sells a workflow
-      tool at{" "}
+      </span>
+      . It sells a workflow tool at{" "}
       <span className="font-medium text-foreground">
         ${FIRM.standardPermFeePct} per seat per month
       </span>
@@ -24,7 +20,7 @@ export function DemoPremise({ name }: { name: string }) {
       <span className="font-medium text-foreground">
         ${FIRM.feeFloorPct}
       </span>{" "}
-      without approval. Every call below is invented sample data, not a real CRM.
+      without approval. The calls below are your recent outcomes.
     </div>
   );
 }

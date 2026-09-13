@@ -38,13 +38,13 @@ export default async function LearnPage() {
       {/* People kept asking what this page was for and where "Northline" came
           from, so the answer sits at the top rather than in a corner pill. */}
       <div className="rounded-xl border border-border bg-card p-4 text-sm leading-relaxed text-muted">
+        Every card below is generated from{" "}
         <strong className="font-medium text-foreground">
           {playbook.firmName}
-        </strong>{" "}
-        is the made-up company you work for in this demo. Every card below is
-        generated from its playbook — the same one the AI client argues against
-        and the scorer marks you on. Change the playbook and these cards change
-        too; they are not a generic sales course.
+        </strong>
+        &apos;s playbook — the same one the AI client argues against and the
+        scorer marks you on. Change the playbook and these cards change too;
+        they are not a generic sales course.
       </div>
 
       <LearnModule

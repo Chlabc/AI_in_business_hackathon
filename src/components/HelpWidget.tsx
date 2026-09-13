@@ -26,8 +26,8 @@ const GENERAL: Answer[] = [
     a: "You practise the hard part of a sales call — the moment a client pushes back on price — out loud, against an AI playing that client. Then you get scored on how you handled it.",
   },
   {
-    q: "Who is Northline? Is this my real data?",
-    a: "No. Northline is a made-up software company invented for this demo, and every call in it is invented sample data. It sells a workflow tool at $100 per seat per month and reps can't go below $80 without approval.",
+    q: "Who is Northline?",
+    a: "Northline is the software company you sell for here. It sells a workflow tool at $100 per seat per month, and reps can't go below $80 without approval.",
   },
   {
     q: "What does my score mean?",
@@ -49,7 +49,7 @@ const BY_PAGE: Record<string, Answer[]> = {
   "/coach": [
     {
       q: "Where did these numbers come from?",
-      a: "From 12 invented sample calls attached to this demo account. We looked at how each one ended and found the habit that costs the most — here, moving on price before asking what the objection really is.",
+      a: "From your recent call outcomes. We looked at how each one ended and found the habit that costs the most — here, moving on price before asking what the objection really is.",
     },
     {
       q: "What should I do on this page?",

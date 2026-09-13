@@ -51,13 +51,13 @@ function LoginForm() {
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16 sm:px-6">
       <div>
-        <p className="eyebrow">Demo sign-in</p>
+        <p className="eyebrow">Sign in</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
           Open as employee or manager
         </h1>
         <p className="mt-3 text-sm text-muted">
-          Passwordless allowlisted emails — not a real identity provider. Two
-          accounts for the Northline demo firm.
+          Enter your work email to continue. Pick a role below to sign in
+          quickly.
         </p>
       </div>
 
@@ -73,7 +73,7 @@ function LoginForm() {
             }}
             className="rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:border-accent disabled:opacity-50"
           >
-            Fill {a.fillLabel}
+            {a.fillLabel}
           </button>
         ))}
       </div>
@@ -86,7 +86,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="alex@northline.demo"
+            placeholder="you@company.com"
             className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-accent"
             autoComplete="username"
           />

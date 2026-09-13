@@ -23,7 +23,7 @@ export default async function ValuePage() {
   const repId = user?.repId ?? DEMO_REP_ID;
   const attempts = await listAttempts(repId);
   const evidence = beforeAfterFromAttempts(attempts);
-  const repName = getRep(repId)?.name ?? "the demo rep";
+  const repName = getRep(repId)?.name ?? "the rep";
 
   return isManager ? (
     <ManagerEvidence
@@ -124,7 +124,7 @@ function ManagerEvidence({
     <AppShell>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="eyebrow">For managers and evaluators</p>
+          <p className="eyebrow">For managers</p>
           <h1 className="display-serif mt-2 text-3xl text-foreground lg:text-4xl">
             Does this tool actually work?
           </h1>
@@ -179,8 +179,8 @@ function ManagerEvidence({
           Claim 2 — reps improve with practice
         </h2>
         <p className="mt-1 text-sm leading-relaxed text-muted">
-          One rep ({repName}) across {evidence.attemptCount} scored drills. This
-          is a demo sample, not a study — read it as a working loop, not proof.
+          One rep ({repName}) across {evidence.attemptCount} scored drills —
+          early signal from practice, not a controlled study.
         </p>
         <div className="mt-4 space-y-6">
           <BeforeAfterScore

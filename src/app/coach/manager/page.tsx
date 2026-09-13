@@ -40,9 +40,8 @@ export default async function ManagerPage() {
             Team overview
           </h1>
           <p className="mt-3 max-w-3xl text-sm text-muted lg:text-base">
-            Development tool, not surveillance. The team KPI table is seeded
-            demo data. Alex&apos;s practice summary only appears when they
-            choose to share it.
+            Development tool, not surveillance. Alex&apos;s practice summary
+            only appears when they choose to share it.
           </p>
         </div>
         <ManagerReportPdfButton

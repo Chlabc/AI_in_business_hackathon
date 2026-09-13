@@ -2,8 +2,8 @@ import { DEMO_REP_ID } from "@/data/seed";
 import type { DemoAccount } from "@/lib/auth-types";
 
 /**
- * Allowlisted demo accounts — not a real IdP.
- * Passwordless: email must match exactly (case-insensitive).
+ * Sign-in accounts for the Northline workspace.
+ * Email must match exactly (case-insensitive).
  */
 export const DEMO_ACCOUNTS: DemoAccount[] = [
   {
@@ -11,14 +11,14 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     name: "Alex Chen",
     role: "employee",
     repId: DEMO_REP_ID,
-    fillLabel: "Alex (Employee)",
+    fillLabel: "Alex · Employee",
   },
   {
     email: "jordan@northline.demo",
     name: "Jordan Hale",
     role: "manager",
     repId: null,
-    fillLabel: "Jordan (Manager)",
+    fillLabel: "Jordan · Manager",
   },
 ];
 

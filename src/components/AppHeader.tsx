@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,6 +39,20 @@ const NAV_ICONS: Record<string, IconComponent> = {
   "/login": LockIcon,
 };
 
+/** Full lockup (glove + wordmark) from public/cornerman-logo.png. */
+function BrandLogo() {
+  return (
+    <Image
+      src="/cornerman-logo.png"
+      alt="Cornerman"
+      width={2172}
+      height={724}
+      className="h-9 w-auto"
+      priority
+    />
+  );
+}
+
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -68,10 +83,6 @@ export function AppHeader({
   const [signingOut, setSigningOut] = useState(false);
 
   const nav = navForRole(user?.role ?? null);
-  const firstName = user?.name.trim().split(/\s+/)[0] ?? "";
-  const identityLabel = user
-    ? `Hi, ${firstName} · ${user.role === "manager" ? "Manager" : "Rep"}`
-    : "Not signed in";
 
   async function signOut() {
     setSigningOut(true);
@@ -88,9 +99,9 @@ export function AppHeader({
     return (
       <header className="sticky top-0 z-40 border-b border-border bg-header/95 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10 xl:px-12">
-          <span className="text-base font-semibold tracking-tight text-foreground">
-            Cornerman
-          </span>
+          <Link href="/" className="shrink-0" aria-label="Cornerman home">
+            <BrandLogo />
+          </Link>
           <nav className="flex items-center gap-1 sm:gap-2">
             {/* One anchor only — the landing page is a single scroll, and a second
                 link to a neighbouring section reads as a second page that repeats it. */}
@@ -117,28 +128,19 @@ export function AppHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-header/95 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10 xl:px-12">
-        <div className="flex min-w-0 items-center gap-4 sm:gap-6">
-          <Link
-            href={
-              user
-                ? user.role === "manager"
-                  ? "/coach/manager"
-                  : "/coach"
-                : "/"
-            }
-            className="shrink-0"
-          >
-            <span className="text-base font-semibold tracking-tight text-foreground">
-              Cornerman
-            </span>
-          </Link>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <div className="hidden min-w-0 items-center gap-3 text-sm sm:flex">
-            <span className="truncate font-medium text-foreground">
-              {identityLabel}
-            </span>
-          </div>
-        </div>
+        <Link
+          href={
+            user
+              ? user.role === "manager"
+                ? "/coach/manager"
+                : "/coach"
+              : "/"
+          }
+          className="shrink-0"
+          aria-label="Cornerman home"
+        >
+          <BrandLogo />
+        </Link>
 
         <div className="flex items-center gap-1">
           {nav.map((item) => {
@@ -176,39 +178,34 @@ export function AppHeader({
       </div>
 
       {/* Below lg the nav moves under the bar so five labels never truncate. */}
-      <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-2 px-4 pb-3 text-xs sm:px-6 lg:hidden">
-        <div className="flex gap-3 text-muted">
-          <span className="text-foreground">{identityLabel}</span>
-        </div>
-        <nav className="flex flex-wrap gap-1">
-          {nav.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`rounded-md px-2.5 py-1 font-medium transition ${
-                  active
-                    ? "bg-accent-soft text-accent"
-                    : "text-muted hover:bg-accent-soft hover:text-foreground"
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-          {user ? (
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="rounded-md px-2.5 py-1 font-medium text-muted transition hover:bg-accent-soft hover:text-foreground"
+      <nav className="mx-auto flex w-full max-w-[1800px] flex-wrap gap-1 px-4 pb-3 text-xs sm:px-6 lg:hidden">
+        {nav.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={`rounded-md px-2.5 py-1 font-medium transition ${
+                active
+                  ? "bg-accent-soft text-accent"
+                  : "text-muted hover:bg-accent-soft hover:text-foreground"
+              }`}
             >
-              Sign out
-            </button>
-          ) : null}
-        </nav>
-      </div>
+              {item.label}
+            </Link>
+          );
+        })}
+        {user ? (
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="rounded-md px-2.5 py-1 font-medium text-muted transition hover:bg-accent-soft hover:text-foreground"
+          >
+            Sign out
+          </button>
+        ) : null}
+      </nav>
     </header>
   );
 }

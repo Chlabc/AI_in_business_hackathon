@@ -31,7 +31,7 @@ export default async function CoachPage() {
   const dash = getRepDashboard(repId);
 
   if (!dash) {
-    return <div className="px-6 py-12 text-muted">Demo rep not found.</div>;
+    return <div className="px-6 py-12 text-muted">Rep not found.</div>;
   }
 
   const { rep, firm, kpis, diagnosis, talkTrack, recentCalls } = dash;

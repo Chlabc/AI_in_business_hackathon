@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Unknown demo account. Use alex@northline.demo or jordan@northline.demo.",
+          "Unrecognized email. Use alex@northline.demo or jordan@northline.demo.",
       },
       { status: 401 },
     );

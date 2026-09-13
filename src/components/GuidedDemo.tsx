@@ -242,8 +242,8 @@ export function GuidedDemo() {
       </div>
 
       <p className="mt-4 text-center text-xs text-muted">
-        Walkthrough uses the seeded demo rep&apos;s data — the same numbers you
-        see inside the app.
+        Walkthrough uses the same session data you&apos;ll see after you sign
+        in.
       </p>
     </section>
   );
