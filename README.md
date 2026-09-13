@@ -6,26 +6,29 @@
 
 Forward: AI in Business Hackathon · Track 1 + Built With ElevenLabs
 
-## Will this work if judges clone on Windows / macOS / Linux?
+## For judges — use the deployed link (no keys needed)
 
-**Yes — the repo is OS-agnostic for install and run**, as long as they have a recent **Node.js (20+)**.
+**You do not need API keys to test the live site.** Secrets are already configured on Vercel.
+
+1. Open the **production URL**
+2. Sign in with a demo account (any password):
+   - Employee: `alex@northline.demo`
+   - Manager: `jordan@northline.demo`
+3. Walk the loop: Profile → Learn → Practice → Progress (employee) or Team → Playbook → Evidence (manager)
+
+Cloning the repo is **optional** (for code review or local hacking). Only local clones need you to create a `.env.local`.
+
+## Cloning locally (optional — any OS)
+
+**Yes — install/run works on Windows, macOS, and Linux** with **Node.js 20+**.
 
 | Step | Cross-OS? | Notes |
 |------|-----------|--------|
-| `npm install` | Yes | Use Node 20+ from [nodejs.org](https://nodejs.org) (LTS) |
-| `npm run dev` | Yes | Script is `next dev` — **no** Unix-only `NODE_ENV=` prefix |
-| `npm run build` / `npm start` | Yes | Standard Next.js |
-| `npm run eval` | Yes | Uses `tsx` (works on Windows/macOS/Linux) |
-| Paths / scripts | Yes | No bash-only scripts in `package.json` |
+| `npm install` | Yes | [nodejs.org](https://nodejs.org) LTS |
+| `npm run dev` | Yes | `next dev` — no Unix-only `NODE_ENV=` prefix |
+| `npm run build` / `start` / `eval` | Yes | Standard tooling |
 
-**What differs by machine is only secrets**, not the OS:
-
-- Without API keys: UI, demo login, diagnosis, Learn, Progress, Playbook rules-parse, and manager notes UI still load.
-- Voice drills need ElevenLabs keys.
-- “Parse with AI” needs `XAI_API_KEY` (falls back to rules + common-sense talk-tracks without it).
-- Manager Leave a note / employee inbox need Supabase keys.
-
-Judges on Windows: prefer **PowerShell** or **cmd** with Node installed; avoid copying Unix-only env export syntax — use a `.env.local` file instead.
+Locally, features that call external APIs need keys in `.env.local` (see below). On the **deployed** URL, those keys are already set — judges should use that.
 
 ## Scope (locked)
 
