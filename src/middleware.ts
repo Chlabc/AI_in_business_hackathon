@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { SESSION_COOKIE } from "@/lib/auth-constants";
 import { authSecretKey } from "@/lib/auth-secret";
-import { findDemoAccount, defaultPathForRole } from "@/data/users";
+import { findDemoAccount } from "@/data/users";
 import type { Role } from "@/lib/auth-types";
 
 async function readUser(
@@ -36,7 +36,8 @@ const MANAGER_ONLY = [
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Public
+  // Public — always show /login (even if already signed in) so demos can
+  // switch employee/manager accounts without the page "disappearing."
   if (
     pathname === "/" ||
     pathname === "/login" ||
@@ -44,13 +45,6 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico"
   ) {
-    const user = await readUser(req);
-    // Logged-in users hitting /login → role home
-    if (pathname === "/login" && user) {
-      return NextResponse.redirect(
-        new URL(defaultPathForRole(user.role), req.url),
-      );
-    }
     return NextResponse.next();
   }
 
