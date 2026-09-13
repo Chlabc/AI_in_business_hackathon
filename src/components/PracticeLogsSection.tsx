@@ -108,17 +108,7 @@ export function PracticeLogsSection({
 
   return (
     <section className="surface-card rounded-xl p-6">
-      <p className="eyebrow">Practice logs</p>
-      <h2 className="mt-1 text-lg font-semibold text-foreground">
-        Review drills, then calibrate the coach
-      </h2>
-      <p className="mt-2 max-w-3xl text-sm text-muted">
-        Pick an agent, open a timestamped session to read the transcript and
-        rubric, then disagree if the score is wrong. Optionally make the fix
-        your{" "}
-        <strong className="font-medium text-foreground">agency standard</strong>
-        . Progress KPI cards below still only appear when that agent shares.
-      </p>
+      <h2 className="text-lg font-semibold text-foreground">Practice logs</h2>
       <label className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
         Agent
         <select
@@ -138,9 +128,6 @@ export function PracticeLogsSection({
         <p className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-xs text-muted">
           {banner}
         </p>
-      ) : null}
-      {available === true ? (
-        <p className="mt-2 text-xs text-ok">Synced to Supabase</p>
       ) : null}
       {message ? <p className="mt-3 text-sm text-ok">{message}</p> : null}
       {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
@@ -231,11 +218,11 @@ function SessionDetailPanel({
 }) {
   return (
     <div className="space-y-5">
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
+      <div className="flex min-h-[24rem] flex-col">
+        <h3 className="shrink-0 text-xs font-semibold uppercase tracking-wider text-muted">
           Transcript
         </h3>
-        <ul className="mt-2 max-h-64 space-y-2 overflow-y-auto">
+        <ul className="mt-2 min-h-0 flex-1 space-y-2 overflow-y-auto">
           {detail.turns.length === 0 ? (
             <li className="text-sm text-muted">No turns stored.</li>
           ) : (
@@ -257,6 +244,11 @@ function SessionDetailPanel({
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
           Rubric · {detail.score.overall}/100
+          {detail.calibration &&
+          Array.isArray(detail.calibration.overrides) &&
+          detail.calibration.overrides.length > 0
+            ? " (calibrated)"
+            : ""}
         </h3>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full min-w-[520px] text-left text-sm">
@@ -359,9 +351,6 @@ function DisagreeForm({
         <div>
           <p className="text-sm font-semibold text-danger">
             Calibrate the coach
-          </p>
-          <p className="mt-0.5 text-xs text-danger/80">
-            Score looks wrong? Correct it and teach the scorer.
           </p>
         </div>
         <button

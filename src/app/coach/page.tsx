@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
+import { AttemptHistory } from "@/components/AttemptHistory";
 import { OnboardingBanner } from "@/components/OnboardingBanner";
 import { PageHeader } from "@/components/PageHeader";
 import { ShareControls } from "@/components/ShareControls";
@@ -35,39 +36,61 @@ export default async function CoachPage() {
     return <div className="px-6 py-12 text-muted">Rep not found.</div>;
   }
 
-  const { rep, kpis, diagnosis, recentCalls } = dash;
+  const { rep, kpis, diagnosis } = dash;
   const attempts = await listAttempts(repId);
   const practice = practiceKpisFromAttempts(attempts);
   kpis.practice = practice;
   const share = await getShareSettings(repId);
 
-  /** Formatting seam only — the underlying figures come from KPI logic. */
-  const discount =
-    kpis.avgFeeAskedPct !== null && kpis.avgFeeEndedPct !== null
-      ? Math.round((kpis.avgFeeAskedPct - kpis.avgFeeEndedPct) * 100) / 100
-      : null;
-
-  const metrics = [
-    {
-      label: "Price concessions",
-      value: pct(kpis.feeConcessionRate),
-      explain:
-        "of the times a client pushed back on price, you lowered it rather than defending it",
-      problem: true,
-    },
-    {
-      label: "Average commission cut",
-      value: seatPrice(discount).replace("%", " pp"),
-      explain: `you ask ${seatPriceFull(kpis.avgFeeAskedPct)} and settle at ${seatPrice(kpis.avgFeeEndedPct)}`,
-      problem: true,
-    },
-    {
-      label: "Win rate",
-      value: pct(kpis.winRate),
-      explain: "of all your calls ended in a win",
-      problem: false,
-    },
-  ];
+  /** Prefer live drill metrics so Profile moves when the agent practices. */
+  const fromDrills = practice.attempts > 0;
+  const metrics = fromDrills
+    ? [
+        {
+          label: "Price concessions (drills)",
+          value: pct(practice.concessionRate),
+          explain: "drills where you softened commission",
+          problem: (practice.concessionRate ?? 0) >= 40,
+        },
+        {
+          label: "Price hold (drills)",
+          value: pct(practice.feeHoldRate),
+          explain: "drills held near approved rate",
+          problem: (practice.feeHoldRate ?? 100) < 60,
+        },
+        {
+          label: "Strong drills (≥70)",
+          value: pct(practice.strongDrillRate),
+          explain: "drills scoring 70+",
+          problem: false,
+        },
+      ]
+    : [
+        {
+          label: "Price concessions",
+          value: pct(kpis.feeConcessionRate),
+          explain: "from call history",
+          problem: true,
+        },
+        {
+          label: "Average commission cut",
+          value: seatPrice(
+            kpis.avgFeeAskedPct !== null && kpis.avgFeeEndedPct !== null
+              ? Math.round(
+                  (kpis.avgFeeAskedPct - kpis.avgFeeEndedPct) * 100,
+                ) / 100
+              : null,
+          ).replace("%", " pp"),
+          explain: `${seatPriceFull(kpis.avgFeeAskedPct)} → ${seatPrice(kpis.avgFeeEndedPct)}`,
+          problem: true,
+        },
+        {
+          label: "Win rate",
+          value: pct(kpis.winRate),
+          explain: "from call history",
+          problem: false,
+        },
+      ];
 
   return (
     <AppShell>
@@ -79,9 +102,7 @@ export default async function CoachPage() {
         title={user.name}
         description={
           <>
-            {rep.title} at {rep.agency} · {rep.weeksInRole} weeks in role. Your
-            credential, recent losses, and performance live here — jump to
-            Practice when you&apos;re ready to drill.
+            {rep.title} at {rep.agency} · {rep.weeksInRole} weeks in role
           </>
         }
         action={
@@ -103,7 +124,9 @@ export default async function CoachPage() {
           name={user.name}
           role={rep.title}
           weeksInRole={rep.weeksInRole}
-          weakestStage={label(diagnosis.primaryStage)}
+          weakestStage={
+            practice.weakestCriterionLabel ?? label(diagnosis.primaryStage)
+          }
           attemptCount={attempts.length}
         />
 
@@ -111,6 +134,27 @@ export default async function CoachPage() {
           <h2 className="text-lg font-semibold text-foreground">
             Your performance snapshot
           </h2>
+          <div className="mb-5 grid grid-cols-3 gap-3">
+            <div className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted">Drills scored</p>
+              <p className="mt-1 text-2xl font-semibold">{practice.attempts}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted">Last drill score</p>
+              <p className="mt-1 text-2xl font-semibold">
+                {practice.lastScore ?? "—"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted">Price hold</p>
+              <p className="mt-1 text-2xl font-semibold">
+                {practice.feeHoldRate === null
+                  ? "—"
+                  : `${practice.feeHoldRate}%`}
+              </p>
+            </div>
+          </div>
+          <p className="mb-5 text-sm text-muted">{practice.trendLabel}</p>
           <div className={colors.performanceMetrics}>
             {metrics.map((m) => (
               <div
@@ -151,88 +195,30 @@ export default async function CoachPage() {
         </section>
       </div>
 
-      {/* Evidence sits under the card + snapshot pair */}
-      <section className="surface-card rounded-xl p-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">
-          Why we think that — {diagnosis.evidence.length} recent losses
-        </h2>
-        <ol className="mt-4 space-y-3">
-          {diagnosis.evidence.map((line, i) => (
-            <li key={line} className="flex gap-3 text-sm text-foreground">
-              <span className="mt-0.5 font-mono text-xs text-muted">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="leading-relaxed">{line}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Secondary: sharing + raw call table */}
+      {/* Secondary: sharing + practice history */}
       <div className={colors.secondary}>
         <ShareControls
           className={colors.sharing}
           initialShared={share.shareProgressWithManager}
           repId={repId}
         />
-        <details className={`${colors.rawCalls} surface-card rounded-xl p-6`}>
+        <details className={`${colors.rawCalls} surface-card rounded-xl p-6`} open={attempts.length > 0}>
           <summary className="cursor-pointer text-sm text-muted transition hover:text-foreground">
-            See all {recentCalls.length} calls we analysed
+            Practice history · {attempts.length} scored drill
+            {attempts.length === 1 ? "" : "s"}
           </summary>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
-              <thead className="text-xs uppercase tracking-wider text-muted">
-                <tr>
-                  <th className="pb-2 pr-3 font-medium">Date</th>
-                  <th className="pb-2 pr-3 font-medium">Client</th>
-                  <th className="pb-2 pr-3 font-medium">Stage</th>
-                  <th className="pb-2 pr-3 font-medium">Objection</th>
-                  <th className="pb-2 pr-3 font-medium">Outcome</th>
-                  <th className="pb-2 font-medium">Commission</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border text-foreground">
-                {recentCalls.map((c) => (
-                  <tr key={c.id}>
-                    <td className="py-2.5 pr-3 font-mono text-xs text-muted">
-                      {c.date}
-                    </td>
-                    <td className="py-2.5 pr-3">{c.client}</td>
-                    <td className="py-2.5 pr-3 capitalize">{label(c.stage)}</td>
-                    <td className="py-2.5 pr-3 capitalize">
-                      {label(c.objectionType)}
-                    </td>
-                    <td className="py-2.5 pr-3">
-                      <OutcomePill outcome={c.outcome} />
-                    </td>
-                    <td className="py-2.5 font-mono text-xs text-muted">
-                      {c.feeEndedPct !== null
-                        ? `${seatPrice(c.feeAskedPct)} → ${seatPrice(c.feeEndedPct)}`
-                        : seatPrice(c.feeAskedPct)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-4">
+            {attempts.length === 0 ? (
+              <p className="text-sm text-muted">
+                No scored drills yet. Finish a practice session to build
+                history.
+              </p>
+            ) : (
+              <AttemptHistory attempts={attempts} />
+            )}
           </div>
         </details>
       </div>
     </AppShell>
-  );
-}
-
-function OutcomePill({ outcome }: { outcome: string }) {
-  const styles: Record<string, string> = {
-    won: "bg-ok-soft text-ok border-ok/30",
-    lost: "bg-danger-soft text-danger border-danger/30",
-    conceded: "bg-warn-soft text-warn border-warn/30",
-    no_decision: "bg-background text-muted border-border",
-  };
-  return (
-    <span
-      className={`inline-flex rounded border px-2 py-0.5 text-xs capitalize ${styles[outcome] ?? styles.no_decision}`}
-    >
-      {label(outcome)}
-    </span>
   );
 }

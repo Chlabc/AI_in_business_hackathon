@@ -4,6 +4,14 @@ import { HelpWidget } from "@/components/HelpWidget";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
+// Dev-only: keep the import out of the production module graph.
+const AgentationDev =
+  process.env.NODE_ENV === "development"
+    ? require("@/components/AgentationDev").AgentationDev
+    : function AgentationDevNoop() {
+        return null;
+      };
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -62,6 +70,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>
           {children}
           <HelpWidget />
+          <AgentationDev />
         </ThemeProvider>
       </body>
     </html>

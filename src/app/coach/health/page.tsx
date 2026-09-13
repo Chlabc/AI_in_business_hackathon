@@ -96,19 +96,7 @@ export default function HealthPage() {
       <PageHeader
         eyebrow="Health"
         title="Does the coaching loop actually work?"
-        description={
-          <>
-            Static snapshot from the last{" "}
-            <code className="rounded bg-card px-1.5 py-0.5 text-xs text-foreground">
-              npm run eval
-            </code>
-            . Same numbers as{" "}
-            <code className="rounded bg-card px-1.5 py-0.5 text-xs text-foreground">
-              EVAL.md
-            </code>{" "}
-            — frozen so results stay stable between eval runs.
-          </>
-        }
+
         action={
           <>
             <Link

@@ -60,11 +60,8 @@ export function ProgressPanel({
       ) : (
         <>
           <div className="border-b border-border px-5 py-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
               Score trend
-            </p>
-            <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
-              One bar per drill, oldest on the left. Taller is a better score.
             </p>
             <div className="flex h-28 items-end gap-1.5">
               {chronological.map((a, i) => {

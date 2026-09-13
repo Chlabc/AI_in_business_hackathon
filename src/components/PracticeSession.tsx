@@ -83,10 +83,6 @@ export function PracticeSession({
             <p className="mt-1 text-sm font-medium leading-relaxed text-foreground">
               “{scenario.openingLine}”
             </p>
-            <p className="mt-2 text-xs text-muted">
-              Live session uses agency commission {standardFeePct}% (floor{" "}
-              {feeFloorPct}%) — edit under Playbook (Manager).
-            </p>
           </div>
 
           <CoachStrip
@@ -157,14 +153,15 @@ export function PracticeSession({
           </p>
         </section>
 
-        <section className="surface-card flex min-h-[320px] flex-col rounded-xl p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-3">
+        <section className="surface-card flex h-full min-h-[320px] flex-col rounded-xl p-5 sm:p-6">
+          <div className="flex shrink-0 items-center justify-between gap-3">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
               Transcript
             </h3>
             <span className="text-xs text-muted">{turns.length} turns</span>
           </div>
-          <div className="mt-4 max-h-[28rem] flex-1 space-y-2 overflow-y-auto">
+          {/* min-h-0 lets flex-1 fill the card; no max-height so scroll uses the full box */}
+          <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto">
             {turns.length === 0 ? (
               <p className="text-sm text-muted">
                 Start the drill to capture spoken turns.

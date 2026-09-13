@@ -46,17 +46,9 @@ export function ShareControls({
 
   return (
     <section className={`surface-card rounded-xl p-5 ${className}`}>
-      <p className="eyebrow">Rep-owned</p>
-      <h2 className="mt-1 text-lg font-semibold text-foreground">
+      <h2 className="text-lg font-semibold text-foreground">
         Sharing with manager
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted">
-        Private by default. When you share, your manager sees{" "}
-        <strong className="font-medium text-foreground">
-          progress summary only
-        </strong>{" "}
-        — never raw practice transcripts.
-      </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button

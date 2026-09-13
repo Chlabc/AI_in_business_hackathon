@@ -139,9 +139,6 @@ export function EmployeeCredential({
               </dd>
             </div>
           </dl>
-          <p className="border-t border-border pt-3 text-xs leading-relaxed text-muted">
-            Raw practice transcripts are never shared with your manager.
-          </p>
           <p className="text-right text-[10px] text-muted">Tap to return ↔</p>
         </div>
       </div>

@@ -65,7 +65,6 @@ export default async function PracticePage({ searchParams }: Props) {
         <PageHeader
           eyebrow="Practice"
           title="What do you want to practise?"
-          description="Start from the pattern costing you deals, skim the tips, then pick a situation. The highlighted card matches that diagnosis."
         />
 
         {diagnosis && dash ? (
@@ -187,16 +186,7 @@ export default async function PracticePage({ searchParams }: Props) {
       <PageHeader
         eyebrow="Live practice"
         title={scenario.title}
-        description={
-          <>
-            {scenario.description} Use cue mode Off / Soft / Full for reactive
-            coach cards. After scoring, use{" "}
-            <strong className="font-medium text-foreground">
-              Practice again
-            </strong>{" "}
-            or pick another scenario.
-          </>
-        }
+        description={scenario.description}
         action={
           <>
             <Link

@@ -422,21 +422,7 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <h2 className="mt-1 text-lg font-semibold text-foreground">
           Company document → knowledge draft
         </h2>
-        <p className="mt-2 text-sm text-muted">
-          Publishing updates Learn, cue cards, scoring, and the next voice
-          drill. Employees never edit this. Paste pricing / value notes or
-          upload{" "}
-          <code className="text-xs">.pdf</code> /{" "}
-          <code className="text-xs">.txt</code> /{" "}
-          <code className="text-xs">.md</code> (text-layer PDFs only). Prefer{" "}
-          <strong className="font-medium text-foreground">
-            Download sample PDF
-          </strong>{" "}
-          to try parsing first. Parse builds a{" "}
-          <strong className="font-medium text-foreground">locked draft</strong>
-          ; talk-track AI edits stay off until you accept them. Nothing reaches
-          drills until Publish.
-        </p>
+
         <textarea
           className={`${fieldClass} mt-4 min-h-[140px] font-mono text-xs`}
           placeholder={`Example:\nStandard commission: 2.5%\nFloor (approval): 2%\nCompetitor often quotes 1.75%\n- local comparable sales\n- tailored marketing and negotiation support`}
@@ -517,12 +503,6 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
           <h2 className="mt-1 text-lg font-semibold text-foreground">
             Accept changes before publish
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            Unchecked items stay on the live playbook. Firm facts default on.
-            Talk-tracks are filled from the document when possible, otherwise
-            common-sense plays grounded in the extracted rates/anchors (so a
-            new company doc doesn’t keep old scripts). Empty tracks auto-accept.
-          </p>
           <ul className="mt-4 space-y-3">
             {proposals.map((p) => (
               <li
@@ -567,11 +547,6 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <h2 className="mt-1 text-lg font-semibold text-foreground">
           Commission & agency positioning
         </h2>
-        <p className="mt-2 text-sm text-muted">
-          Commission rates inform the AI seller and scoring. Coaching
-          tips below never go into ElevenLabs.
-        </p>
-
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <label className="block text-xs font-semibold uppercase tracking-wider text-muted">
             Company name
@@ -649,11 +624,6 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <h2 className="mt-1 text-lg font-semibold text-foreground">
           Objection playbooks
         </h2>
-        <p className="mt-2 text-sm text-muted">
-          Drive live Soft/Full cue cards and scoring. Not injected into the
-          voice client.
-        </p>
-
         <div className="mt-4 space-y-3">
           {working.talkTracks.map((t) => {
             const open = openTrack === t.id;
@@ -737,10 +707,6 @@ export function PlaybookEditor({ live, initialDraft }: PlaybookEditorProps) {
         <h2 className="mt-1 text-lg font-semibold text-foreground">
           Extra company notes
         </h2>
-        <p className="mt-2 text-sm text-muted">
-          Freeform dump for humans (and future retrieval). Not pasted wholesale
-          into ElevenLabs.
-        </p>
         <textarea
           rows={6}
           className={`${fieldClass} mt-4`}

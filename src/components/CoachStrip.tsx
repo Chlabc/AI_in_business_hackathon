@@ -98,20 +98,13 @@ export function CoachStrip({
         </div>
       </div>
 
-      {/* The numbers stay visible in every mode — Unaided removes the coaching,
-          not the facts a rep would obviously know about their own product. */}
       <p className="mt-3 border-t border-border pt-3 text-xs text-muted">
-        List <strong className="text-foreground">${standardFeePct}/seat</strong>{" "}
-        · floor <strong className="text-foreground">${feeFloorPct}</strong> ·
-        anything on this panel is on your screen only, never the client&apos;s
+        List <strong className="text-foreground">{standardFeePct}%</strong> ·
+        floor <strong className="text-foreground">{feeFloorPct}%</strong>
       </p>
 
       {mode === "off" ? (
-        <p className="mt-4 text-sm text-muted">
-          Unaided — no play, no anchor points, no example line. You&apos;re
-          still scored against the approved playbook afterwards.
-          {!connected ? " Start the drill when ready." : null}
-        </p>
+        <p className="mt-4 text-sm text-muted">Cues off</p>
       ) : (
         <div className="mt-4 space-y-3">
           <p className="text-sm leading-relaxed text-foreground">

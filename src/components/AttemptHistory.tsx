@@ -45,17 +45,6 @@ export function AttemptHistory({ attempts }: { attempts: PracticeAttempt[] }) {
 
   return (
     <div>
-      {/* Holding the price is one of six scored criteria, so "Held" next to a
-          low score is correct and needs saying — people read it as a bug. */}
-      <p className="mb-3 text-xs leading-relaxed text-muted">
-        <strong className="font-medium text-foreground">Score</strong> is out of
-        100 across six things — did you explore the objection, ask questions,
-        anchor on value, hold the price, use the approved play, and avoid caving
-        early. <strong className="font-medium text-foreground">Held</strong> is
-        only the fourth of those. You can hold the price and still score low by
-        skipping the other five.
-      </p>
-
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="text-xs uppercase tracking-wider text-muted">
