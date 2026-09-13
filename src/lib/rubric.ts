@@ -32,14 +32,14 @@ export const FEE_RUBRIC: RubricCriterion[] = [
     label: "Anchored on value",
     weight: 20,
     description:
-      "Cited time-to-hire, guarantee, shortlist quality, or similar approved anchors.",
+      "Cited local comparable sales, the marketing plan, negotiation support, or similar approved agency anchors.",
   },
   {
     id: "held_fee",
     label: "Held near standard fee",
     weight: 25,
     description:
-      "Did not drop below firm floor ($80). Preferred holding near list ($100).",
+      "Did not drop below firm floor (2%). Preferred holding near list (2.5%).",
   },
   {
     id: "used_approved_play",

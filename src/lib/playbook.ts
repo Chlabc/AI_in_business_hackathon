@@ -34,17 +34,17 @@ export type FirmPlaybook = {
 const STORE = dataStorePath("playbook.json");
 
 const DEFAULT_EXAMPLES: Partial<Record<ObjectionType, string>> = {
-  fee: "Before we talk discount — what does a failed rollout cost you in the next quarter? That’s what our time-to-value and CSM cover. Happy to trade annual prepay before we touch list price.",
+  fee: "Before we discuss commission — what matters most when choosing your agent? Let’s compare the local market evidence, marketing plan and negotiation support included in our service.",
   other_agency:
-    "I respect that CompetitorX relationship — where are they still leaving gaps? Happy to run a 30-day pilot on one team so you can compare without ripping anything out.",
+    "I respect that relationship — is there anything you still need from your selling plan? If useful, we can arrange a no-obligation appraisal so you can compare approaches.",
   just_cvs:
-    "We don’t open unlimited trial seats cold — better a 20-minute demo on your actual workflow. What are the must-haves before I enable access?",
+    "A useful appraisal starts with your property and plans. What is your timeframe, and would a short appraisal appointment help?",
   timing:
-    "Totally fair. I’ll leave one relevant insight and book a 10-minute check-in next month — no pitch deck.",
+    "Totally fair. Would a local market update be useful, and may I check in next month? If you prefer no follow-up, I’ll respect that.",
   exclusivity:
-    "How about I send the SOC2 pack + mutual NDA today, and we lock 20 minutes Thursday while legal reviews — not an open-ended stall?",
+    "Shall I send the sales authority and fee summary for you and your partner to review, then check in on Thursday?",
   other:
-    "Help me understand what success looks like on this rollout before we talk commercials.",
+    "Help me understand your selling plans and priorities before we discuss the agency agreement.",
 };
 
 export function defaultPlaybook(): FirmPlaybook {
@@ -54,11 +54,11 @@ export function defaultPlaybook(): FirmPlaybook {
     vertical: FIRM.vertical,
     standardPermFeePct: FIRM.standardPermFeePct,
     feeFloorPct: FIRM.feeFloorPct,
-    competitorQuotePct: 70, // competitor seat $/mo quote
+    competitorQuotePct: 1.75, // fictional competing commission
     valueAnchors: [...FIRM.valueAnchors],
     talkTracks: TALK_TRACKS.map((t) => talkTrackToPlaybook(t)),
     faqNotes:
-      "Paste long FAQ / security / pricing policy notes here. Cornerman uses structured fields above for coaching and scoring; this dump is for humans and future retrieval — not pasted wholesale into the voice client.",
+      "Fictional Australian residential agency for practice. Commission examples are agency-specific demo assumptions, not market benchmarks. Rates exclude GST; marketing costs are separate. An appraisal is an estimated selling price, not a formal valuation. Respect a clear refusal and ask permission before following up.",
     updatedAt: new Date(0).toISOString(),
   };
 }
@@ -154,8 +154,12 @@ export async function savePlaybook(
   if (next.feeFloorPct > next.standardPermFeePct) {
     throw new Error("Fee floor cannot be above standard fee");
   }
-  if (next.standardPermFeePct < 1 || next.standardPermFeePct > 500) {
-    throw new Error("List seat price must be between $1 and $500");
+  if (
+    !Number.isFinite(next.standardPermFeePct) ||
+    next.standardPermFeePct <= 0 ||
+    next.standardPermFeePct > 100
+  ) {
+    throw new Error("Standard commission must be greater than 0% and at most 100%");
   }
   await fs.mkdir(path.dirname(STORE), { recursive: true });
   await fs.writeFile(STORE, JSON.stringify(next, null, 2), "utf8");

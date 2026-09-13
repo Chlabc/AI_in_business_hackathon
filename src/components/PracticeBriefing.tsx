@@ -46,7 +46,7 @@ export function PracticeBriefing({
 
       <div className={colors.pricing}>
         <div>
-          <p className="text-sm text-muted">List price</p>
+          <p className="text-sm text-muted">Standard commission</p>
           <p className="mt-1 text-2xl font-semibold text-foreground">
             {seatPriceFull(listPct)}
           </p>

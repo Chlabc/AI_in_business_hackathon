@@ -85,7 +85,7 @@ export function diagnoseCalls(
   const evidence = supporting.slice(0, 4).map((c) => {
     const drop =
       c.feeEndedPct !== null
-        ? ` (${seatPrice(c.feeAskedPct)} → ${seatPrice(c.feeEndedPct)} a seat)`
+        ? ` (${seatPrice(c.feeAskedPct)} → ${seatPrice(c.feeEndedPct)} commission)`
         : "";
     return `${c.date} · ${c.client}: ${c.notes}${drop}`;
   });

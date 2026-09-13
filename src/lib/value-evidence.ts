@@ -93,7 +93,7 @@ export function beforeAfterFromAttempts(
       holdPhrase,
       scorePhrase,
       behaviourPhrase,
-      "If each avoided panic discount protects margin on a multi-seat deal, coaching payback is the retained list price on deals the AE would otherwise cave — measured here via hold rate, not invented win rates.",
+      "If each avoided panic discount protects margin on a property listing, coaching payback is the retained list price on listings where the agent would otherwise concede — measured here via hold rate, not invented win rates.",
     ].join(" "),
   };
 }
@@ -114,30 +114,30 @@ export type UserTestSession = {
 export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   {
     id: "ut_01",
-    participant: "AE A",
-    role: "Account Executive",
+    participant: "Agent A",
+    role: "Real Estate Agent",
     date: "2026-09-10",
-    beforeNote: "Opened with an immediate discount when buyer said “too expensive.”",
-    afterNote: "Asked what “too expensive” meant; anchored SOC2 / time-to-value; held nearer list.",
+    beforeNote: "Opened with an immediate discount when seller said “too expensive.”",
+    afterNote: "Asked what “too expensive” meant; anchored marketing plan / local market evidence; held nearer list.",
     quote:
       "Having the cue cards mid-call stopped me from apologising for the price.",
     source: "demo_labeled",
   },
   {
     id: "ut_02",
-    participant: "AE B",
-    role: "Account Executive",
+    participant: "Agent B",
+    role: "Real Estate Agent",
     date: "2026-09-11",
-    beforeNote: "Matched competitor $ without clarifying what was included.",
-    afterNote: "Clarified comparison; offered annual prepay trade instead of a deep cut.",
+    beforeNote: "Matched competitor commission without clarifying what was included.",
+    afterNote: "Clarified comparison; offered campaign scope review instead of a deep cut.",
     quote:
       "The scorecard made it obvious I was conceding in the first 20 seconds.",
     source: "demo_labeled",
   },
   {
     id: "ut_03",
-    participant: "AE C",
-    role: "Account Executive",
+    participant: "Agent C",
+    role: "Real Estate Agent",
     date: "2026-09-12",
     beforeNote: "Avoided price calls; low confidence on floor rules.",
     afterNote: "Completed Learn quiz + 2 drills; could state list/floor without opening the playbook.",
@@ -158,8 +158,8 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
   },
   {
     id: "ut_05",
-    participant: "AE D",
-    role: "Account Executive",
+    participant: "Agent D",
+    role: "Real Estate Agent",
     date: "2026-09-13",
     beforeNote: "Robotic script reading when nervous.",
     afterNote: "Used Soft cues (bullets only); Full example collapsed unless stuck.",
@@ -170,7 +170,7 @@ export const DEFAULT_USER_TEST_SESSIONS: UserTestSession[] = [
 ];
 
 export const USER_TEST_PROTOCOL: string[] = [
-  "Pick one AE with a known price-cave habit (or use Alex).",
+  "Pick one agent with a known price-cave habit (or use Alex).",
   "Record a baseline: one unscored or Soft-off drill — note if they discount in the first reply.",
   "Run Learn (facts) + Soft/Full cues for 2–3 drills on the same scenario.",
   "Capture before/after: first vs latest hold + score (this page auto-fills from attempts).",

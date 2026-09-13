@@ -17,7 +17,7 @@ export default async function PlaybookPage() {
       <PageHeader
         eyebrow="Playbook"
         title="Firm knowledge"
-        description="Upload or edit approved SaaS pricing, talk-tracks, and FAQ. Parse into a locked draft, accept proposals, then Publish — AEs pick up changes in Learn, cue cards, scoring, and the next voice drill. Thin firm facts go to ElevenLabs automatically; coaching tips never do."
+        description="Upload or edit approved agency commissions, talk-tracks, and FAQ. Parse into a locked draft, accept proposals, then Publish — agents pick up changes in Learn, cue cards, scoring, and the next voice drill. Thin firm facts go to ElevenLabs automatically; coaching tips never do."
       />
 
       <PlaybookEditor live={playbook} initialDraft={draft} />

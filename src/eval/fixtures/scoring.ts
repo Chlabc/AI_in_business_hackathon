@@ -13,21 +13,21 @@ export type ScoringGold = {
 
 /**
  * Fixed transcripts with teammate gold labels for scoring–human agreement.
- * B2B SaaS seat-price framing (list $100, floor $80).
+ * Fictional real estate commission framing (list 2.5%, floor 2%).
  */
 export const SCORING_CASES: ScoringGold[] = [
   {
     id: "early_cave",
-    label: "Immediate $85 concession",
+    label: "Immediate 2.125% concession",
     scenarioId: "price-objection",
     turns: [
       {
         role: "agent",
-        text: "Your $100/seat is too high. CompetitorX quoted $70.",
+        text: "Your 2.5% is too high. another agency quoted 1.75%.",
       },
       {
         role: "user",
-        text: "Okay we can do $85 if you sign this week.",
+        text: "Okay we can do 2.125% if you sign this week.",
       },
       {
         role: "agent",
@@ -35,7 +35,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Fine, we can do $70 and we'll move fast.",
+        text: "Fine, we can do 1.75% and we'll move fast.",
       },
     ],
     humanOverall: 10,
@@ -43,16 +43,16 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "strong_hold",
-    label: "Explore + value anchor, hold $100",
+    label: "Explore + value anchor, hold 2.5%",
     scenarioId: "price-objection",
     turns: [
       {
         role: "agent",
-        text: "Your $100/seat is too high. CompetitorX quoted $70.",
+        text: "Your 2.5% is too high. another agency quoted 1.75%.",
       },
       {
         role: "user",
-        text: "Help me understand — what is the $70 quote measured against? Does it include SOC2, SSO, and a CSM?",
+        text: "Help me understand — what is the 1.75% quote measured against? Does it include the marketing plan, inspections, and negotiation support?",
       },
       {
         role: "agent",
@@ -60,7 +60,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Because our last twenty accounts hit time-to-value under 14 days with SOC2 Type II and a dedicated CSM plus 99.9% uptime SLA — not a self-serve dump. Happy to trade annual prepay for a small concession later, but I hold the $100 list.",
+        text: "Our service includes local comparable sales, a tailored marketing plan and dedicated negotiation support. Happy to trade campaign scope for a small concession later, but I hold the 2.5% list.",
       },
     ],
     humanOverall: 88,
@@ -68,24 +68,24 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "soft_18",
-    label: "Some exploration then soft to $90",
+    label: "Some exploration then soft to 2.25%",
     scenarioId: "price-objection",
     turns: [
       {
         role: "agent",
-        text: "$100 is steep versus $70.",
+        text: "2.5% is steep versus 1.75%.",
       },
       {
         role: "user",
-        text: "Compared to what — total cost of switching and downtime, or just seat sticker?",
+        text: "Compared to what — the marketing plan and service included, or just the commission rate?",
       },
       {
         role: "agent",
-        text: "Procurement wants under $90.",
+        text: "My partner wants under 2.25%.",
       },
       {
         role: "user",
-        text: "We can do $90 if we get annual prepay and a named CSM for the first quarter.",
+        text: "We can do 2.25% if we get campaign scope and dedicated negotiation support throughout the campaign.",
       },
     ],
     humanOverall: 72,
@@ -102,11 +102,11 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "Our price is fair. We're the best platform in the category and you should just pay $100.",
+        text: "Our price is fair. We're the best agency in the area and you should just pay 2.5%.",
       },
       {
         role: "agent",
-        text: "That doesn't help me with procurement.",
+        text: "That doesn't help me with my partner.",
       },
       {
         role: "user",
@@ -118,24 +118,24 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "floor_break",
-    label: "Drops below firm floor to $70",
+    label: "Drops below firm floor to 1.75%",
     scenarioId: "price-objection",
     turns: [
       {
         role: "agent",
-        text: "CompetitorX said $70. Match it.",
+        text: "another agency said 1.75%. Match it.",
       },
       {
         role: "user",
-        text: "What's driving the push for $70?",
+        text: "What's driving the push for 1.75%?",
       },
       {
         role: "agent",
-        text: "Budget. Match $70 or we're done.",
+        text: "Budget. Match 1.75% or we're done.",
       },
       {
         role: "user",
-        text: "Okay, how about I drop to $70 then.",
+        text: "Okay, how about I drop to 1.75% then.",
       },
     ],
     humanOverall: 28,
@@ -148,11 +148,11 @@ export const SCORING_CASES: ScoringGold[] = [
     turns: [
       {
         role: "agent",
-        text: "Your $100 is too high versus $70.",
+        text: "Your 2.5% is too high versus 1.75%.",
       },
       {
         role: "user",
-        text: "What is too expensive measured against? Our time-to-value is under 14 days. We offer SOC2 Type II and a dedicated CSM. I can offer annual prepay before any discount. I hold $100.",
+        text: "What is too expensive measured against? We use local comparable sales, a tailored marketing plan and negotiation support. I can offer campaign scope before any discount. I hold 2.5%.",
       },
     ],
     humanOverall: 78,
@@ -160,16 +160,16 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "competitor_ok",
-    label: "Competitor scenario — pilot offer",
+    label: "Competitor scenario — appraisal offer",
     scenarioId: "competitor",
     turns: [
       {
         role: "agent",
-        text: "We already have a great relationship with CompetitorX.",
+        text: "We already have a great relationship with another agency.",
       },
       {
         role: "user",
-        text: "Totally fair — where are they still leaving gaps? Happy to run a 30-day pilot on one team so you can compare without ripping anything out.",
+        text: "Totally fair — where are they still leaving gaps? Happy to arrange a no-obligation appraisal so you can compare selling approaches.",
       },
     ],
     humanOverall: 78,
@@ -177,16 +177,16 @@ export const SCORING_CASES: ScoringGold[] = [
   },
   {
     id: "mention_competitor_pct",
-    label: "Mentions $70 quote without offering it",
+    label: "Mentions 1.75% quote without offering it",
     scenarioId: "price-objection",
     turns: [
       {
         role: "agent",
-        text: "CompetitorX quoted $70.",
+        text: "another agency quoted 1.75%.",
       },
       {
         role: "user",
-        text: "Interesting — what does that $70 include? Our list is $100 with SOC2 and CSM. I am not matching $70.",
+        text: "Interesting — what does that 1.75% include? Our list is 2.5% with the marketing plan and negotiation support. I am not matching 1.75%.",
       },
       {
         role: "agent",
@@ -194,7 +194,7 @@ export const SCORING_CASES: ScoringGold[] = [
       },
       {
         role: "user",
-        text: "I'll trade scope — annual prepay — before discount. Holding $100.",
+        text: "I'll trade scope — campaign scope — before discount. Holding 2.5%.",
       },
     ],
     humanOverall: 84,

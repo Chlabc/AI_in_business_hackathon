@@ -22,7 +22,7 @@ export function pickSpotlightIndex(
     anchorPoints.findIndex((a) => re.test(a.toLowerCase()));
 
   if (
-    /too high|too expensive|\$|price|cost|cheaper|quoted|discount|budget/.test(
+    /too high|too expensive|\$|commission|fee|price|cost|cheaper|quoted|discount|budget/.test(
       t,
     )
   ) {
@@ -37,16 +37,16 @@ export function pickSpotlightIndex(
     const i = find(/relationship|gap|incumbent|pilot|trial|respect/);
     if (i >= 0) return i;
   }
-  if (/think|get back|later|not sure|co-founder|legal|procurement/.test(t)) {
-    const i = find(/next|follow|check-in|diary|date|step|nda|security/);
+  if (/think|get back|later|not sure|partner|conveyancer|authority/.test(t)) {
+    const i = find(/next|follow|check-in|diary|date|step|authority|summary/);
     if (i >= 0) return i;
   }
   if (/not (looking|buying|interested)|no thanks|brush|not evaluating/.test(t)) {
     const i = find(/pushy|insight|check-in|useful|roadmap/);
     if (i >= 0) return i;
   }
-  if (/deck|trial|free|send me|demo/.test(t)) {
-    const i = find(/quality|must-have|demo|trial|workflow|access/);
+  if (/appraisal|estimate|send me/.test(t)) {
+    const i = find(/quality|property|condition|appraisal|timing/);
     if (i >= 0) return i;
   }
 

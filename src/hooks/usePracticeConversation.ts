@@ -263,7 +263,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
           setStatus("connected");
           pushTurn(
             "system",
-            `Connected · ${sc.title} — speak as the Account Executive.`,
+            `Connected · ${sc.title} — speak as the real estate agent.`,
           );
         },
         onDisconnect: (details) => {

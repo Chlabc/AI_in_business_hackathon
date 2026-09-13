@@ -24,7 +24,8 @@ const difficultyPill: Record<string, string> = {
 };
 
 function label(value: string) {
-  return value.replaceAll("_", " ");
+  const labels: Record<string, string> = { fee: "commission", just_cvs: "appraisal request", other_agency: "another agent", exclusivity: "sales authority", needs: "selling plans" };
+  return labels[value] ?? value.replaceAll("_", " ");
 }
 
 export default async function PracticePage({ searchParams }: Props) {

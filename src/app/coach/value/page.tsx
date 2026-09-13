@@ -211,13 +211,13 @@ function ManagerEvidence({
   return (
     <AppShell>
       <PageHeader
-        eyebrow="Evidence"
+        eyebrow="For principals"
         title="Does this tool actually work?"
         description={
           <>
             Two separate claims, kept separate: whether the coach{" "}
             <strong className="font-medium text-foreground">judges well</strong>
-            , and whether reps{" "}
+            , and whether agents{" "}
             <strong className="font-medium text-foreground">improve</strong>.
             Every figure is measured, not estimated.
           </>

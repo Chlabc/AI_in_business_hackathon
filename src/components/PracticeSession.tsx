@@ -84,8 +84,8 @@ export function PracticeSession({
               “{scenario.openingLine}”
             </p>
             <p className="mt-2 text-xs text-muted">
-              Live session uses playbook list ${standardFeePct}/seat (floor $
-              {feeFloorPct}) — edit under Playbook (Manager).
+              Live session uses agency commission {standardFeePct}% (floor{" "}
+              {feeFloorPct}%) — edit under Playbook (Manager).
             </p>
           </div>
 

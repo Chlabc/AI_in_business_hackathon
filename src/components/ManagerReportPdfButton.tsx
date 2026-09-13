@@ -123,7 +123,7 @@ export function ManagerReportPdfButton({
       setRgb(doc, COLOR.muted);
       doc.setFontSize(9);
       const honesty = doc.splitTextToSize(
-        "Practice summaries appear only when the AE opts in to share — transcripts are never included.",
+        "Practice summaries appear only when the agent opts in to share — transcripts are never included.",
         CONTENT_WIDTH,
       );
       doc.text(honesty, PAGE_MARGIN, y);
@@ -160,7 +160,7 @@ export function ManagerReportPdfButton({
       y += 2;
       doc.setFontSize(8);
       setRgb(doc, COLOR.muted);
-      doc.text(`Team average conversion: ${teamAverageConversion}%`, PAGE_MARGIN, y);
+      doc.text(`Team listing conversion: ${teamAverageConversion}%`, PAGE_MARGIN, y);
       y += 10;
 
       sectionTitle(`${focusRepName} — practice summary`);
@@ -178,7 +178,7 @@ export function ManagerReportPdfButton({
         doc.setFontSize(9);
         setRgb(doc, COLOR.muted);
         const blocked = doc.splitTextToSize(
-          "AE has not shared progress. Practice stays private until they toggle sharing on their coach page.",
+          "Agent has not shared progress. Practice stays private until they toggle sharing on their coach page.",
           CONTENT_WIDTH - 14,
         );
         doc.text(blocked, PAGE_MARGIN + 7, y + 17);

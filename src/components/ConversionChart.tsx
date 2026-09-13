@@ -41,7 +41,7 @@ export function ConversionChart({
               borderRadius: 8,
               color: "var(--foreground)",
             }}
-            formatter={(value) => [`${value}%`, "Conversion"]}
+            formatter={(value) => [`${value}%`, "Listing conversion"]}
           />
           <Line
             type="monotone"

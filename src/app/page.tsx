@@ -36,15 +36,15 @@ const WHAT_YOU_GET = [
 
 const AUDIENCES = [
   {
-    title: "For reps",
+    title: "For agents",
     body: "Practise the objection in a realistic voice call and walk away with a score you can act on.",
   },
   {
-    title: "For managers",
+    title: "For principals",
     body: "See progress summaries, not raw call recordings, so the system reads as coaching rather than surveillance.",
   },
   {
-    title: "For the firm",
+    title: "For the agency",
     body: "Update talk tracks, price floors and red lines in one place, and the AI client and the scorer both follow them.",
   },
 ];
@@ -140,14 +140,14 @@ export default function Home() {
           <CoverWaves />
           <div className="cover-inner">
             <p className="hero-kicker">
-              AI sales coaching for reps and managers
+              AI real estate coaching for agents and principals
             </p>
             <div className="cover-rule mt-5" />
             <h1 className="display-serif mt-6 text-4xl leading-[1.04] text-white sm:text-5xl lg:text-[3.75rem]">
               Practise the call you keep losing.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
-              Cornerman finds the moment you lose deals, puts you in a live
+              Cornerman finds the moment you lose listings, puts you in a live
               spoken roleplay against a client who pushes back, and scores you
               against your own firm&apos;s playbook.
             </p>
@@ -179,7 +179,7 @@ export default function Home() {
             <Reveal>
               <p className="band-eyebrow">The problem</p>
               <h2 className="band-title text-foreground">
-                Reps don&apos;t lose deals because they lack knowledge. They lose
+                Agents don&apos;t lose listings because they lack knowledge. They lose
                 them in the ten seconds after a client says &ldquo;that&apos;s
                 too expensive.&rdquo;
               </h2>
@@ -285,7 +285,7 @@ export default function Home() {
             <Reveal>
               <p className="band-eyebrow">Why this is useful</p>
               <h2 className="band-title text-foreground">
-                Built for the moment reps actually lose confidence.
+                Built for the moment agents lose confidence.
               </h2>
             </Reveal>
             <div className="mt-14 grid gap-x-14 gap-y-10 lg:grid-cols-3">
