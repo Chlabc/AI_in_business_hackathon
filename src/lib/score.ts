@@ -10,6 +10,7 @@ import {
   resolveScoringMode,
   scoreTranscriptWithLlm,
 } from "@/lib/score-llm";
+import { applyAgencyStandards } from "@/lib/scoring-standards";
 import {
   defaultPlaybook,
   getPlaybook,
@@ -413,7 +414,6 @@ export async function scoreTranscript(
   turns: TranscriptTurn[],
   scenarioId = "price-objection",
 ): Promise<PracticeScore> {
-  const { applyAgencyStandards } = await import("@/lib/scoring-standards");
   const playbook = await getPlaybook();
   const base = scoreTranscriptHeuristic(turns, scenarioId, playbook);
 
@@ -421,7 +421,11 @@ export async function scoreTranscript(
     return applyAgencyStandards(base, turns);
   }
 
-  const llm = await scoreTranscriptWithLlm(turns, scenarioId, playbook);
+  // Never let the LLM path block scoring indefinitely.
+  const llm = await Promise.race([
+    scoreTranscriptWithLlm(turns, scenarioId, playbook),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 14_000)),
+  ]);
   if (!llm) return applyAgencyStandards(base, turns);
 
   const guarded = applyFeeGuardrails(llm, turns, playbook, base);

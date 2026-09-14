@@ -122,7 +122,8 @@ Rules:
     system,
     user,
     temperature: 0.2,
-    timeoutMs: 25_000,
+    // Keep short so /api/practice/score cannot hang the browser fetch.
+    timeoutMs: 12_000,
   })) as LlmScorePayload | null;
   if (!parsed || typeof parsed !== "object") return null;
 

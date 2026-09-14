@@ -37,6 +37,9 @@ export function extractJsonObject(content: string): unknown | null {
 /**
  * Call xAI chat completions and parse a JSON object from the reply.
  * Returns null on missing key, HTTP error, timeout, or bad JSON.
+ *
+ * Uses both AbortSignal.timeout and a Promise.race wall clock so a stuck
+ * upstream can never hang the Next.js score route (browser NetworkError).
  */
 export async function xaiChatJson(
   opts: XaiChatJsonOptions,
@@ -45,38 +48,63 @@ export async function xaiChatJson(
   if (!apiKey) return null;
 
   const model = opts.model?.trim() || defaultModel();
-  const timeoutMs = opts.timeoutMs ?? 25_000;
+  const timeoutMs = opts.timeoutMs ?? 12_000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: opts.temperature ?? 0.2,
-        messages: [
-          { role: "system", content: opts.system },
-          { role: "user", content: opts.user },
-        ],
-      }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!res.ok) {
-      console.error("[xai] chat failed", res.status, await res.text().catch(() => ""));
+  const run = async (): Promise<unknown | null> => {
+    try {
+      const res = await fetch("https://api.x.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          temperature: opts.temperature ?? 0.2,
+          messages: [
+            { role: "system", content: opts.system },
+            { role: "user", content: opts.user },
+          ],
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        console.error(
+          "[xai] chat failed",
+          res.status,
+          await res.text().catch(() => ""),
+        );
+        return null;
+      }
+      const data = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+      };
+      const content = data.choices?.[0]?.message?.content ?? "";
+      return extractJsonObject(content);
+    } catch (err) {
+      const name = err instanceof Error ? err.name : "";
+      if (name !== "AbortError" && name !== "TimeoutError") {
+        console.error("[xai] chat error", err);
+      } else {
+        console.warn("[xai] chat timed out after", timeoutMs, "ms");
+      }
       return null;
+    } finally {
+      clearTimeout(timer);
     }
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const content = data.choices?.[0]?.message?.content ?? "";
-    return extractJsonObject(content);
-  } catch (err) {
-    console.error("[xai] chat error", err);
-    return null;
-  }
+  };
+
+  return Promise.race([
+    run(),
+    new Promise<null>((resolve) => {
+      setTimeout(() => {
+        controller.abort();
+        resolve(null);
+      }, timeoutMs + 500);
+    }),
+  ]);
 }
 
 export function xaiConfigured(): boolean {

@@ -203,7 +203,9 @@ export function usePracticeConversation(scenario: PracticeScenario) {
       // Keep UI in sync with whatever we scored
       turnsRef.current = merged;
       setTurns(merged);
-      setNotice(null);
+      setNotice("Scoring your drill…");
+      const controller = new AbortController();
+      const abortTimer = setTimeout(() => controller.abort(), 20_000);
       try {
         const res = await fetch("/api/practice/score", {
           method: "POST",
@@ -216,6 +218,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
             // the drill rather than whatever it was set to when the page loaded.
             cueMode: readCueMode(),
           }),
+          signal: controller.signal,
         });
         const data = (await res.json()) as {
           score?: PracticeScore;
@@ -229,9 +232,19 @@ export function usePracticeConversation(scenario: PracticeScenario) {
         setScore(data.score);
         setAttemptId(data.attempt?.id ?? null);
         setAttemptPersisted(data.persisted !== false && Boolean(data.attempt?.id));
+        setNotice(null);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Scoring failed");
+        const name = e instanceof Error ? e.name : "";
+        const raw = e instanceof Error ? e.message : "Scoring failed";
+        const timedOut = name === "AbortError" || /abort|networkerror|failed to fetch/i.test(raw);
+        setError(
+          timedOut
+            ? "Scoring took too long or the connection dropped. Try End & score again — if it keeps failing, the rule-based scorer should still respond."
+            : raw,
+        );
+        setNotice(null);
       } finally {
+        clearTimeout(abortTimer);
         setScoring(false);
       }
     },

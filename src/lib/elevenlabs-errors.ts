@@ -32,6 +32,9 @@ const BENIGN_SUBSTRINGS = [
   "ice connection",
   "negotiationneeded",
   "pc connection state",
+  // Firefox often surfaces WebRTC teardown as a fetch NetworkError overlay.
+  "networkerror when attempting to fetch",
+  "networkerror when attempting to fetch resource",
 ] as const;
 
 export function isBenignElevenLabsError(...parts: unknown[]): boolean {

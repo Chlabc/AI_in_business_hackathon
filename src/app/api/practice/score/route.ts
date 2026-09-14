@@ -73,8 +73,16 @@ export async function POST(request: Request) {
       };
     }
 
-    // Durable manager log (transcript + score), best-effort alongside file store.
-    const cloud = await tryUpsertPracticeSession(attempt);
+    // Durable manager log — never let a stuck Supabase call hang the browser.
+    const cloud = await Promise.race([
+      tryUpsertPracticeSession(attempt),
+      new Promise<{ ok: false; error: string }>((resolve) =>
+        setTimeout(
+          () => resolve({ ok: false, error: "supabase upsert timed out" }),
+          4_000,
+        ),
+      ),
+    ]);
 
     return NextResponse.json({
       attempt,
