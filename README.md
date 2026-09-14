@@ -2,7 +2,7 @@
 
 **The AI sales coach that drills your real weak spot.**
 
-> Cornerman diagnoses an Australian residential real-estate agent’s losing pattern from seeded call outcomes, runs a live ElevenLabs objection roleplay, scores against the firm’s playbook, and shows progress — rep-owned, not surveillance.
+> Cornerman diagnoses an Australian residential real-estate agent’s losing pattern from seeded call outcomes, runs a live ElevenLabs objection roleplay, scores it against the agency’s own playbook, and lets the principal correct the coach when they disagree — with the correction carrying a reason and applying to future drills.
 
 Forward: AI in Business Hackathon · Track 1 + Built With ElevenLabs
 
@@ -47,17 +47,31 @@ Locally, features that call external APIs need keys in `.env.local` (see below).
 **Manager:** Team · Playbook · Evidence  
 
 - Demo login (work email + **any password**)
-- Live drills with cue modes (Off / Soft / Full / Unaided) and cueMode logged on attempts
+- Live drills with cue modes **Guided → Hints → Unaided**, recorded on the attempt so a
+  score can be read as earned with or without help
+- Reflection (“what went wrong” / “next time I will”) kept with the attempt and in the
+  take-away PDF — not on the manager report
 - Playbook: download sample PDF, parse (AI or rules), clear knowledge base, publish to live
 - Manager “Leave a note” → employee inbox (Supabase)
-- Refusal rubric for “Not interested” scenarios
+- Refusal rubric for “Not interested” scenarios — respecting a clear no is the
+  heaviest criterion, so booking the appointment is not the only way to win
+- **Calibrate the coach:** a principal who disagrees with a score picks the criterion,
+  sets the score they believe is right, **writes a reason**, and chooses whether it
+  applies to that conversation only or becomes an **agency standard**. Standards are
+  read back into later scoring and shown to the agent with the name of whoever set them.
 
 ## Stack
 
-- Next.js 16 + React 19 + TypeScript (App Router)
-- ElevenLabs Conversational AI (voice)
-- Supabase Postgres (comments / inbox; optional practice logs)
-- xAI Grok (`XAI_API_KEY`) for playbook Parse with AI + **live AI rubric scoring** (heuristic fallback)
+- Next.js 16 (App Router) + Turbopack, React 19, TypeScript
+- Tailwind CSS v4 with a CSS custom-property design system
+- ElevenLabs Conversational AI (voice) — per-session `first_message` / prompt overrides
+  let one agent play four different sellers
+- xAI Grok (`XAI_API_KEY`, `grok-4.5`) for playbook Parse with AI + **live AI rubric
+  scoring**, with the deterministic heuristic as fallback
+- Supabase Postgres (practice sessions, calibration standards, comments / inbox, share settings)
+- `jose` — signed-JWT session cookie, role enforced in middleware
+- `jspdf` — the agent's take-away report · `unpdf` — reading an agency's existing playbook
+- `recharts` — progress charts
 - Deploy: Vercel
 
 ## Phases
@@ -74,7 +88,26 @@ Locally, features that call external APIs need keys in `.env.local` (see below).
 npm run eval
 ```
 
-Writes `EVAL.md` (diagnosis accuracy, scoring–human agreement, persona/guardrails).
+Writes `EVAL.md` and `src/data/eval-snapshot.json`, which the app reads and serves at
+**Manager → Evidence** (`/coach/health`). Current results:
+
+| Check | Result |
+|---|---|
+| Diagnosis accuracy | **5/5** |
+| Scoring agreement with a human grader (±20 band) | **8/8** |
+| Persona / guardrails | **4/4** |
+
+Guardrails include a **prompt injection hidden inside a transcript** that tries to force
+a perfect score.
+
+Two deliberate choices about what the harness measures:
+
+- It calls `scoreTranscriptHeuristic` — the **deterministic** scorer — so results are
+  reproducible without an `XAI_API_KEY` and free to run. Live drills use the AI-forward
+  path (`llm+heuristic`) on top of the same rubric.
+- It calls the **uncorrected** scorer. Principal calibration is applied when a live drill
+  is scored, not in the harness, so the 8/8 figure can't shift because someone calibrated
+  the system. The harness measures the scorer we ship; calibration sits on top of it.
 
 ## Local setup (any OS)
 
@@ -117,7 +150,7 @@ Copy from `.env.example`. **Never commit secrets.**
 | `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` | Manager notes / inbox |
 | `NEXT_PUBLIC_APP_URL` | Absolute URLs (use `http://localhost:3000` locally) |
 
-Optional: `PLAYBOOK_LLM_PROVIDER`, `PLAYBOOK_LLM_MODEL`, `SCORING_LLM_MODEL` (default xAI `grok-4.5`). Live drills use SpaceXAI against the playbook when the key is set; `npm run eval` always uses the heuristic scorer.
+Optional: `PLAYBOOK_LLM_PROVIDER`, `PLAYBOOK_LLM_MODEL`, `SCORING_LLM_MODEL` (default xAI `grok-4.5`). Live drills use xAI against the playbook when the key is set; `npm run eval` always uses the heuristic scorer.
 
 For Supabase SQL helpers (if using practice session logs): run `supabase/practice_sessions.sql` in the Supabase SQL editor.
 
@@ -134,6 +167,17 @@ Set the same keys under **Project → Settings → Environment Variables** (Prod
 - Login is **demo allowlist**, not production SSO.
 - The diagnose → drill → score loop is real; CRM integration is the obvious next step.
 - Playbook sample PDF is under **Playbook → Download sample PDF** for testing parse yourself.
+- **Sharing is partial, and we'd rather say so.** An agent chooses whether to share
+  progress with their principal (`shareProgressWithManager`, default off), and the team
+  table respects it — an unshared agent shows as “has not shared progress” instead of
+  their numbers. That consent gate does **not** yet cover the practice logs below it, so
+  a principal can still open a transcript. Extending the gate to transcripts is the next
+  thing on the list; until it ships, “practice transcripts stay private” is a design
+  intention, not a guarantee the code makes.
+- Reflection is **optional and shown after the score**, not a gate in front of it.
+- No invented testimonials, user counts, or technologies we don't actually use. Five
+  clearly fictional quotes were removed rather than relabelled, because they sat under a
+  “Sessions (5)” heading that could read as five completed user tests.
 
 ## License / hackathon
 
