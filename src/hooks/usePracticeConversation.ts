@@ -205,7 +205,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
       setTurns(merged);
       setNotice("Scoring your drill…");
       const controller = new AbortController();
-      const abortTimer = setTimeout(() => controller.abort(), 20_000);
+      const abortTimer = setTimeout(() => controller.abort(), 35_000);
       try {
         const res = await fetch("/api/practice/score", {
           method: "POST",

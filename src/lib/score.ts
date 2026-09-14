@@ -421,10 +421,10 @@ export async function scoreTranscript(
     return applyAgencyStandards(base, turns);
   }
 
-  // Never let the LLM path block scoring indefinitely.
+  // Never let the LLM path block scoring indefinitely (client aborts ~35s).
   const llm = await Promise.race([
     scoreTranscriptWithLlm(turns, scenarioId, playbook),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), 14_000)),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 30_000)),
   ]);
   if (!llm) return applyAgencyStandards(base, turns);
 

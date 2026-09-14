@@ -73,57 +73,43 @@ export async function scoreTranscriptWithLlm(
   const rubric = rubricForScenario(scenario.id);
   const rubricIds = new Set(rubric.map((c) => c.id));
 
-  const system = `You are the scoring engine for Cornerman, an Australian residential real-estate sales coach.
-Score the AGENT (role "user" in the transcript) against the firm's playbook and the given rubric.
-Return ONLY JSON with this shape:
-{"overall":0-100,"heldFee":true|false,"feeOfferedPct":number|null,"criteria":[{"id":string,"score":0|0.5|1,"notes":string}],"feedback":string[],"suggestedResponse":string}
-Rules:
-- Include exactly one criteria entry for every rubric id provided.
-- score must be 0, 0.5, or 1 (half marks allowed).
-- notes: short behavioural evidence from the transcript (≤160 chars).
-- heldFee: true only if the agent held near the list commission without dropping below the soft hold band.
-- feeOfferedPct: lowest commission % the agent explicitly offered, or null if none.
-- Never invent firm policy or a commission below the floor (${playbook.feeFloorPct}%).
-- feedback: 2 to 5 behavioural bullets grounded in the approved play.
-- suggestedResponse: one stronger line the agent could say next time, consistent with the playbook.
-- Do not score the AI seller (role "agent"); only the human agent.`;
+  const system = `Score the human AGENT only (transcript role "user") for Cornerman real-estate coaching.
+Return ONLY JSON:
+{"overall":0-100,"heldFee":true|false,"feeOfferedPct":number|null,"criteria":[{"id":string,"score":0|0.5|1,"notes":string}],"feedback":string[2-4],"suggestedResponse":string}
+Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy or a fee below floor ${playbook.feeFloorPct}%; suggestedResponse = one better next line from the playbook.`;
 
   const user = JSON.stringify({
-    scenario: {
-      id: scenario.id,
-      title: scenario.title,
-      objectionType: scenario.objectionType,
-    },
+    scenarioId: scenario.id,
+    objectionType: scenario.objectionType,
     firm: {
-      name: playbook.firmName,
-      listCommissionPct: playbook.standardPermFeePct,
-      floorCommissionPct: playbook.feeFloorPct,
-      competitorQuotePct: playbook.competitorQuotePct,
-      valueAnchors: playbook.valueAnchors,
+      listPct: playbook.standardPermFeePct,
+      floorPct: playbook.feeFloorPct,
+      anchors: playbook.valueAnchors.slice(0, 4),
     },
-    talkTrack: {
-      id: talkTrack.id,
-      title: talkTrack.title,
+    play: {
       approvedPlay: talkTrack.approvedPlay,
-      anchorPoints: talkTrack.anchorPoints,
-      neverDo: talkTrack.neverDo,
-      exampleLine: talkTrack.exampleLine,
+      anchorPoints: talkTrack.anchorPoints.slice(0, 4),
+      neverDo: talkTrack.neverDo.slice(0, 4),
     },
     rubric: rubric.map((c) => ({
       id: c.id,
       label: c.label,
       weight: c.weight,
-      description: c.description,
     })),
-    transcript: turns.filter((t) => t.role !== "system"),
+    transcript: turns
+      .filter((t) => t.role !== "system")
+      .map((t) => ({
+        role: t.role,
+        text: t.text.length > 500 ? `${t.text.slice(0, 500)}…` : t.text,
+      })),
   });
 
   const parsed = (await xaiChatJson({
     system,
     user,
-    temperature: 0.2,
-    // Keep short so /api/practice/score cannot hang the browser fetch.
-    timeoutMs: 12_000,
+    temperature: 0.1,
+    // Full rubric needs headroom; client aborts at 35s as a backstop.
+    timeoutMs: 28_000,
   })) as LlmScorePayload | null;
   if (!parsed || typeof parsed !== "object") return null;
 
