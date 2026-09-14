@@ -4,6 +4,7 @@ import { useState } from "react";
 import { DownloadPdfButton } from "@/components/DownloadPdfButton";
 import { seatPrice } from "@/lib/money";
 import type { PracticeScore } from "@/lib/rubric";
+import type { ScoringMeta } from "@/lib/scoring-meta";
 
 export type ReflectionDraft = {
   whatWentWrong: string;
@@ -12,12 +13,35 @@ export type ReflectionDraft = {
 
 type FeedbackCardProps = {
   score: PracticeScore;
+  scoringMeta?: ScoringMeta | null;
   whatYouSaid?: string[];
   repName?: string;
   cueMode?: string | null;
   attemptId?: string | null;
   attemptPersisted?: boolean;
 };
+
+function formatFallbackReason(meta: ScoringMeta): string | null {
+  if (meta.llmUsed || meta.fallbackReason === "ok") return null;
+  switch (meta.fallbackReason) {
+    case "xai_key_missing":
+      return "AI scoring skipped: XAI_API_KEY not visible to this server (check Vercel env + redeploy).";
+    case "mode_heuristic":
+      return "AI scoring skipped: CORNERMAN_SCORING=heuristic.";
+    case "llm_timeout_or_null":
+      return "AI scoring timed out; used rule-based fallback.";
+    case "llm_invalid_json":
+      return "AI reply was not valid JSON; used rule-based fallback.";
+    case "llm_incomplete_rubric":
+      return "AI reply missed rubric criteria; used rule-based fallback.";
+    case "llm_http_error":
+      return "AI HTTP error; used rule-based fallback.";
+    default:
+      return meta.xaiKeyPresent
+        ? null
+        : "AI scoring skipped: XAI_API_KEY not visible to this server.";
+  }
+}
 
 /** Green / amber / red so a weak criterion is obvious without reading the number. */
 function tierBarClass(fraction: number) {
@@ -28,6 +52,7 @@ function tierBarClass(fraction: number) {
 
 export function FeedbackCard({
   score,
+  scoringMeta = null,
   whatYouSaid = [],
   repName = "Alex Chen",
   cueMode = null,
@@ -94,6 +119,7 @@ export function FeedbackCard({
     "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent";
 
   const agency = score.agencyStandardsApplied ?? [];
+  const fallbackNote = scoringMeta ? formatFallbackReason(scoringMeta) : null;
 
   return (
     <section className="surface-card overflow-hidden rounded-xl">
@@ -109,6 +135,12 @@ export function FeedbackCard({
             <span className="rounded border border-border bg-card px-2 py-1 text-muted">
               {score.method}
             </span>
+            {scoringMeta ? (
+              <span className="rounded border border-border bg-card px-2 py-1 text-muted">
+                key {scoringMeta.xaiKeyPresent ? "on" : "off"}
+                {scoringMeta.vercelEnv ? ` · ${scoringMeta.vercelEnv}` : ""}
+              </span>
+            ) : null}
             <span
               className={`rounded border px-2 py-1 font-medium ${
                 score.heldFee
@@ -123,6 +155,9 @@ export function FeedbackCard({
             </span>
           </div>
         </div>
+        {fallbackNote ? (
+          <p className="mt-3 text-xs text-warn">{fallbackNote}</p>
+        ) : null}
       </div>
 
       {agency.length > 0 ? (

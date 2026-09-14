@@ -13,12 +13,30 @@ export type XaiChatJsonOptions = {
   model?: string;
 };
 
-function defaultModel(): string {
+/**
+ * Read server secrets via bracket access so the bundler cannot replace them
+ * with `undefined` at build time when the key was missing during `next build`.
+ */
+export function readXaiApiKey(): string | undefined {
+  const env = process.env;
+  const raw =
+    env["XAI_API_KEY"]?.trim() ||
+    env["xai_api_key"]?.trim() ||
+    undefined;
+  return raw || undefined;
+}
+
+export function readScoringModel(): string {
+  const env = process.env;
   return (
-    process.env.SCORING_LLM_MODEL?.trim() ||
-    process.env.PLAYBOOK_LLM_MODEL?.trim() ||
+    env["SCORING_LLM_MODEL"]?.trim() ||
+    env["PLAYBOOK_LLM_MODEL"]?.trim() ||
     "grok-4.5"
   );
+}
+
+function defaultModel(): string {
+  return readScoringModel();
 }
 
 /** Extract the first JSON object from a model reply (allows markdown fences). */
@@ -44,7 +62,7 @@ export function extractJsonObject(content: string): unknown | null {
 export async function xaiChatJson(
   opts: XaiChatJsonOptions,
 ): Promise<unknown | null> {
-  const apiKey = process.env.XAI_API_KEY?.trim();
+  const apiKey = readXaiApiKey();
   if (!apiKey) return null;
 
   const model = opts.model?.trim() || defaultModel();
@@ -108,5 +126,5 @@ export async function xaiChatJson(
 }
 
 export function xaiConfigured(): boolean {
-  return Boolean(process.env.XAI_API_KEY?.trim());
+  return Boolean(readXaiApiKey());
 }

@@ -11,6 +11,7 @@ import {
 } from "@/lib/elevenlabs-errors";
 import type { PracticeScore } from "@/lib/rubric";
 import type { FirmPlaybook } from "@/lib/playbook";
+import type { ScoringMeta } from "@/lib/scoring-meta";
 import {
   buildSessionOverrides,
   formatDisconnectDetails,
@@ -84,6 +85,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
   const [scoring, setScoring] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [score, setScore] = useState<PracticeScore | null>(null);
+  const [scoringMeta, setScoringMeta] = useState<ScoringMeta | null>(null);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [attemptPersisted, setAttemptPersisted] = useState(false);
   const [lastDisconnect, setLastDisconnect] = useState<string | null>(null);
@@ -117,6 +119,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
     setNotice(null);
     setLastDisconnect(null);
     setScore(null);
+    setScoringMeta(null);
     setAttemptId(null);
     setAttemptPersisted(false);
     setTurns([]);
@@ -192,6 +195,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
       if (!snapshot.some((t) => t.role === "user")) {
         setScoring(false);
         setScore(null);
+        setScoringMeta(null);
         setAttemptId(null);
         setAttemptPersisted(false);
         setNotice(
@@ -224,12 +228,14 @@ export function usePracticeConversation(scenario: PracticeScenario) {
           score?: PracticeScore;
           attempt?: { id?: string };
           persisted?: boolean;
+          scoringMeta?: ScoringMeta;
           error?: string;
         };
         if (!res.ok || !data.score) {
           throw new Error(data.error ?? "Scoring failed");
         }
         setScore(data.score);
+        setScoringMeta(data.scoringMeta ?? null);
         setAttemptId(data.attempt?.id ?? null);
         setAttemptPersisted(data.persisted !== false && Boolean(data.attempt?.id));
         setNotice(null);
@@ -423,6 +429,7 @@ export function usePracticeConversation(scenario: PracticeScenario) {
     isSpeaking,
     scoring,
     score,
+    scoringMeta,
     attemptId,
     attemptPersisted,
     lastDisconnect,

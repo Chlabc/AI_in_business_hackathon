@@ -10,7 +10,14 @@ import {
   resolveScoringMode,
   scoreTranscriptWithLlm,
 } from "@/lib/score-llm";
+import type { ScoringMeta } from "@/lib/scoring-meta";
 import { applyAgencyStandards } from "@/lib/scoring-standards";
+import { readScoringModel, xaiConfigured } from "@/lib/xai";
+
+export type ScoreTranscriptResult = {
+  score: PracticeScore;
+  meta: ScoringMeta;
+};
 import {
   defaultPlaybook,
   getPlaybook,
@@ -413,29 +420,66 @@ function applyFeeGuardrails(
 export async function scoreTranscript(
   turns: TranscriptTurn[],
   scenarioId = "price-objection",
-): Promise<PracticeScore> {
+): Promise<ScoreTranscriptResult> {
   const playbook = await getPlaybook();
   const base = scoreTranscriptHeuristic(turns, scenarioId, playbook);
+  const mode = resolveScoringMode();
+  const keyPresent = xaiConfigured();
+  const baseMeta = {
+    mode,
+    xaiKeyPresent: keyPresent,
+    model: readScoringModel(),
+    vercelEnv: process.env["VERCEL_ENV"] ?? null,
+  } as const;
 
-  if (resolveScoringMode() === "heuristic") {
-    return applyAgencyStandards(base, turns);
+  if (mode === "heuristic") {
+    return {
+      score: await applyAgencyStandards(base, turns),
+      meta: { ...baseMeta, llmUsed: false, fallbackReason: "mode_heuristic" },
+    };
+  }
+
+  if (!keyPresent) {
+    return {
+      score: await applyAgencyStandards(base, turns),
+      meta: { ...baseMeta, llmUsed: false, fallbackReason: "xai_key_missing" },
+    };
   }
 
   // Never let the LLM path block scoring indefinitely (client aborts ~35s).
-  const llm = await Promise.race([
+  const attempt = await Promise.race([
     scoreTranscriptWithLlm(turns, scenarioId, playbook),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), 30_000)),
+    new Promise<{ score: null; reason: "llm_timeout_or_null" }>((resolve) =>
+      setTimeout(
+        () => resolve({ score: null, reason: "llm_timeout_or_null" }),
+        30_000,
+      ),
+    ),
   ]);
-  if (!llm) return applyAgencyStandards(base, turns);
 
+  if (!attempt.score) {
+    return {
+      score: await applyAgencyStandards(base, turns),
+      meta: {
+        ...baseMeta,
+        llmUsed: false,
+        fallbackReason: attempt.reason,
+      },
+    };
+  }
+
+  const llm = attempt.score;
   const guarded = applyFeeGuardrails(llm, turns, playbook, base);
   const recomputed = overallFromCriteria(guarded.criteria);
   // Keep model overall only when still close after guardrail edits.
   const finalOverall =
     Math.abs(llm.overall - recomputed) <= 15 ? llm.overall : recomputed;
 
-  return applyAgencyStandards(
-    { ...guarded, overall: finalOverall },
-    turns,
-  );
+  return {
+    score: await applyAgencyStandards(
+      { ...guarded, overall: finalOverall },
+      turns,
+    ),
+    meta: { ...baseMeta, llmUsed: true, fallbackReason: "ok" },
+  };
 }

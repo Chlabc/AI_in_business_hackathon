@@ -42,10 +42,14 @@ export async function POST(request: Request) {
     }
 
     const repId = repIdForViewer(user);
-    const score = await scoreTranscript(
+    const { score, meta } = await scoreTranscript(
       turns,
       body.scenarioId ?? "price-objection",
     );
+    console.info("[practice/score]", {
+      method: score.method,
+      ...meta,
+    });
 
     let attempt: PracticeAttempt;
     let persisted = true;
@@ -92,6 +96,7 @@ export async function POST(request: Request) {
       score,
       persisted,
       sessionLogged: cloud.ok,
+      scoringMeta: meta,
     });
   } catch (e) {
     return jsonAuthError(e) ?? NextResponse.json({ error: "Error" }, { status: 500 });

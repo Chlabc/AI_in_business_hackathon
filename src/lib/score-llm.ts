@@ -11,7 +11,13 @@ import {
   type FirmPlaybook,
 } from "@/lib/playbook";
 import type { TranscriptTurn } from "@/lib/score";
+import type { ScoringMeta } from "@/lib/scoring-meta";
 import { xaiChatJson, xaiConfigured } from "@/lib/xai";
+
+export type LlmScoreAttempt = {
+  score: PracticeScore | null;
+  reason: NonNullable<ScoringMeta["fallbackReason"]>;
+};
 
 export type ScoringMode = "auto" | "llm" | "heuristic";
 
@@ -55,18 +61,20 @@ function asFeedback(v: unknown): string[] {
 
 /**
  * Ask SpaceXAI for a full rubric score.
- * Returns null if disabled, unconfigured, or the reply cannot be validated.
- * Caller applies fee/floor hybrid guardrails and agency standards.
+ * Returns score + reason so the UI can show why a run fell back to heuristic.
  */
 export async function scoreTranscriptWithLlm(
   turns: TranscriptTurn[],
   scenarioId: string,
   playbook: FirmPlaybook,
-): Promise<PracticeScore | null> {
+): Promise<LlmScoreAttempt> {
   const mode = resolveScoringMode();
-  if (mode === "heuristic") return null;
-  if (mode === "auto" && !xaiConfigured()) return null;
-  if (mode === "llm" && !xaiConfigured()) return null;
+  if (mode === "heuristic") {
+    return { score: null, reason: "mode_heuristic" };
+  }
+  if (!xaiConfigured()) {
+    return { score: null, reason: "xai_key_missing" };
+  }
 
   const scenario = getScenario(scenarioId);
   const talkTrack = getPlaybookTalkTrack(playbook, scenario.objectionType);
@@ -111,7 +119,9 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
     // Full rubric needs headroom; client aborts at 35s as a backstop.
     timeoutMs: 28_000,
   })) as LlmScorePayload | null;
-  if (!parsed || typeof parsed !== "object") return null;
+  if (!parsed || typeof parsed !== "object") {
+    return { score: null, reason: "llm_invalid_json" };
+  }
 
   const byId = new Map<string, LlmCriterion>();
   for (const row of Array.isArray(parsed.criteria) ? parsed.criteria : []) {
@@ -120,7 +130,9 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
     }
   }
   // Require a complete rubric — otherwise fall back to heuristic.
-  if (byId.size !== rubric.length) return null;
+  if (byId.size !== rubric.length) {
+    return { score: null, reason: "llm_incomplete_rubric" };
+  }
 
   const criteria: CriterionScore[] = rubric.map((c) => {
     const row = byId.get(c.id)!;
@@ -163,19 +175,24 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
       : talkTrack.exampleLine || talkTrack.approvedPlay;
 
   return {
-    overall,
-    heldFee:
-      typeof parsed.heldFee === "boolean" ? parsed.heldFee : feeOfferedPct === null,
-    feeOfferedPct,
-    criteria,
-    feedback:
-      feedback.length > 0
-        ? feedback
-        : [`Approved play: ${talkTrack.approvedPlay}`],
-    approvedPlayReminder: talkTrack.approvedPlay,
-    suggestedResponse: suggested,
-    method: "llm",
-    talkTrackId: talkTrack.id,
-    scenarioId: scenario.id,
+    score: {
+      overall,
+      heldFee:
+        typeof parsed.heldFee === "boolean"
+          ? parsed.heldFee
+          : feeOfferedPct === null,
+      feeOfferedPct,
+      criteria,
+      feedback:
+        feedback.length > 0
+          ? feedback
+          : [`Approved play: ${talkTrack.approvedPlay}`],
+      approvedPlayReminder: talkTrack.approvedPlay,
+      suggestedResponse: suggested,
+      method: "llm",
+      talkTrackId: talkTrack.id,
+      scenarioId: scenario.id,
+    },
+    reason: "ok",
   };
 }

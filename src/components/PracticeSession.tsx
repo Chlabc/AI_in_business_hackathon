@@ -43,6 +43,7 @@ export function PracticeSession({
     isSpeaking,
     scoring,
     score,
+    scoringMeta,
     attemptId,
     attemptPersisted,
     lastDisconnect,
@@ -211,6 +212,7 @@ export function PracticeSession({
           <FeedbackCard
             key={attemptId ?? `score-${score.overall}-${score.scenarioId}`}
             score={score}
+            scoringMeta={scoringMeta}
             whatYouSaid={userLines}
             attemptId={attemptId}
             attemptPersisted={attemptPersisted}
