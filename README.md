@@ -57,7 +57,7 @@ Locally, features that call external APIs need keys in `.env.local` (see below).
 - Next.js 16 + React 19 + TypeScript (App Router)
 - ElevenLabs Conversational AI (voice)
 - Supabase Postgres (comments / inbox; optional practice logs)
-- xAI Grok (`XAI_API_KEY`) for playbook Parse with AI + scoring refine
+- xAI Grok (`XAI_API_KEY`) for playbook Parse with AI + **live AI rubric scoring** (heuristic fallback)
 - Deploy: Vercel
 
 ## Phases
@@ -112,11 +112,12 @@ Copy from `.env.example`. **Never commit secrets.**
 |----------|------------|
 | `AUTH_SECRET` | Signed session cookie (long random string) |
 | `ELEVENLABS_API_KEY` + `ELEVENLABS_AGENT_ID` | Live voice drills |
-| `XAI_API_KEY` | Playbook “Parse with AI” + optional score refine |
+| `XAI_API_KEY` | Playbook “Parse with AI” + live AI rubric scoring |
+| `CORNERMAN_SCORING` | `auto` (default) / `llm` / `heuristic` |
 | `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` | Manager notes / inbox |
 | `NEXT_PUBLIC_APP_URL` | Absolute URLs (use `http://localhost:3000` locally) |
 
-Optional: `PLAYBOOK_LLM_PROVIDER`, `PLAYBOOK_LLM_MODEL` (defaults to xAI `grok-4.5` when `XAI_API_KEY` is set).
+Optional: `PLAYBOOK_LLM_PROVIDER`, `PLAYBOOK_LLM_MODEL`, `SCORING_LLM_MODEL` (default xAI `grok-4.5`). Live drills use SpaceXAI against the playbook when the key is set; `npm run eval` always uses the heuristic scorer.
 
 For Supabase SQL helpers (if using practice session logs): run `supabase/practice_sessions.sql` in the Supabase SQL editor.
 

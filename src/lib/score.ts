@@ -1,10 +1,15 @@
 import { getScenario } from "@/data/scenarios";
 import {
+  overallFromCriteria,
   rubricForScenario,
   type CriterionScore,
   type PracticeScore,
   type RubricCriterionId,
 } from "@/lib/rubric";
+import {
+  resolveScoringMode,
+  scoreTranscriptWithLlm,
+} from "@/lib/score-llm";
 import {
   defaultPlaybook,
   getPlaybook,
@@ -341,7 +346,67 @@ export function scoreTranscriptHeuristic(
 }
 
 /**
- * Optional SpaceXAI refinement. Falls back to heuristic if no key / failure.
+ * Apply rule-based fee/floor clamps on top of an LLM rubric score.
+ * Keeps offered-% detection deterministic so the model cannot invent policy.
+ */
+function applyFeeGuardrails(
+  llm: PracticeScore,
+  turns: TranscriptTurn[],
+  playbook: FirmPlaybook,
+  heuristicFallback: PracticeScore,
+): PracticeScore {
+  const all = userText(turns);
+  const detected = extractOfferedFees(all);
+  const feeOfferedPct = detected.length
+    ? Math.min(...detected)
+    : llm.feeOfferedPct;
+
+  const holdBar = softHoldBar(playbook);
+  const floor = playbook.feeFloorPct;
+
+  let criteria = llm.criteria.map((c) => ({ ...c }));
+  let heldFee = llm.heldFee;
+
+  if (feeOfferedPct !== null) {
+    heldFee = feeOfferedPct >= holdBar;
+    const heldIdx = criteria.findIndex((c) => c.id === "held_fee");
+    if (heldIdx >= 0) {
+      const row = criteria[heldIdx]!;
+      if (feeOfferedPct < floor) {
+        criteria[heldIdx] = {
+          ...row,
+          score: 0,
+          notes: `Offered ${feeOfferedPct}%, below firm floor (${floor}%).`,
+        };
+        heldFee = false;
+      } else if (feeOfferedPct < holdBar && row.score > 0.35) {
+        criteria[heldIdx] = {
+          ...row,
+          score: 0.5,
+          notes: `Moved to ${feeOfferedPct}% — above floor but soft vs ${playbook.standardPermFeePct}% list.`,
+        };
+      }
+    }
+  } else if (/we can do|drop to|discount to/.test(all)) {
+    heldFee = false;
+  }
+
+  return {
+    ...llm,
+    feeOfferedPct,
+    heldFee,
+    criteria,
+    suggestedResponse:
+      llm.suggestedResponse || heuristicFallback.suggestedResponse,
+    feedback:
+      llm.feedback.length > 0 ? llm.feedback : heuristicFallback.feedback,
+    method: "llm+heuristic",
+  };
+}
+
+/**
+ * AI-forward live scoring via SpaceXAI (full rubric), with heuristic fallback.
+ * Hybrid guardrails keep fee-offer / floor detection rule-based.
  * Agency scoring standards (manager calibration) apply last.
  */
 export async function scoreTranscript(
@@ -351,69 +416,22 @@ export async function scoreTranscript(
   const { applyAgencyStandards } = await import("@/lib/scoring-standards");
   const playbook = await getPlaybook();
   const base = scoreTranscriptHeuristic(turns, scenarioId, playbook);
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) return applyAgencyStandards(base, turns);
 
-  try {
-    const talkTrack = getPlaybookTalkTrack(playbook, "fee");
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "grok-4.5",
-        temperature: 0.2,
-        messages: [
-          {
-            role: "system",
-            content: `You score a real estate commission-objection roleplay. Return ONLY JSON:
-{"overall":0-100,"feedback":["bullet1","bullet2","bullet3"],"heldFee":true|false}
-Rules: feedback must be behavioural and grounded in the approved talk-track. Never invent commission rates below ${playbook.feeFloorPct}%. Never invent policies.`,
-          },
-          {
-            role: "user",
-            content: JSON.stringify({
-              approvedPlay: talkTrack.approvedPlay,
-              firm: {
-                standardCommissionPct: playbook.standardPermFeePct,
-                floorCommissionPct: playbook.feeFloorPct,
-              },
-              heuristic: base,
-              transcript: turns.filter((t) => t.role !== "system"),
-            }),
-          },
-        ],
-      }),
-    });
-    if (!res.ok) return applyAgencyStandards(base, turns);
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const content = data.choices?.[0]?.message?.content ?? "";
-    const match = content.match(/\{[\s\S]*\}/);
-    if (!match) return applyAgencyStandards(base, turns);
-    const parsed = JSON.parse(match[0]) as {
-      overall?: number;
-      feedback?: string[];
-      heldFee?: boolean;
-    };
-    const merged: PracticeScore = {
-      ...base,
-      overall:
-        typeof parsed.overall === "number"
-          ? Math.max(0, Math.min(100, Math.round(parsed.overall)))
-          : base.overall,
-      heldFee:
-        typeof parsed.heldFee === "boolean" ? parsed.heldFee : base.heldFee,
-      feedback: Array.isArray(parsed.feedback)
-        ? parsed.feedback.slice(0, 5)
-        : base.feedback,
-      method: "llm+heuristic",
-    };
-    return applyAgencyStandards(merged, turns);
-  } catch {
+  if (resolveScoringMode() === "heuristic") {
     return applyAgencyStandards(base, turns);
   }
+
+  const llm = await scoreTranscriptWithLlm(turns, scenarioId, playbook);
+  if (!llm) return applyAgencyStandards(base, turns);
+
+  const guarded = applyFeeGuardrails(llm, turns, playbook, base);
+  const recomputed = overallFromCriteria(guarded.criteria);
+  // Keep model overall only when still close after guardrail edits.
+  const finalOverall =
+    Math.abs(llm.overall - recomputed) <= 15 ? llm.overall : recomputed;
+
+  return applyAgencyStandards(
+    { ...guarded, overall: finalOverall },
+    turns,
+  );
 }

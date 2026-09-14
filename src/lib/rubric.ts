@@ -138,7 +138,7 @@ export type PracticeScore = {
   approvedPlayReminder: string;
   /** Huey-style model answer the rep can rehearse next */
   suggestedResponse: string;
-  method: "heuristic" | "llm+heuristic";
+  method: "heuristic" | "llm" | "llm+heuristic";
   talkTrackId: string;
   scenarioId: string;
   /** Present when agency scoring standards adjusted one or more criteria. */
