@@ -449,7 +449,12 @@ export async function scoreTranscript(
   // Never let the LLM path block scoring indefinitely (client aborts ~35s).
   const attempt = await Promise.race([
     scoreTranscriptWithLlm(turns, scenarioId, playbook),
-    new Promise<{ score: null; reason: "llm_timeout_or_null" }>((resolve) =>
+    new Promise<{
+      score: null;
+      reason: "llm_timeout_or_null";
+      model?: string;
+      detail?: string;
+    }>((resolve) =>
       setTimeout(
         () => resolve({ score: null, reason: "llm_timeout_or_null" }),
         30_000,
