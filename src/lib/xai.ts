@@ -52,6 +52,19 @@ export function readScoringModel(): string {
   );
 }
 
+/** Try these in order when the preferred scoring model returns HTTP errors. */
+export function scoringModelFallbackChain(): string[] {
+  const preferred = readScoringModel();
+  const chain = [
+    preferred,
+    "grok-4-1-fast-non-reasoning",
+    "grok-4-fast-non-reasoning",
+    "grok-4.5",
+    "grok-4.3",
+  ];
+  return [...new Set(chain.filter(Boolean))];
+}
+
 function defaultModel(): string {
   return readScoringModel();
 }

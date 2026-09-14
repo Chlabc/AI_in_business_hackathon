@@ -18,4 +18,6 @@ export type ScoringMeta = {
     | "ok";
   model?: string;
   vercelEnv?: string | null;
+  /** Safe detail e.g. "HTTP 404" — never includes secrets. */
+  detail?: string;
 };

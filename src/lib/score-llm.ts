@@ -12,11 +12,17 @@ import {
 } from "@/lib/playbook";
 import type { TranscriptTurn } from "@/lib/score";
 import type { ScoringMeta } from "@/lib/scoring-meta";
-import { xaiChatJsonResult, xaiConfigured } from "@/lib/xai";
+import {
+  scoringModelFallbackChain,
+  xaiChatJsonResult,
+  xaiConfigured,
+} from "@/lib/xai";
 
 export type LlmScoreAttempt = {
   score: PracticeScore | null;
   reason: NonNullable<ScoringMeta["fallbackReason"]>;
+  detail?: string;
+  model?: string;
 };
 
 export type ScoringMode = "auto" | "llm" | "heuristic";
@@ -112,20 +118,38 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
       })),
   });
 
-  const llmResult = await xaiChatJsonResult({
-    system,
-    user,
-    temperature: 0,
-    // Fast non-reasoning model + JSON mode; keep a margin under client abort.
-    timeoutMs: 20_000,
-    jsonMode: true,
-  });
-  if (!llmResult.ok) {
-    return { score: null, reason: llmResult.reason };
+  // Prefer a fast model; if that account can't use it (404/403), try fallbacks.
+  let llmResult: Awaited<ReturnType<typeof xaiChatJsonResult>> | null = null;
+  for (const model of scoringModelFallbackChain()) {
+    llmResult = await xaiChatJsonResult({
+      system,
+      user,
+      temperature: 0,
+      timeoutMs: 20_000,
+      jsonMode: true,
+      model,
+    });
+    if (llmResult.ok) break;
+    // Only rotate on HTTP/model errors — don't burn retries on timeouts/bad JSON.
+    if (
+      llmResult.reason !== "llm_http_error" &&
+      llmResult.reason !== "xai_key_missing"
+    ) {
+      break;
+    }
+    console.warn("[score-llm] model failed, trying next", model, llmResult.detail);
+  }
+  if (!llmResult || !llmResult.ok) {
+    return {
+      score: null,
+      reason: llmResult?.reason ?? "llm_http_error",
+      detail: llmResult && !llmResult.ok ? llmResult.detail : undefined,
+      model: llmResult && !llmResult.ok ? llmResult.model : undefined,
+    };
   }
   const parsed = llmResult.value as LlmScorePayload;
   if (!parsed || typeof parsed !== "object") {
-    return { score: null, reason: "llm_invalid_json" };
+    return { score: null, reason: "llm_invalid_json", model: llmResult.model };
   }
 
   const byId = new Map<string, LlmCriterion>();
@@ -199,5 +223,6 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
       scenarioId: scenario.id,
     },
     reason: "ok",
+    model: llmResult.model,
   };
 }

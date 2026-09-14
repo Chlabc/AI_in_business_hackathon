@@ -464,6 +464,8 @@ export async function scoreTranscript(
         ...baseMeta,
         llmUsed: false,
         fallbackReason: attempt.reason,
+        model: attempt.model ?? baseMeta.model,
+        detail: attempt.detail,
       },
     };
   }
@@ -480,6 +482,11 @@ export async function scoreTranscript(
       { ...guarded, overall: finalOverall },
       turns,
     ),
-    meta: { ...baseMeta, llmUsed: true, fallbackReason: "ok" },
+    meta: {
+      ...baseMeta,
+      llmUsed: true,
+      fallbackReason: "ok",
+      model: attempt.model ?? baseMeta.model,
+    },
   };
 }

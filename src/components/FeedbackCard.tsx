@@ -37,7 +37,7 @@ function formatFallbackReason(meta: ScoringMeta): string | null {
     case "llm_incomplete_rubric":
       return "AI reply missed rubric criteria; used rule-based fallback.";
     case "llm_http_error":
-      return "AI HTTP error; used rule-based fallback.";
+      return `AI HTTP error${meta.detail ? ` (${meta.detail})` : ""}; used rule-based fallback. Check xAI credits/model access on the Vercel key.`;
     default:
       return meta.xaiKeyPresent
         ? null
