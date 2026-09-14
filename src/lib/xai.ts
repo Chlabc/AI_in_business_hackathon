@@ -102,19 +102,33 @@ export function extractJsonObject(content: string): unknown | null {
  * Call xAI chat completions and parse a JSON object from the reply.
  * Returns a typed result so callers can show accurate fallback reasons.
  */
-export async function xaiChatJsonResult(
-  opts: XaiChatJsonOptions,
-): Promise<XaiChatJsonResult> {
-  const apiKey = readXaiApiKey();
-  if (!apiKey) return { ok: false, reason: "xai_key_missing" };
+function summarizeXaiErrorBody(raw: string, status: number): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return `HTTP ${status}`;
+  try {
+    const parsed = JSON.parse(trimmed) as {
+      error?: string | { message?: string; code?: string };
+      message?: string;
+    };
+    const msg =
+      (typeof parsed.error === "string" ? parsed.error : parsed.error?.message) ||
+      parsed.message ||
+      trimmed;
+    return `HTTP ${status}: ${String(msg).slice(0, 180)}`;
+  } catch {
+    return `HTTP ${status}: ${trimmed.slice(0, 180)}`;
+  }
+}
 
-  const model = opts.model?.trim() || defaultModel();
+async function xaiChatJsonOnce(
+  opts: XaiChatJsonOptions & { model: string; apiKey: string; jsonMode: boolean },
+): Promise<XaiChatJsonResult> {
   const timeoutMs = opts.timeoutMs ?? 12_000;
-  const jsonMode = opts.jsonMode !== false;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const started = Date.now();
   const ms = () => Date.now() - started;
+  const { model, apiKey, jsonMode } = opts;
 
   try {
     const res = await fetch("https://api.x.ai/v1/chat/completions", {
@@ -136,12 +150,12 @@ export async function xaiChatJsonResult(
     });
 
     if (!res.ok) {
-      const detail = await res.text().catch(() => "");
-      console.error("[xai] chat failed", res.status, detail.slice(0, 400));
+      const raw = await res.text().catch(() => "");
+      console.error("[xai] chat failed", model, res.status, raw.slice(0, 400));
       return {
         ok: false,
         reason: "llm_http_error",
-        detail: `HTTP ${res.status}`,
+        detail: summarizeXaiErrorBody(raw, res.status),
         model,
         ms: ms(),
       };
@@ -197,6 +211,45 @@ export async function xaiChatJsonResult(
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * Call xAI chat completions and parse a JSON object from the reply.
+ * On HTTP 400 with JSON mode enabled, retries once without response_format
+ * (some API keys/models reject json_object).
+ */
+export async function xaiChatJsonResult(
+  opts: XaiChatJsonOptions,
+): Promise<XaiChatJsonResult> {
+  const apiKey = readXaiApiKey();
+  if (!apiKey) return { ok: false, reason: "xai_key_missing" };
+
+  const model = opts.model?.trim() || defaultModel();
+  const wantJson = opts.jsonMode !== false;
+
+  const first = await xaiChatJsonOnce({
+    ...opts,
+    apiKey,
+    model,
+    jsonMode: wantJson,
+  });
+  if (first.ok) return first;
+
+  if (
+    wantJson &&
+    first.reason === "llm_http_error" &&
+    first.detail?.includes("HTTP 400")
+  ) {
+    console.warn("[xai] retrying without response_format after HTTP 400", model);
+    return xaiChatJsonOnce({
+      ...opts,
+      apiKey,
+      model,
+      jsonMode: false,
+    });
+  }
+
+  return first;
 }
 
 /** Back-compat wrapper used by playbook import. */

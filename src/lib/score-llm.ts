@@ -87,9 +87,10 @@ export async function scoreTranscriptWithLlm(
   const rubric = rubricForScenario(scenario.id);
   const rubricIds = new Set(rubric.map((c) => c.id));
 
-  const system = `Score the human AGENT only (transcript role "user") for Cornerman real-estate coaching.
-Return ONLY JSON:
-{"overall":0-100,"heldFee":true|false,"feeOfferedPct":number|null,"criteria":[{"id":string,"score":0|0.5|1,"notes":string}],"feedback":string[2-4],"suggestedResponse":string}
+  // Must mention "json" for APIs that require it with response_format=json_object.
+  const system = `You are a JSON scoring engine for Cornerman real-estate coaching.
+Score the human AGENT only (transcript role "user"). Return a single json object:
+{"overall":0-100,"heldFee":true|false,"feeOfferedPct":number|null,"criteria":[{"id":string,"score":0|0.5|1,"notes":string}],"feedback":["...","..."],"suggestedResponse":"string"}
 Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy or a fee below floor ${playbook.feeFloorPct}%; suggestedResponse = one better next line from the playbook.`;
 
   const user = JSON.stringify({
@@ -118,13 +119,13 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
       })),
   });
 
-  // Prefer a fast model; if that account can't use it (404/403), try fallbacks.
+  // Prefer a fast model; if that account can't use it (400/404/403), try fallbacks.
   let llmResult: Awaited<ReturnType<typeof xaiChatJsonResult>> | null = null;
   for (const model of scoringModelFallbackChain()) {
     llmResult = await xaiChatJsonResult({
       system,
       user,
-      temperature: 0,
+      temperature: 0.1,
       timeoutMs: 20_000,
       jsonMode: true,
       model,
