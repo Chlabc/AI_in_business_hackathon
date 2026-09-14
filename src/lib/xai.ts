@@ -32,10 +32,23 @@ export type XaiChatJsonResult =
  */
 export function readXaiApiKey(): string | undefined {
   const env = process.env;
-  const raw =
+  let raw =
     env["XAI_API_KEY"]?.trim() ||
     env["xai_api_key"]?.trim() ||
     undefined;
+  if (!raw) return undefined;
+  // Vercel UI paste sometimes keeps wrapping quotes → xAI returns
+  // "Incorrect API key provided".
+  if (
+    (raw.startsWith('"') && raw.endsWith('"')) ||
+    (raw.startsWith("'") && raw.endsWith("'"))
+  ) {
+    raw = raw.slice(1, -1).trim();
+  }
+  // Accidental "Bearer …" paste
+  if (/^bearer\s+/i.test(raw)) {
+    raw = raw.replace(/^bearer\s+/i, "").trim();
+  }
   return raw || undefined;
 }
 

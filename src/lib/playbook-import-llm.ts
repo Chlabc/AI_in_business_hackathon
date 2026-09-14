@@ -213,7 +213,9 @@ export async function extractPlaybookWithLlm(
   let model: string;
 
   if (provider === "xai") {
-    apiKey = process.env.XAI_API_KEY;
+    // Same reader as scoring (trims + strips wrapping quotes).
+    const { readXaiApiKey } = await import("@/lib/xai");
+    apiKey = readXaiApiKey();
     if (!apiKey) return null;
     baseUrl = "https://api.x.ai/v1";
     model = process.env.PLAYBOOK_LLM_MODEL ?? "grok-4.5";
