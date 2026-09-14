@@ -9,6 +9,9 @@ import { parseCueMode } from "@/lib/cue-reactivity";
 import { tryUpsertPracticeSession } from "@/lib/practice-sessions";
 import { scoreTranscript, type TranscriptTurn } from "@/lib/score";
 
+/** Live AI scoring often needs 15–25s; Hobby default is too short. */
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   try {
     const user = await requireRole("employee");
