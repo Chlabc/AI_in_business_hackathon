@@ -32,6 +32,8 @@ function formatFallbackReason(meta: ScoringMeta): string | null {
       return "AI scoring timed out; used rule-based fallback.";
     case "llm_invalid_json":
       return "AI reply was not valid JSON; used rule-based fallback.";
+    case "llm_empty_content":
+      return "AI returned an empty reply (often a slow reasoning model); used rule-based fallback.";
     case "llm_incomplete_rubric":
       return "AI reply missed rubric criteria; used rule-based fallback.";
     case "llm_http_error":

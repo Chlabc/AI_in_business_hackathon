@@ -12,7 +12,7 @@ import {
 } from "@/lib/playbook";
 import type { TranscriptTurn } from "@/lib/score";
 import type { ScoringMeta } from "@/lib/scoring-meta";
-import { xaiChatJson, xaiConfigured } from "@/lib/xai";
+import { xaiChatJsonResult, xaiConfigured } from "@/lib/xai";
 
 export type LlmScoreAttempt = {
   score: PracticeScore | null;
@@ -112,13 +112,18 @@ Rules: one criteria row per rubric id; notes ≤120 chars; never invent policy o
       })),
   });
 
-  const parsed = (await xaiChatJson({
+  const llmResult = await xaiChatJsonResult({
     system,
     user,
-    temperature: 0.1,
-    // Full rubric needs headroom; client aborts at 35s as a backstop.
-    timeoutMs: 28_000,
-  })) as LlmScorePayload | null;
+    temperature: 0,
+    // Fast non-reasoning model + JSON mode; keep a margin under client abort.
+    timeoutMs: 20_000,
+    jsonMode: true,
+  });
+  if (!llmResult.ok) {
+    return { score: null, reason: llmResult.reason };
+  }
+  const parsed = llmResult.value as LlmScorePayload;
   if (!parsed || typeof parsed !== "object") {
     return { score: null, reason: "llm_invalid_json" };
   }

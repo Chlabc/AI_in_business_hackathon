@@ -12,6 +12,7 @@ export type ScoringMeta = {
     | "xai_key_missing"
     | "llm_timeout_or_null"
     | "llm_invalid_json"
+    | "llm_empty_content"
     | "llm_incomplete_rubric"
     | "llm_http_error"
     | "ok";

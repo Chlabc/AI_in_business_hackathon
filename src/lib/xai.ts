@@ -9,9 +9,22 @@ export type XaiChatJsonOptions = {
   temperature?: number;
   /** Default 25s — matches playbook import budget. */
   timeoutMs?: number;
-  /** Override model; defaults to SCORING_LLM_MODEL / PLAYBOOK_LLM_MODEL / grok-4.5 */
+  /** Override model; defaults to SCORING_LLM_MODEL / PLAYBOOK_LLM_MODEL / fast non-reasoning. */
   model?: string;
+  /** Request JSON object mode when the API supports it (default true). */
+  jsonMode?: boolean;
 };
+
+export type XaiChatJsonFailure =
+  | "xai_key_missing"
+  | "llm_timeout_or_null"
+  | "llm_http_error"
+  | "llm_empty_content"
+  | "llm_invalid_json";
+
+export type XaiChatJsonResult =
+  | { ok: true; value: unknown; model: string; ms: number }
+  | { ok: false; reason: XaiChatJsonFailure; detail?: string; model?: string; ms?: number };
 
 /**
  * Read server secrets via bracket access so the bundler cannot replace them
@@ -26,12 +39,16 @@ export function readXaiApiKey(): string | undefined {
   return raw || undefined;
 }
 
+/**
+ * Prefer a fast non-reasoning model for live scoring.
+ * Override with SCORING_LLM_MODEL / PLAYBOOK_LLM_MODEL if needed.
+ */
 export function readScoringModel(): string {
   const env = process.env;
   return (
     env["SCORING_LLM_MODEL"]?.trim() ||
     env["PLAYBOOK_LLM_MODEL"]?.trim() ||
-    "grok-4.5"
+    "grok-4-1-fast-non-reasoning"
   );
 }
 
@@ -41,8 +58,24 @@ function defaultModel(): string {
 
 /** Extract the first JSON object from a model reply (allows markdown fences). */
 export function extractJsonObject(content: string): unknown | null {
-  const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const raw = fenced?.[1]?.trim() || content;
+  const trimmed = content.trim();
+  if (!trimmed) return null;
+
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  let raw = (fenced?.[1] ?? trimmed).trim();
+
+  // Strip common prose prefixes before the first `{`.
+  const brace = raw.indexOf("{");
+  if (brace > 0) raw = raw.slice(brace);
+
+  // Try direct parse first.
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    /* fall through */
+  }
+
+  // Balance braces in case of trailing commentary.
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) return null;
   try {
@@ -54,75 +87,111 @@ export function extractJsonObject(content: string): unknown | null {
 
 /**
  * Call xAI chat completions and parse a JSON object from the reply.
- * Returns null on missing key, HTTP error, timeout, or bad JSON.
- *
- * Uses both AbortSignal.timeout and a Promise.race wall clock so a stuck
- * upstream can never hang the Next.js score route (browser NetworkError).
+ * Returns a typed result so callers can show accurate fallback reasons.
  */
-export async function xaiChatJson(
+export async function xaiChatJsonResult(
   opts: XaiChatJsonOptions,
-): Promise<unknown | null> {
+): Promise<XaiChatJsonResult> {
   const apiKey = readXaiApiKey();
-  if (!apiKey) return null;
+  if (!apiKey) return { ok: false, reason: "xai_key_missing" };
 
   const model = opts.model?.trim() || defaultModel();
   const timeoutMs = opts.timeoutMs ?? 12_000;
+  const jsonMode = opts.jsonMode !== false;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const started = Date.now();
+  const ms = () => Date.now() - started;
 
-  const run = async (): Promise<unknown | null> => {
-    try {
-      const res = await fetch("https://api.x.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          temperature: opts.temperature ?? 0.2,
-          messages: [
-            { role: "system", content: opts.system },
-            { role: "user", content: opts.user },
-          ],
-        }),
-        signal: controller.signal,
-      });
-      if (!res.ok) {
-        console.error(
-          "[xai] chat failed",
-          res.status,
-          await res.text().catch(() => ""),
-        );
-        return null;
-      }
-      const data = (await res.json()) as {
-        choices?: { message?: { content?: string } }[];
+  try {
+    const res = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        temperature: opts.temperature ?? 0.2,
+        ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
+        messages: [
+          { role: "system", content: opts.system },
+          { role: "user", content: opts.user },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      console.error("[xai] chat failed", res.status, detail.slice(0, 400));
+      return {
+        ok: false,
+        reason: "llm_http_error",
+        detail: `HTTP ${res.status}`,
+        model,
+        ms: ms(),
       };
-      const content = data.choices?.[0]?.message?.content ?? "";
-      return extractJsonObject(content);
-    } catch (err) {
-      const name = err instanceof Error ? err.name : "";
-      if (name !== "AbortError" && name !== "TimeoutError") {
-        console.error("[xai] chat error", err);
-      } else {
-        console.warn("[xai] chat timed out after", timeoutMs, "ms");
-      }
-      return null;
-    } finally {
-      clearTimeout(timer);
     }
-  };
 
-  return Promise.race([
-    run(),
-    new Promise<null>((resolve) => {
-      setTimeout(() => {
-        controller.abort();
-        resolve(null);
-      }, timeoutMs + 500);
-    }),
-  ]);
+    const data = (await res.json()) as {
+      choices?: {
+        message?: {
+          content?: string | null;
+          reasoning_content?: string | null;
+        };
+      }[];
+    };
+    const message = data.choices?.[0]?.message;
+    const content = (message?.content ?? "").trim();
+    if (!content) {
+      console.warn(
+        "[xai] empty content",
+        model,
+        "reasoning?",
+        Boolean(message?.reasoning_content),
+      );
+      return { ok: false, reason: "llm_empty_content", model, ms: ms() };
+    }
+
+    const value = extractJsonObject(content);
+    if (value === null || typeof value !== "object") {
+      console.warn("[xai] invalid JSON", model, content.slice(0, 240));
+      return {
+        ok: false,
+        reason: "llm_invalid_json",
+        detail: content.slice(0, 120),
+        model,
+        ms: ms(),
+      };
+    }
+
+    return { ok: true, value, model, ms: ms() };
+  } catch (err) {
+    const name = err instanceof Error ? err.name : "";
+    if (name === "AbortError" || name === "TimeoutError") {
+      console.warn("[xai] chat timed out after", timeoutMs, "ms", model);
+      return { ok: false, reason: "llm_timeout_or_null", model, ms: ms() };
+    }
+    console.error("[xai] chat error", err);
+    return {
+      ok: false,
+      reason: "llm_http_error",
+      detail: err instanceof Error ? err.message : "error",
+      model,
+      ms: ms(),
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Back-compat wrapper used by playbook import. */
+export async function xaiChatJson(
+  opts: XaiChatJsonOptions,
+): Promise<unknown | null> {
+  const result = await xaiChatJsonResult(opts);
+  return result.ok ? result.value : null;
 }
 
 export function xaiConfigured(): boolean {
